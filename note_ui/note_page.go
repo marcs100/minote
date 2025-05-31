@@ -2,6 +2,7 @@ package note_ui
 
 import (
 	"log"
+	"sync"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -15,7 +16,7 @@ import (
 	"github.com/marcs100/minote/notes"
 )
 
-func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, parentWindow fyne.Window) {
+func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, parentWindow fyne.Window) *fyne.Container {
 	np.ParentWindow = parentWindow
 	np.AllowEdit = allowEdit
 	np.NoteInfo.NewNote = false
@@ -64,7 +65,8 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	//
 	// FOR EACH OD THESE FUNCTIONS BELOW, I WIIL NEED TO PASS an INSTANCE OF THIS STRUCT
 	// AS THE STRUCT WILL HOLD THE DATA ELEMENTS THAT WERE ACCESSD BY e.g., NOTEWIDGETS.blah IN SCRIBE-NB
-	np.Entry = NewEntryCustom(func(cs *desktop.CustomShortcut) {
+	ch := make(chan bool)
+	np.NotePageWidgets.Entry = NewEntryCustom(func(cs *desktop.CustomShortcut) {
 		switch cs.ShortcutName() {
 		case main_ui.ScViewMode.ShortcutName():
 			SetViewMode(parentWindow)
@@ -76,122 +78,129 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 			ShowProperties(noteInfo)
 		}
 	}, func() {
-		np.NoteInfo.Content = np.Entry.Text
-		SaveNote(&np.NoteInfo, retrievedNote, parentWindow)
+		np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
+		SaveNote(np, retrievedNote, ch)
+		<-ch
 	},
 	)
 
-	np.Entry.Text = np.NoteInfo.Content
-	np.Entry.Wrapping = fyne.TextWrapWord
+	np.NotePageWidgets.Entry.Text = np.NoteInfo.Content
+	np.NotePageWidgets.Entry.Wrapping = fyne.TextWrapWord
 
 	themeBackground := canvas.NewRectangle(main_ui.AppTheme.NoteBgColour)
 	noteColour, _ := main_ui.RGBStringToFyneColor(np.NoteInfo.Colour)
 
-	NoteCanvas.noteBackground = canvas.NewRectangle(noteColour)
+	np.NotePageCanvas.NoteBackground = canvas.NewRectangle(noteColour)
 	if np.NoteInfo.Colour == "#e7edef" || np.NoteInfo.Colour == "#FFFFFF" || np.NoteInfo.Colour == "#ffffff" || np.NoteInfo.Colour == "#000000" {
-		NoteCanvas.noteBackground = canvas.NewRectangle(main_ui.AppTheme.NoteBgColour) // colour not set or using the old scribe default note colour
+		np.NotePageCanvas.NoteBackground = canvas.NewRectangle(main_ui.AppTheme.NoteBgColour) // colour not set or using the old scribe default note colour
 	}
 
-	colourStack := container.NewStack(NoteCanvas.noteBackground)
+	colourStack := container.NewStack(np.NotePageCanvas.NoteBackground)
 
-	NoteWidgets.markdownText = widget.NewRichTextFromMarkdown(noteInfo.Content)
-	NoteWidgets.markdownText.Wrapping = fyne.TextWrapWord
-	NoteWidgets.markdownText.Hide()
-	markdownPadded := container.NewPadded(themeBackground, NoteWidgets.markdownText)
-	NoteContainers.markdown = container.NewStack(colourStack, markdownPadded)
+	np.NotePageWidgets.MarkdownText = widget.NewRichTextFromMarkdown(np.NoteInfo.Content)
+	np.NotePageWidgets.MarkdownText.Wrapping = fyne.TextWrapWord
+	np.NotePageWidgets.MarkdownText.Hide()
+	markdownPadded := container.NewPadded(themeBackground, np.NotePageWidgets.MarkdownText)
+	np.NotePageContainers.Markdown = container.NewStack(colourStack, markdownPadded)
 	spacerLabel := widget.NewLabel("      ")
 
-	scrolledMarkdown := container.NewScroll(NoteContainers.markdown)
-	background := canvas.NewRectangle(AppTheme.NoteBgColour)
-	content := container.NewStack(background, scrolledMarkdown, NoteWidgets.entry)
+	scrolledMarkdown := container.NewScroll(np.NotePageContainers.Markdown)
+	background := canvas.NewRectangle(main_ui.AppTheme.NoteBgColour)
+	content := container.NewStack(background, scrolledMarkdown, np.NotePageWidgets.Entry)
 
 	//var btnLabel = "Pin"
 	btnIcon := theme.RadioButtonIcon()
-	if noteInfo.Pinned {
+	if np.NoteInfo.Pinned {
 		btnIcon = theme.RadioButtonCheckedIcon()
 		//btnLabel = "Unpin"
 	}
 
-	NoteWidgets.pinButton = widget.NewButtonWithIcon("", btnIcon, func() {
-		PinNote(noteInfo)
+	np.NotePageWidgets.PinButton = widget.NewButtonWithIcon("", btnIcon, func() {
+		PinNote(&np.NoteInfo)
 	})
 
 	//changeNotebookBtn := NewButtonWithPos("Change Notebook", func(e *fyne.PointEvent){
-	changeNotebookBtn := NewChangeNotebookButton(noteInfo, parentWindow)
+	changeNotebookBtn := NewChangeNotebookButton(&np.NoteInfo, parentWindow)
 
 	colourButton := widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), func() {
-		ChangeNoteColour(noteInfo, parentWindow)
+		ChangeNoteColour(&np.NoteInfo, parentWindow)
 	})
 
-	NoteWidgets.deleteButton = widget.NewButtonWithIcon("", theme.DeleteIcon(), func() {
-		DeleteNote(noteInfo, parentWindow)
+	np.NotePageWidgets.DeleteButton = widget.NewButtonWithIcon("", theme.DeleteIcon(), func() {
+		DeleteNote(&np.NoteInfo, parentWindow)
 	})
 
 	tagsBtn := widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
 		ToggleTagsNotePanel()
 	})
 
-	propertiesButton := widget.NewButtonWithIcon("", theme.InfoIcon(), func() { ShowProperties(noteInfo) })
+	propertiesButton := widget.NewButtonWithIcon("", theme.InfoIcon(), func() { ShowProperties(&np.NoteInfo) })
 
-	NoteWidgets.deleteButton.Hide()
+	np.NotePageWidgets.DeleteButton.Hide()
 
-	NoteWidgets.modeSelect = widget.NewRadioGroup([]string{EDIT_MODE, VIEW_MODE}, func(value string) {
+	np.NotePageWidgets.ModeSelect = widget.NewRadioGroup([]string{main_ui.EDIT_MODE, main_ui.VIEW_MODE}, func(value string) {
 		switch value {
-		case EDIT_MODE:
+		case main_ui.EDIT_MODE:
 			if allowEdit {
 				SetEditMode(parentWindow)
 			}
-		case VIEW_MODE:
+		case main_ui.VIEW_MODE:
 			SetViewMode(parentWindow)
 		}
 	})
 
 	if !allowEdit {
-		NoteWidgets.modeSelect.Hide()
+		np.NotePageWidgets.ModeSelect.Hide()
 	}
 
-	NoteContainers.propertiesPanel = NewProperetiesPanel()
+	np.NotePageContainers.PropertiesPanel = NewProperetiesPanel()
 
-	NoteWidgets.modeSelect.SetSelected("View")
-	NoteWidgets.modeSelect.Horizontal = true
-	toolbar := container.NewHBox(NoteWidgets.modeSelect, spacerLabel, NoteWidgets.pinButton, colourButton, changeNotebookBtn, tagsBtn, propertiesButton, NoteWidgets.deleteButton)
+	np.NotePageWidgets.ModeSelect.SetSelected("View")
+	np.NotePageWidgets.ModeSelect.Horizontal = true
+	toolbar := container.NewHBox(np.NotePageWidgets.ModeSelect, spacerLabel, np.NotePageWidgets.PinButton, colourButton, changeNotebookBtn, tagsBtn, propertiesButton, np.NotePageWidgets.DeleteButton)
 
-	if err = CreateNotesTagPanel(noteInfo, parentWindow); err != nil {
+	if err := CreateNotesTagPanel(&np.NoteInfo, parentWindow); err != nil {
 		dialog.ShowError(err, parentWindow)
 		log.Panicln("Error creating tags panel!")
 	}
-	topVBox := container.NewVBox(toolbar, NoteContainers.tagsPanel)
+	topVBox := container.NewVBox(toolbar, np.NotePageContainers.TagsPanel)
 
-	NoteContainers.propertiesPanel.Hide()
-	NoteContainers.tagsPanel.Hide()
+	np.NotePageContainers.PropertiesPanel.Hide()
+	np.NotePageContainers.TagsPanel.Hide()
 
-	return container.NewBorder(topVBox, nil, nil, NoteContainers.propertiesPanel, content)
+	return container.NewBorder(topVBox, nil, nil, np.NotePageContainers.PropertiesPanel, content)
 }
 
 //Pass a pointer to the note page - *NotePage
 // Make sure this functiion is thread safe, as multiple note instances can be calling this function
 
-func SaveNote(noteInfo *note.NoteInfo, retrievedNote *note.NoteData, parentWindow fyne.Window) {
+func SaveNote(np *NotePage, retrievedNote *note.NoteData, ch chan bool) {
+	var mut sync.Mutex
+	mut.Lock()
+	defer mut.Unlock()
+
 	var noteChanges note.NoteChanges
 
-	if noteInfo.Deleted {
-		go main_ui.UpdateView()
+	if np.NoteInfo.Deleted {
+		main_ui.UpdateView()
+		ch <- true
 		return
 	}
 
-	if noteInfo.NewNote {
-		if noteInfo.Content != "" {
+	if np.NoteInfo.NewNote {
+		if np.NoteInfo.Content != "" {
 			noteChanges.ContentChanged = true
 		}
 	} else {
-		noteChanges = note.CheckChanges(retrievedNote, noteInfo)
+		noteChanges = note.CheckChanges(retrievedNote, &np.NoteInfo)
 	}
 	//if contentChanged{
 	if noteChanges.ContentChanged || noteChanges.ParamsChanged {
-		res, err := note.SaveNote(noteInfo)
+		res, err := note.SaveNote(&np.NoteInfo)
 		if err != nil {
 			log.Println("Error saving note")
-			dialog.ShowError(err, parentWindow)
+			dialog.ShowError(err, np.ParentWindow)
+			ch <- true
 			return
 		}
 
@@ -199,18 +208,19 @@ func SaveNote(noteInfo *note.NoteInfo, retrievedNote *note.NoteData, parentWindo
 			log.Println("No note was saved (affected rows = 0)")
 		} else {
 			log.Println("....Note updated successfully....")
-			if *retrievedNote, err = notes.GetNote(noteInfo.Id); err != nil {
+			if *retrievedNote, err = notes.GetNote(np.NoteInfo.Id); err != nil {
 				log.Println("Error getting updated note")
-				dialog.ShowError(err, parentWindow)
+				dialog.ShowError(err, np.ParentWindow)
 			}
 			main_ui.UpdateView()
 		}
 	} else if noteChanges.PinStatusChanged {
 		// we do not want a create or modified time stamp for just pinning/unpinning notes
-		res, err := note.SaveNoteNoTimeStamp(noteInfo)
+		res, err := note.SaveNoteNoTimeStamp(&np.NoteInfo)
 		if err != nil {
 			log.Println("Error saving note")
-			dialog.ShowError(err, parentWindow)
+			dialog.ShowError(err, np.ParentWindow)
+			ch <- true
 			return
 			//log.Panic()
 		}
@@ -219,11 +229,12 @@ func SaveNote(noteInfo *note.NoteInfo, retrievedNote *note.NoteData, parentWindo
 			log.Println("No note was saved (affected rows = 0)")
 		} else {
 			log.Println("....Note updated successfully....")
-			if *retrievedNote, err = notes.GetNote(noteInfo.Id); err != nil {
+			if *retrievedNote, err = notes.GetNote(np.NoteInfo.Id); err != nil {
 				log.Println("Error getting updated note")
-				dialog.ShowError(err, parentWindow)
+				dialog.ShowError(err, np.ParentWindow)
 			}
-			go main_ui.UpdateView()
+			main_ui.UpdateView()
 		}
 	}
+	ch <- true
 }
