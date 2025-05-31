@@ -69,3 +69,8 @@ func GetSearchResults(searchText string, filter SearchFilter) ([]note.NoteData, 
 	}
 	return searchNotes, err
 }
+
+func GetNote(id uint) (note.NoteData, error) {
+	res, err := minotedb.GetNote(id)
+	return note.NoteData(res), err
+}

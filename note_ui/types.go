@@ -10,4 +10,5 @@ type NotePage struct {
 	ParentWindow fyne.Window
 	NoteInfo     note.NoteInfo
 	AllowEdit    bool
+	Entry        *EntryCustom
 }
