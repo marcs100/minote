@@ -1,5 +1,5 @@
 # Minote
-(THIS PAGE IS A WROK IN PROGRESS!)
+(THIS PAGE IS A WORK IN PROGRESS!)
 ## A modern note taking application for Linx and Windows, that supports markdown
 
 ### Written in Go and uses Fyne for the GUI.
