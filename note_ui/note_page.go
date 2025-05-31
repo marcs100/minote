@@ -168,6 +168,9 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	return container.NewBorder(topVBox, nil, nil, NoteContainers.propertiesPanel, content)
 }
 
+//Pass a pointer to the note page - *NotePage
+// Make sure this functiion is thread safe, as multiple note instances can be calling this function
+
 func SaveNote(noteInfo *note.NoteInfo, retrievedNote *note.NoteData, parentWindow fyne.Window) {
 	var noteChanges note.NoteChanges
 
