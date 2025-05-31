@@ -3,12 +3,12 @@ package note_ui
 import (
 	"log"
 
-	"fyne.io/fyne/canvas"
-	"fyne.io/fyne/theme"
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/marcs100/minote/main_ui"
 	"github.com/marcs100/minote/note"
