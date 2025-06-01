@@ -28,7 +28,7 @@ import (
 
 func StartUI(appConfigIn *config.Config, configFile string, version string) {
 	main_app.Conf = appConfigIn
-	mainApp = app.NewWithID("minote")
+	main_app.MainApp = app.NewWithID("minote")
 	main_app.AppStatus.ConfigFile = configFile
 	CreateMainWindow(version)
 }
@@ -37,7 +37,7 @@ func CreateMainWindow(version string) {
 
 	main_app.AppStatus.NoteSize = fyne.NewSize(main_app.Conf.Settings.NoteWidth, main_app.Conf.Settings.NoteHeight)
 
-	mainWindow = mainApp.NewWindow(fmt.Sprintf("Minote   v%s", version))
+	mainWindow = main_app.MainApp.NewWindow(fmt.Sprintf("Minote   v%s", version))
 	var themeVar main_app.ThemeVariant
 	switch main_app.Conf.Settings.ThemeVariant {
 	case "light":
@@ -298,8 +298,8 @@ func ShowNotesInGrid(notes []note.NoteData, noteSize fyne.Size) {
 	AppContainers.mainGridContainer.Show()
 }
 
-func ShowNotesAsPages(notes []note.NoteData) {
-	var noteInfo note.NoteInfo
+func ShowNotesAsPages(notesIn []note.NoteData) {
+	//var noteInfo note.NoteInfo
 	var retrievedNote note.NoteData
 	var err error = nil
 
@@ -307,7 +307,7 @@ func ShowNotesAsPages(notes []note.NoteData) {
 		AppContainers.mainGridContainer.Hide()
 	}
 
-	PageView.NumberOfPages = len(notes)
+	PageView.NumberOfPages = len(notesIn)
 	PageView.Step = 1
 	if PageView.CurrentPage == 0 {
 		PageView.CurrentPage = 1
@@ -317,7 +317,7 @@ func ShowNotesAsPages(notes []note.NoteData) {
 		return
 	}
 
-	var noteId = notes[PageView.CurrentPage-1].Id
+	var noteId = notesIn[PageView.CurrentPage-1].Id
 
 	AppWidgets.pageLabel.SetText(PageView.GetLabelText())
 	AppWidgets.pageLabel.Show()

@@ -3,9 +3,9 @@ package main_app
 import (
 	"fmt"
 	"log"
-	"github.com/marcs100/minote/conversions"
-	"fyne.io/fyne/v2/theme"
 
+	"fyne.io/fyne/v2/theme"
+	"github.com/marcs100/minote/conversions"
 )
 
 // Background colour for notes based on current theme variane light/dark
@@ -35,7 +35,7 @@ func GetThemeColours(themeVarIn ThemeVariant) AppColours {
 			log.Panicln(err)
 		}
 	case SYSTEM_THEME:
-		themeVariant := mainApp.Settings().ThemeVariant()
+		themeVariant := MainApp.Settings().ThemeVariant()
 		if themeVariant == theme.VariantDark {
 			log.Println("using system theme dark")
 			appColours.MainBgColour, err = conversions.RGBStringToFyneColor(Conf.Settings.DarkColourBg)
@@ -59,8 +59,8 @@ func GetThemeColours(themeVarIn ThemeVariant) AppColours {
 			}
 		} else {
 			log.Println("Unidentified system theme variant!!!")
-			appColours.MainBgColour = mainApp.Settings().Theme().Color(theme.ColorNameBackground, themeVariant)
-			appColours.NoteBgColour = mainApp.Settings().Theme().Color(theme.ColorNameForeground, themeVariant)
+			appColours.MainBgColour = MainApp.Settings().Theme().Color(theme.ColorNameBackground, themeVariant)
+			appColours.NoteBgColour = MainApp.Settings().Theme().Color(theme.ColorNameForeground, themeVariant)
 		}
 	}
 	return appColours

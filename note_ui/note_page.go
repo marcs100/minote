@@ -23,6 +23,7 @@ import (
 func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, parentWindow fyne.Window) *fyne.Container {
 	np.ParentWindow = parentWindow
 	np.AllowEdit = allowEdit
+	np.RetrievedNote = *retrievedNote
 	np.NoteInfo.NewNote = false
 	if retrievedNote == nil {
 		//New note
@@ -83,7 +84,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 		}
 	}, func() {
 		np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
-		SaveNote(np, retrievedNote)
+		np.SaveNote()
 		//<-ch
 	},
 	)
@@ -132,7 +133,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	})
 
 	np.NotePageWidgets.DeleteButton = widget.NewButtonWithIcon("", theme.DeleteIcon(), func() {
-		DeleteNote(np)
+		np.DeleteNote()
 	})
 
 	tagsBtn := widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
@@ -249,7 +250,7 @@ func NewChangeNotebookButton(np *NotePage) *widget.Button {
 	return changeNotebookBtn
 }
 
-func DeleteNote(np *NotePage) {
+func (np *NotePage) DeleteNote() {
 	dialog.ShowConfirm("Delete note", "Are you sure?", func(confirm bool) {
 		if confirm {
 			var res bool
@@ -368,7 +369,7 @@ func (np *NotePage) ChangeNoteColour() {
 
 //var sn_mut sync.Mutex
 
-func SaveNote(np *NotePage, retrievedNote *note.NoteData) {
+func (np *NotePage) SaveNote() {
 
 	//sn_mut.Lock()
 	//defer sn_mut.Unlock()
@@ -386,7 +387,7 @@ func SaveNote(np *NotePage, retrievedNote *note.NoteData) {
 			noteChanges.ContentChanged = true
 		}
 	} else {
-		noteChanges = note.CheckChanges(retrievedNote, &np.NoteInfo)
+		noteChanges = note.CheckChanges(&np.RetrievedNote, &np.NoteInfo)
 	}
 	//if contentChanged{
 	if noteChanges.ContentChanged || noteChanges.ParamsChanged {
@@ -402,7 +403,7 @@ func SaveNote(np *NotePage, retrievedNote *note.NoteData) {
 			log.Println("No note was saved (affected rows = 0)")
 		} else {
 			log.Println("....Note updated successfully....")
-			if *retrievedNote, err = notes.GetNote(np.NoteInfo.Id); err != nil {
+			if np.RetrievedNote, err = notes.GetNote(np.NoteInfo.Id); err != nil {
 				log.Println("Error getting updated note")
 				dialog.ShowError(err, np.ParentWindow)
 			}
@@ -423,7 +424,7 @@ func SaveNote(np *NotePage, retrievedNote *note.NoteData) {
 			log.Println("No note was saved (affected rows = 0)")
 		} else {
 			log.Println("....Note updated successfully....")
-			if *retrievedNote, err = notes.GetNote(np.NoteInfo.Id); err != nil {
+			if np.RetrievedNote, err = notes.GetNote(np.NoteInfo.Id); err != nil {
 				log.Println("Error getting updated note")
 				dialog.ShowError(err, np.ParentWindow)
 			}

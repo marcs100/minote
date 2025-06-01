@@ -12,6 +12,7 @@ type NotePage struct {
 	Id                 uint
 	ParentWindow       fyne.Window
 	NoteInfo           note.NoteInfo
+	RetrievedNote      note.NoteData
 	AllowEdit          bool
 	NotePageWidgets    NotePageWidgets
 	NotePageContainers NotePageContainers

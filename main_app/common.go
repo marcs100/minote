@@ -26,4 +26,4 @@ const (
 var AppStatus ApplicationStatus //structure containing various app status
 var Conf *config.Config
 var AppTheme AppColours
-var mainApp fyne.App
+var MainApp fyne.App
