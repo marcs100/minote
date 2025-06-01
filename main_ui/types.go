@@ -1,13 +1,9 @@
 package main_ui
 
 import (
-	"image/color"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"github.com/marcs100/minote/note"
-	"github.com/marcs100/minote/notes"
 )
 
 type PageViewStatus struct {
@@ -29,7 +25,7 @@ type ApplicationContainers struct {
 
 // widgets for main window
 type ApplicationWidgets struct {
-	toolbar            *widget.Toolbar
+	Toolbar            *widget.Toolbar
 	singleNotePage     *widget.RichText
 	viewLabel          *widget.Label
 	pageLabel          *widget.Label
@@ -37,20 +33,6 @@ type ApplicationWidgets struct {
 	tagsList           *widget.List
 	searchEntry        *widget.Entry
 	searchResultsLabel *widget.Label
-}
-
-type ApplicationStatus struct {
-	ConfigFile      string
-	CurrentView     string
-	CurrentNotebook string
-	CurrentLayout   string
-	Notes           []note.NoteData
-	Notebooks       []string
-	Tags            []string
-	TagsChecked     []string
-	OpenNotes       []uint //maintain a list of notes that are currently open
-	NoteSize        fyne.Size
-	SearchFilter    notes.SearchFilter
 }
 
 // widgets for note window
@@ -76,10 +58,3 @@ tagLabels       *fyne.Container
 /*type NoteWindowCanvas struct {
 noteBackground *canvas.Rectangle
 }*/
-
-type AppColours struct {
-	NoteBgColour color.Color
-	MainBgColour color.Color
-}
-
-type theme_variant int

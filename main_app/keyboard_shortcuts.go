@@ -1,4 +1,4 @@
-package main_ui
+package main_app
 
 import (
 	"fyne.io/fyne/v2"

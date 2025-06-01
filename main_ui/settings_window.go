@@ -10,39 +10,40 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/marcs100/minote/config"
+	"github.com/marcs100/minote/main_app"
 )
 
 func NewSettingsWindow() {
 
 	newConf := CopySettings()
 
-	var themeVar theme_variant
-	switch Conf.Settings.ThemeVariant {
+	var themeVar main_app.ThemeVariant
+	switch main_app.Conf.Settings.ThemeVariant {
 	case "light":
-		themeVar = LIGHT_THEME
+		themeVar = main_app.LIGHT_THEME
 	case "dark":
-		themeVar = DARK_THEME
+		themeVar = main_app.DARK_THEME
 	case "system":
-		themeVar = SYSTEM_THEME
+		themeVar = main_app.SYSTEM_THEME
 	}
-	AppTheme = GetThemeColours(themeVar)
+	main_app.AppTheme = main_app.GetThemeColours(themeVar)
 
 	settingsWindow := mainApp.NewWindow("Settings")
 	settingsWindow.Resize(fyne.NewSize(500, 400))
 
-	bg := canvas.NewRectangle(AppTheme.MainBgColour)
+	bg := canvas.NewRectangle(main_app.AppTheme.MainBgColour)
 
 	viewHeading := widget.NewRichTextFromMarkdown("### View")
 	viewLabel := widget.NewLabel("  Default View:          ")
 	viewSelect := widget.NewSelect([]string{"pinned", "recent"}, func(sel string) {
 		newConf.Settings.InitialView = sel
 	})
-	viewSelect.SetSelected(Conf.Settings.InitialView)
+	viewSelect.SetSelected(main_app.Conf.Settings.InitialView)
 	viewGrid := container.NewGridWithRows(1, viewLabel, viewSelect)
 
 	recentNotesLimitLabel := widget.NewLabel("  Recent Note Limit:")
 	recentNotesLimitEntry := widget.NewEntry()
-	recentNotesLimitEntry.SetText(fmt.Sprintf("%d", Conf.Settings.RecentNotesLimit))
+	recentNotesLimitEntry.SetText(fmt.Sprintf("%d", main_app.Conf.Settings.RecentNotesLimit))
 	recentNotesLimitEntry.OnChanged = func(input string) {
 		i, err := strconv.Atoi(input)
 		if err != nil {
@@ -63,7 +64,7 @@ func NewSettingsWindow() {
 	layoutSelect := widget.NewSelect([]string{"grid", "page"}, func(sel string) {
 		newConf.Settings.InitialLayout = sel
 	})
-	layoutSelect.Selected = Conf.Settings.InitialLayout
+	layoutSelect.Selected = main_app.Conf.Settings.InitialLayout
 	layoutGrid := container.NewGridWithRows(1, layoutLabel, layoutSelect)
 
 	gridLimitLabel := widget.NewLabel("  Notes per Page Limit:")
@@ -82,14 +83,14 @@ func NewSettingsWindow() {
 	}
 	gridLimitStack := container.NewStack(gridLimitEntry)
 	gridLimitGrid := container.NewGridWithRows(1, gridLimitLabel, gridLimitStack)
-	gridLimitEntry.SetText(fmt.Sprintf("%d", Conf.Settings.GridMaxPages))
+	gridLimitEntry.SetText(fmt.Sprintf("%d", main_app.Conf.Settings.GridMaxPages))
 
 	appearanceHeading := widget.NewRichTextFromMarkdown("### Appearance")
 	appearanceLabel := widget.NewLabel("  Theme:")
 	appearanceSelect := widget.NewSelect([]string{"light", "dark", "system"}, func(sel string) {
 		newConf.Settings.ThemeVariant = sel
 	})
-	appearanceSelect.Selected = Conf.Settings.ThemeVariant
+	appearanceSelect.Selected = main_app.Conf.Settings.ThemeVariant
 	appearanceGrid := container.NewGridWithRows(1, appearanceLabel, appearanceSelect)
 
 	vbox := container.NewVBox(
@@ -105,8 +106,8 @@ func NewSettingsWindow() {
 	stack := container.NewStack(bg, vbox)
 
 	settingsWindow.SetOnClosed(func() {
-		if newConf != *Conf {
-			if err := config.WriteConfig(AppStatus.configFile, newConf); err != nil {
+		if newConf != *main_app.Conf {
+			if err := config.WriteConfig(main_app.AppStatus.ConfigFile, newConf); err != nil {
 				dialog.ShowError(err, settingsWindow)
 			}
 		}
@@ -118,20 +119,20 @@ func NewSettingsWindow() {
 
 func CopySettings() config.Config {
 	return config.Config{
-		Title: Conf.Title,
+		Title: main_app.Conf.Title,
 		Settings: config.AppSettings{
-			Database:         Conf.Settings.Database,
-			RecentNotesLimit: Conf.Settings.RecentNotesLimit,
-			NoteWidth:        Conf.Settings.NoteWidth,
-			NoteHeight:       Conf.Settings.NoteHeight,
-			InitialView:      Conf.Settings.InitialView,
-			InitialLayout:    Conf.Settings.InitialLayout,
-			GridMaxPages:     Conf.Settings.GridMaxPages,
-			ThemeVariant:     Conf.Settings.ThemeVariant,
-			DarkColourNote:   Conf.Settings.DarkColourNote,
-			LightColourNote:  Conf.Settings.LightColourNote,
-			DarkColourBg:     Conf.Settings.DarkColourBg,
-			LightColourBg:    Conf.Settings.LightColourBg,
+			Database:         main_app.Conf.Settings.Database,
+			RecentNotesLimit: main_app.Conf.Settings.RecentNotesLimit,
+			NoteWidth:        main_app.Conf.Settings.NoteWidth,
+			NoteHeight:       main_app.Conf.Settings.NoteHeight,
+			InitialView:      main_app.Conf.Settings.InitialView,
+			InitialLayout:    main_app.Conf.Settings.InitialLayout,
+			GridMaxPages:     main_app.Conf.Settings.GridMaxPages,
+			ThemeVariant:     main_app.Conf.Settings.ThemeVariant,
+			DarkColourNote:   main_app.Conf.Settings.DarkColourNote,
+			LightColourNote:  main_app.Conf.Settings.LightColourNote,
+			DarkColourBg:     main_app.Conf.Settings.DarkColourBg,
+			LightColourBg:    main_app.Conf.Settings.LightColourBg,
 		},
 	}
 }
