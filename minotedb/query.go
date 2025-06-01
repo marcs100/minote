@@ -23,7 +23,7 @@ func GetPinnedNotes() ([]NoteDataDB, error) {
 	return getNotes(query)
 }
 
-func GetPinnedDate(noteId int) (string, error) {
+func GetPinnedDate(noteId uint) (string, error) {
 	var query string = fmt.Sprintf("select pinnedDate from notes where id = %d", noteId)
 	fields, err := getColumn(query)
 	if err == nil && len(fields) == 0 {

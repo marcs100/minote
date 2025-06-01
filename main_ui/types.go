@@ -40,17 +40,17 @@ type ApplicationWidgets struct {
 }
 
 type ApplicationStatus struct {
-	configFile      string
-	currentView     string
-	currentNotebook string
-	currentLayout   string
-	notes           []note.NoteData
-	notebooks       []string
-	tags            []string
-	tagsChecked     []string
-	openNotes       []uint //maintain a list of notes that are currently open
-	noteSize        fyne.Size
-	searchFilter    notes.SearchFilter
+	ConfigFile      string
+	CurrentView     string
+	CurrentNotebook string
+	CurrentLayout   string
+	Notes           []note.NoteData
+	Notebooks       []string
+	Tags            []string
+	TagsChecked     []string
+	OpenNotes       []uint //maintain a list of notes that are currently open
+	NoteSize        fyne.Size
+	SearchFilter    notes.SearchFilter
 }
 
 // widgets for note window

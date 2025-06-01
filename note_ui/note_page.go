@@ -1,8 +1,9 @@
 package note_ui
 
 import (
+	"fmt"
+	"image/color"
 	"log"
-	"sync"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -71,7 +72,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 		case main_ui.ScViewMode.ShortcutName():
 			SetViewMode(parentWindow)
 		case main_ui.ScPinNote.ShortcutName():
-			PinNote(noteInfo)
+			PinNote(np)
 		case main_ui.ScNoteColour.ShortcutName():
 			ChangeNoteColour(noteInfo, parentWindow)
 		case main_ui.ScShowInfo.ShortcutName():
@@ -79,7 +80,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 		}
 	}, func() {
 		np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
-		SaveNote(np, retrievedNote, ch)
+		SaveNote(np, retrievedNote)
 		<-ch
 	},
 	)
@@ -120,14 +121,15 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	})
 
 	//changeNotebookBtn := NewButtonWithPos("Change Notebook", func(e *fyne.PointEvent){
-	changeNotebookBtn := NewChangeNotebookButton(&np.NoteInfo, parentWindow)
+	//ch = make(chan bool)
+	changeNotebookBtn := NewChangeNotebookButton(np)
 
 	colourButton := widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), func() {
-		ChangeNoteColour(&np.NoteInfo, parentWindow)
+		ChangeNoteColour(np)
 	})
 
 	np.NotePageWidgets.DeleteButton = widget.NewButtonWithIcon("", theme.DeleteIcon(), func() {
-		DeleteNote(&np.NoteInfo, parentWindow)
+		DeleteNote(np)
 	})
 
 	tagsBtn := widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
@@ -171,13 +173,202 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	return container.NewBorder(topVBox, nil, nil, np.NotePageContainers.PropertiesPanel, content)
 }
 
+// Thread safe function
+//var chn_mut sync.Mutex
+
+func NewChangeNotebookButton(np *NotePage) *widget.Button {
+	//chn_mut.Lock()
+	//defer chn_mut.Unlock()
+	changeNotebookBtn := widget.NewButtonWithIcon("", theme.FolderOpenIcon(), func() {
+		var notebooks []string
+		var err error
+		if notebooks, err = notes.GetNotebooks(); err != nil {
+			log.Println("Error getting notebook")
+			dialog.ShowError(err, np.ParentWindow)
+			log.Panicln(err)
+		}
+		nbMenu := fyne.NewMenu("Select Notebook")
+
+		//Add new notebook entry to menu
+		nbMenuItem := fyne.NewMenuItem("*New*", func() {
+			//fmt.Println("Need to ask use for new notebook name here!!!!!!!!")
+			notebookEntry := widget.NewEntry()
+			eNotebookEntry := widget.NewFormItem("Name", notebookEntry)
+			newNotebookDialog := dialog.NewForm("New Notebook?", "OK", "Cancel", []*widget.FormItem{eNotebookEntry}, func(confirmed bool) {
+				if confirmed {
+					//check that the notebook does not already exist
+					exists, err := notes.CheckNotebookExists(notebookEntry.Text)
+					if err == nil {
+						if exists == false {
+							//chnage notebook to this new notebook
+							np.NoteInfo.Notebook = notebookEntry.Text
+							np.ParentWindow.SetTitle(fmt.Sprintf("Notebook: %s --- Note id: %d", np.NoteInfo.Notebook, np.NoteInfo.Id))
+							_, err = note.SaveNote(&np.NoteInfo)
+							if err != nil {
+								log.Print("Error saving note: ")
+								dialog.ShowError(err, np.ParentWindow)
+								//log.Panic(err)
+							}
+							main_ui.UpdateNotebooksList()
+							UpdateProperties(np.NoteInfo)
+						}
+					} else {
+						dialog.ShowError(err, np.ParentWindow)
+						log.Panicln(fmt.Sprintf("Error check notebook exists: %s", err))
+					}
+				}
+			}, np.ParentWindow)
+			newNotebookDialog.Show()
+		})
+
+		nbMenu.Items = append(nbMenu.Items, nbMenuItem)
+
+		//Now add all the existing notebooks to the menu
+		for _, notebook := range notebooks {
+			menuItem := fyne.NewMenuItem(notebook, func() {
+				np.NoteInfo.Notebook = notebook
+				//fmt.Println("Change notebook to " + notebook)
+				np.ParentWindow.SetTitle(fmt.Sprintf("Notebook: %s --- Note id: %d", np.NoteInfo.Notebook, np.NoteInfo.Id))
+				UpdateProperties(&np.NoteInfo)
+			})
+			nbMenu.Items = append(nbMenu.Items, menuItem)
+		}
+
+		popUpMenu := widget.NewPopUpMenu(nbMenu, np.ParentWindow.Canvas())
+		//popUpMenu.Show()
+		pos := fyne.NewPos(250, 40)
+		popUpMenu.ShowAtPosition(pos)
+		//popUpMenu.ShowAtPosition(e.Position.AddXY(150,0))
+
+	})
+
+	//ch <- true
+	return changeNotebookBtn
+}
+
+func DeleteNote(np *NotePage) {
+	dialog.ShowConfirm("Delete note", "Are you sure?", func(confirm bool) {
+		if confirm {
+			var res bool
+			var err error = nil
+			if np.NoteInfo.NewNote {
+				res = true
+			} else {
+				res, err = notes.DeleteNote(np.NoteInfo.Id)
+			}
+
+			if res == false || err != nil {
+				log.Println("Error deleting note - panic!")
+				dialog.ShowError(err, np.ParentWindow)
+				//log.Panicln(err)
+			} else {
+				np.NoteInfo.Deleted = true
+				np.ParentWindow.Close()
+			}
+		}
+	}, np.ParentWindow)
+}
+
+func PinNote(np *NotePage) {
+	var res bool
+	var err error = nil
+	if np.NoteInfo.Pinned {
+		if np.NoteInfo.NewNote {
+			//new note that hasn't been saved yet'
+			np.NoteInfo.Pinned = false
+			res = true
+		} else {
+			res, err = notes.UnpinNote(np.NoteInfo.Id)
+		}
+
+		if err == nil && res == true {
+			np.NoteInfo.Pinned = false
+			np.NoteInfo.PinnedDate = ""
+			if np.NotePageWidgets.PinButton != nil {
+				np.NotePageWidgets.PinButton.SetIcon(theme.RadioButtonIcon())
+				np.NotePageWidgets.PinButton.Refresh()
+			}
+		}
+	} else {
+		if np.NoteInfo.Id == 0 {
+			//new note that hasn't been saved yet'
+			np.NoteInfo.Pinned = true
+			res = true
+		} else {
+			res, err = notes.PinNote(np.NoteInfo.Id)
+			pinnedDate, err := notes.GetPinnedDate(np.NoteInfo.Id)
+			if err != nil {
+				log.Println(fmt.Sprintf("Error getting pinned date: %s", err))
+			}
+			np.NoteInfo.PinnedDate = pinnedDate
+		}
+		if err == nil && res == 1 {
+			np.NoteInfo.Pinned = true
+			if np.NotePageWidgets.PinButton != nil {
+				np.NotePageWidgets.PinButton.SetIcon(theme.RadioButtonCheckedIcon())
+				np.NotePageWidgets.PinButton.Refresh()
+			}
+		}
+	}
+
+	UpdateProperties(np.NoteInfo)
+
+	if main_ui.AppStatus.CurrentView == main_ui.VIEW_PINNED {
+		main_ui.UpdateView() //updates view on main window
+	}
+}
+
+func SetEditMode(np *NotePage) {
+	np.NotePageWidgets.MarkdownText.Hide()
+	NoteContainers.markdown.Hide()
+	NoteWidgets.deleteButton.Show()
+	if AppStatus.currentLayout == LAYOUT_PAGE {
+		//Hide page back & forward for edit mode
+		AppWidgets.toolbar.Items[2].ToolbarObject().Hide()
+		AppWidgets.toolbar.Items[3].ToolbarObject().Hide()
+	}
+	NoteWidgets.modeSelect.SetSelected(EDIT_MODE)
+	NoteWidgets.entry.Show()
+	parentWindow.Canvas().Focus(NoteWidgets.entry)
+	parentWindow.Content().Refresh()
+}
+
+func SetViewMode(parentWindow fyne.Window) {
+	NoteWidgets.entry.Hide()
+	NoteWidgets.deleteButton.Hide()
+	if AppStatus.currentLayout == LAYOUT_PAGE {
+		//Show page back & forward for edit mode
+		AppWidgets.toolbar.Items[2].ToolbarObject().Show()
+		AppWidgets.toolbar.Items[3].ToolbarObject().Show()
+	}
+	NoteWidgets.markdownText.ParseMarkdown(NoteWidgets.entry.Text)
+	NoteWidgets.markdownText.Show()
+	NoteWidgets.modeSelect.SetSelected(VIEW_MODE)
+	parentWindow.Canvas().Focus(nil) // this allows the canvas keyboard shortcuts to work rather than the entry widget shortcuts
+	NoteContainers.markdown.Show()
+}
+
+func ChangeNoteColour(noteInfo *note.NoteInfo, parentWindow fyne.Window) {
+	picker := dialog.NewColorPicker("Note Color", "Pick colour", func(c color.Color) {
+		fmt.Println(c)
+		hex := FyneColourToRGBHex(c)
+		noteInfo.Colour = fmt.Sprintf("%s%s", "#", hex)
+		NoteCanvas.noteBackground.FillColor = c
+	}, parentWindow)
+	picker.Advanced = true
+	picker.Show()
+	UpdateProperties(noteInfo)
+}
+
 //Pass a pointer to the note page - *NotePage
 // Make sure this functiion is thread safe, as multiple note instances can be calling this function
 
+//var sn_mut sync.Mutex
+
 func SaveNote(np *NotePage, retrievedNote *note.NoteData, ch chan bool) {
-	var mut sync.Mutex
-	mut.Lock()
-	defer mut.Unlock()
+
+	//sn_mut.Lock()
+	//defer sn_mut.Unlock()
 
 	var noteChanges note.NoteChanges
 
@@ -236,5 +427,35 @@ func SaveNote(np *NotePage, retrievedNote *note.NoteData, ch chan bool) {
 			main_ui.UpdateView()
 		}
 	}
-	ch <- true
+	//ch <- true
+}
+
+func AddNoteKeyboardShortcuts(noteInfo *note.NoteInfo, allowEdit bool, parentWindow fyne.Window) {
+	//Keyboard shortcut to set edit mode
+	if allowEdit {
+		parentWindow.Canvas().AddShortcut(scEditMode, func(shortcut fyne.Shortcut) {
+			SetEditMode(parentWindow)
+		})
+	}
+
+	//Keyboard shortcut to pin/unpin notes
+	parentWindow.Canvas().AddShortcut(scPinNote, func(shortcut fyne.Shortcut) {
+		PinNote(noteInfo)
+	})
+
+	//Keyboard shortcut to change note colour
+	parentWindow.Canvas().AddShortcut(scNoteColour, func(shortcut fyne.Shortcut) {
+		ChangeNoteColour(noteInfo, parentWindow)
+	})
+
+	//Keyboard shortcut to show properties panel
+	parentWindow.Canvas().AddShortcut(scShowInfo, func(shortcut fyne.Shortcut) {
+		go ShowProperties(noteInfo)
+	})
+}
+
+func NoteContainerRefresh() {
+	if noteContainer != nil {
+		noteContainer.Refresh()
+	}
 }

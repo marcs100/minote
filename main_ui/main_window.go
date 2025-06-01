@@ -25,13 +25,13 @@ import (
 func StartUI(appConfigIn *config.Config, configFile string, version string) {
 	Conf = appConfigIn
 	mainApp = app.NewWithID("minote")
-	AppStatus.configFile = configFile
+	AppStatus.ConfigFile = configFile
 	CreateMainWindow(version)
 }
 
 func CreateMainWindow(version string) {
 
-	AppStatus.noteSize = fyne.NewSize(Conf.Settings.NoteWidth, Conf.Settings.NoteHeight)
+	AppStatus.NoteSize = fyne.NewSize(Conf.Settings.NoteWidth, Conf.Settings.NoteHeight)
 
 	mainWindow = mainApp.NewWindow(fmt.Sprintf("Minote   v%s", version))
 	var themeVar theme_variant
@@ -47,7 +47,7 @@ func CreateMainWindow(version string) {
 	AppTheme = GetThemeColours(themeVar)
 
 	//Main Grid container for displaying notes
-	grid := container.NewGridWrap(AppStatus.noteSize)
+	grid := container.NewGridWrap(AppStatus.NoteSize)
 	AppContainers.grid = grid //store to allow interaction in other functions
 
 	singleNotePage := widget.NewRichTextFromMarkdown("")
@@ -72,9 +72,9 @@ func CreateMainWindow(version string) {
 	mainWindow.Resize(fyne.NewSize(2000, 1200))
 
 	//set default view and layout`
-	AppStatus.currentView = Conf.Settings.InitialView
+	AppStatus.CurrentView = Conf.Settings.InitialView
 	fmt.Println("initial view = " + Conf.Settings.InitialView)
-	AppStatus.currentLayout = Conf.Settings.InitialLayout
+	AppStatus.CurrentLayout = Conf.Settings.InitialLayout
 
 	if err := UpdateView(); err != nil {
 		fmt.Println(err)
@@ -84,8 +84,8 @@ func CreateMainWindow(version string) {
 	AddMainKeyboardShortcuts()
 
 	mainWindow.SetCloseIntercept(func() {
-		if len(AppStatus.openNotes) > 0 {
-			fmt.Println(fmt.Sprintf("len of open notes array is %d", len(AppStatus.openNotes)))
+		if len(AppStatus.OpenNotes) > 0 {
+			fmt.Println(fmt.Sprintf("len of open notes array is %d", len(AppStatus.OpenNotes)))
 			//do not close if there are notes open
 			dlg := dialog.NewInformation("Error", "There are notes open, please close them before closing the application!", mainWindow)
 			dlg.Show()
@@ -121,16 +121,16 @@ func CreateTopPanel() *fyne.Container {
 	toolbar := widget.NewToolbar(
 		//show grid view
 		widget.NewToolbarAction(theme.GridIcon(), func() {
-			if AppStatus.currentLayout != LAYOUT_GRID {
-				AppStatus.currentLayout = LAYOUT_GRID
+			if AppStatus.CurrentLayout != LAYOUT_GRID {
+				AppStatus.CurrentLayout = LAYOUT_GRID
 				PageView.Reset()
 				UpdateView()
 			}
 		}),
 		//show single page view
 		widget.NewToolbarAction(theme.FileIcon(), func() {
-			if AppStatus.currentLayout != LAYOUT_PAGE {
-				AppStatus.currentLayout = LAYOUT_PAGE
+			if AppStatus.CurrentLayout != LAYOUT_PAGE {
+				AppStatus.CurrentLayout = LAYOUT_PAGE
 				PageView.Reset()
 				UpdateView()
 			}
@@ -193,7 +193,7 @@ func CreateSidePanel() *fyne.Container {
 
 	//pinnedBtn := widget.NewButton("P", func(){
 	pinnedBtn := widget.NewButtonWithIcon("Pinned", theme.RadioButtonCheckedIcon(), func() {
-		AppStatus.currentView = VIEW_PINNED
+		AppStatus.CurrentView = VIEW_PINNED
 		PageView.Reset()
 		err := UpdateView()
 		if err != nil {
@@ -204,8 +204,8 @@ func CreateSidePanel() *fyne.Container {
 	})
 
 	RecentBtn := widget.NewButtonWithIcon("Recent", theme.HistoryIcon(), func() {
-		//AppStatus.notes,err = minotedb.GetRecentNotes(Conf.Settings.RecentNotesLimit)
-		AppStatus.currentView = VIEW_RECENT
+		//AppStatus.Notes,err = minotedb.GetRecentNotes(Conf.Settings.RecentNotesLimit)
+		AppStatus.CurrentView = VIEW_RECENT
 		PageView.Reset()
 		err := UpdateView()
 		if err != nil {
@@ -217,7 +217,7 @@ func CreateSidePanel() *fyne.Container {
 
 	tagsBtn := widget.NewButtonWithIcon("Tags", theme.CheckButtonIcon(), func() {
 		ToggleMainTagsPanel()
-		AppStatus.currentView = VIEW_TAGS
+		AppStatus.CurrentView = VIEW_TAGS
 		PageView.Reset()
 		err := UpdateView()
 		if err != nil {
@@ -345,7 +345,7 @@ func UpdateView() error {
 	//var notes []minotedb.NoteData
 	var err error
 	//fyne.CurrentApp().SendNotification(fyne.NewNotification("Current View: ", currentView))
-	switch AppStatus.currentView {
+	switch AppStatus.CurrentView {
 	case VIEW_PINNED:
 		if AppContainers.listPanel != nil {
 			AppContainers.listPanel.Hide()
@@ -357,8 +357,8 @@ func UpdateView() error {
 			AppContainers.tagsPanel.Hide()
 		}
 		AppWidgets.viewLabel.SetText("Pinned Notes")
-		AppStatus.notes, err = notes.GetPinnedNotes()
-		AppStatus.currentNotebook = ""
+		AppStatus.Notes, err = notes.GetPinnedNotes()
+		AppStatus.CurrentNotebook = ""
 	case VIEW_RECENT:
 		if AppContainers.listPanel != nil {
 			AppContainers.listPanel.Hide()
@@ -371,14 +371,14 @@ func UpdateView() error {
 		}
 
 		AppWidgets.viewLabel.SetText(("Recent Notes"))
-		AppStatus.notes, err = notes.GetRecentNotes(Conf.Settings.RecentNotesLimit)
-		AppStatus.currentNotebook = ""
+		AppStatus.Notes, err = notes.GetRecentNotes(Conf.Settings.RecentNotesLimit)
+		AppStatus.CurrentNotebook = ""
 	case VIEW_NOTEBOOK:
 		if AppContainers.tagsPanel != nil {
 			AppContainers.tagsPanel.Hide()
 		}
-		AppWidgets.viewLabel.SetText("Notebook - " + AppStatus.currentNotebook)
-		AppStatus.notes, err = notes.GetNotebook(AppStatus.currentNotebook)
+		AppWidgets.viewLabel.SetText("Notebook - " + AppStatus.CurrentNotebook)
+		AppStatus.Notes, err = notes.GetNotebook(AppStatus.CurrentNotebook)
 	case VIEW_TAGS:
 		if AppContainers.listPanel != nil {
 			AppContainers.listPanel.Hide()
@@ -386,20 +386,20 @@ func UpdateView() error {
 		if AppContainers.searchPanel != nil {
 			AppContainers.searchPanel.Hide()
 		}
-		//if len(AppStatus.tagsChecked) > 0 {
+		//if len(AppStatus.TagsChecked) > 0 {
 		AppWidgets.viewLabel.SetText("Tagged Notes")
-		AppStatus.notes, err = notes.GetTaggedNotes(AppStatus.tagsChecked)
+		AppStatus.Notes, err = notes.GetTaggedNotes(AppStatus.TagsChecked)
 		//} else {
-		//	AppStatus.notes = nil
+		//	AppStatus.Notes = nil
 		//}
 	case VIEW_SEARCH:
 		if AppContainers.tagsPanel != nil {
 			AppContainers.tagsPanel.Hide()
 		}
 		if len(strings.TrimSpace(AppWidgets.searchEntry.Text)) > 0 {
-			AppStatus.notes, err = notes.GetSearchResults(AppWidgets.searchEntry.Text, AppStatus.searchFilter)
+			AppStatus.Notes, err = notes.GetSearchResults(AppWidgets.searchEntry.Text, AppStatus.SearchFilter)
 			if err == nil {
-				AppWidgets.searchResultsLabel.SetText(fmt.Sprintf("Found (%d) > ", len(AppStatus.notes)))
+				AppWidgets.searchResultsLabel.SetText(fmt.Sprintf("Found (%d) > ", len(AppStatus.Notes)))
 				AppWidgets.viewLabel.SetText("Search Results")
 			}
 		}
@@ -413,9 +413,9 @@ func UpdateView() error {
 		return err
 	}
 
-	switch AppStatus.currentLayout {
+	switch AppStatus.CurrentLayout {
 	case LAYOUT_GRID:
-		if len(AppStatus.notes) <= Conf.Settings.GridMaxPages {
+		if len(AppStatus.Notes) <= Conf.Settings.GridMaxPages {
 			AppWidgets.toolbar.Items[2].ToolbarObject().Hide()
 			AppWidgets.toolbar.Items[3].ToolbarObject().Hide()
 			AppWidgets.pageLabel.Hide()
@@ -424,11 +424,11 @@ func UpdateView() error {
 			AppWidgets.toolbar.Items[3].ToolbarObject().Show()
 			AppWidgets.pageLabel.Show()
 		}
-		ShowNotesInGrid(AppStatus.notes, AppStatus.noteSize)
+		ShowNotesInGrid(AppStatus.Notes, AppStatus.NoteSize)
 	case LAYOUT_PAGE:
 		AppWidgets.toolbar.Items[2].ToolbarObject().Show()
 		AppWidgets.toolbar.Items[3].ToolbarObject().Show()
-		ShowNotesAsPages(AppStatus.notes)
+		ShowNotesAsPages(AppStatus.Notes)
 	default:
 		err = errors.New("undefined layout")
 	}
@@ -438,7 +438,7 @@ func UpdateView() error {
 
 func CreateNotebooksList() {
 	var err error
-	AppStatus.notebooks, err = minotedb.GetNotebooks()
+	AppStatus.Notebooks, err = minotedb.GetNotebooks()
 	if err != nil {
 		log.Print("Error getting Notebooks: ")
 		dialog.ShowError(err, mainWindow)
@@ -447,19 +447,19 @@ func CreateNotebooksList() {
 
 	AppWidgets.notebooksList = widget.NewList(
 		func() int {
-			return len(AppStatus.notebooks)
+			return len(AppStatus.Notebooks)
 		},
 		func() fyne.CanvasObject {
 			return widget.NewButton("------------Notebooks (xx)------------", func() {})
 
 		},
 		func(id widget.ListItemID, o fyne.CanvasObject) {
-			AppStatus.notes, _ = notes.GetNotebook(AppStatus.notebooks[id])
-			o.(*widget.Button).SetText(fmt.Sprintf("%s (%d)", AppStatus.notebooks[id], len(AppStatus.notes)))
+			AppStatus.Notes, _ = notes.GetNotebook(AppStatus.Notebooks[id])
+			o.(*widget.Button).SetText(fmt.Sprintf("%s (%d)", AppStatus.Notebooks[id], len(AppStatus.Notes)))
 			o.(*widget.Button).OnTapped = func() {
-				//AppStatus.notes,_ = minotedb.GetNotebook(AppStatus.notebooks[id])
-				AppStatus.currentView = VIEW_NOTEBOOK
-				AppStatus.currentNotebook = AppStatus.notebooks[id]
+				//AppStatus.Notes,_ = minotedb.GetNotebook(AppStatus.Notebooks[id])
+				AppStatus.CurrentView = VIEW_NOTEBOOK
+				AppStatus.CurrentNotebook = AppStatus.Notebooks[id]
 				PageView.Reset()
 				UpdateView()
 			}
@@ -470,7 +470,7 @@ func CreateNotebooksList() {
 
 func UpdateNotebooksList() {
 	var err error
-	AppStatus.notebooks, err = minotedb.GetNotebooks()
+	AppStatus.Notebooks, err = minotedb.GetNotebooks()
 	if err != nil {
 		log.Print("Error getting Notebooks: ")
 		dialog.ShowError(err, mainWindow)
@@ -481,7 +481,7 @@ func UpdateNotebooksList() {
 
 func ShowNotebooksPanel() {
 	UpdateNotebooksList()
-	if AppStatus.currentView != VIEW_NOTEBOOK {
+	if AppStatus.CurrentView != VIEW_NOTEBOOK {
 		AppWidgets.viewLabel.SetText("Notebooks")
 	}
 
@@ -498,7 +498,7 @@ func AddMainKeyboardShortcuts() {
 	//Keyboard shortcut to show Pinned Notes
 	mainWindow.Canvas().AddShortcut(ScViewPinned, func(shortcut fyne.Shortcut) {
 		var err error
-		AppStatus.currentView = VIEW_PINNED
+		AppStatus.CurrentView = VIEW_PINNED
 		PageView.Reset()
 		err = UpdateView()
 		if err != nil {
@@ -511,7 +511,7 @@ func AddMainKeyboardShortcuts() {
 	//Keyboard shortcut to show Recent notes
 	mainWindow.Canvas().AddShortcut(ScViewRecent, func(shortcut fyne.Shortcut) {
 		var err error
-		AppStatus.currentView = VIEW_RECENT
+		AppStatus.CurrentView = VIEW_RECENT
 		PageView.Reset()
 		err = UpdateView()
 		if err != nil {

@@ -74,3 +74,45 @@ func GetNote(id uint) (note.NoteData, error) {
 	res, err := minotedb.GetNote(id)
 	return note.NoteData(res), err
 }
+
+func GetNotebooks() ([]string, error) {
+	return minotedb.GetNotebooks()
+}
+
+func CheckNotebookExists(notebook string) (bool, error) {
+	return minotedb.CheckNotebookExists(notebook)
+}
+
+func DeleteNote(id uint) (bool, error) {
+	var noteDeleted = false
+	res, err := minotedb.DeleteNote(id)
+	if res > 0 && err == nil {
+		noteDeleted = true
+	}
+
+	return noteDeleted, err
+}
+
+func UnpinNote(id uint) (bool, error) {
+	var unpinned = false
+	res, err := minotedb.UnpinNote(id)
+	if res > 0 && err == nil {
+		unpinned = true
+	}
+
+	return unpinned, err
+}
+
+func PinNote(id uint) (bool, error) {
+	var pinned = false
+	res, err := minotedb.PinNote(id)
+	if res > 0 && err == nil {
+		pinned = true
+	}
+
+	return pinned, err
+}
+
+func GetPinnedDate(id uint) (string, error) {
+	return minotedb.GetPinnedDate(id)
+}
