@@ -172,7 +172,7 @@ func getNotes(query string) ([]NoteDataDB, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var note NoteDataDB
-		err := rows.Scan(&note.Id, &note.Notebook, &note.Content, &note.Created, &note.Modified, &note.Pinned, &note.BackgroundColour, &note.PinnedDate)
+		err := rows.Scan(&note.Id, &note.Notebook, &note.Content, &note.Created, &note.Modified, &note.Pinned, &note.PinnedDate, &note.BackgroundColour)
 
 		if err != nil {
 			return nil, err
@@ -230,7 +230,7 @@ func getSearchResults(searchText string, filter SearchFilter) ([]NoteDataDB, err
 	defer rows.Close()
 	for rows.Next() {
 		var note NoteDataDB
-		err := rows.Scan(&note.Id, &note.Notebook, &note.Content, &note.Created, &note.Modified, &note.Pinned, &note.BackgroundColour, &note.PinnedDate)
+		err := rows.Scan(&note.Id, &note.Notebook, &note.Content, &note.Created, &note.Modified, &note.Pinned, &note.PinnedDate, &note.BackgroundColour)
 
 		if err != nil {
 			return nil, err
