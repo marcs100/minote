@@ -8,6 +8,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+	"github.com/marcs100/minote/main_app"
 	"github.com/marcs100/minote/notes"
 )
 
@@ -29,11 +30,11 @@ func CreateTagsPanel() *fyne.Container {
 func CreateMainTagsList() (*widget.List, error) {
 	var err error = nil
 
-	AppStatus.tags = notes.GetAllTags()
+	main_app.AppStatus.Tags = notes.GetAllTags()
 
 	tagsList := widget.NewList(
 		func() int {
-			return len(AppStatus.tags)
+			return len(main_app.AppStatus.Tags)
 		},
 
 		func() fyne.CanvasObject {
@@ -41,19 +42,19 @@ func CreateMainTagsList() (*widget.List, error) {
 		},
 
 		func(id widget.ListItemID, o fyne.CanvasObject) {
-			o.(*widget.Check).Text = AppStatus.tags[id]
+			o.(*widget.Check).Text = main_app.AppStatus.Tags[id]
 			o.(*widget.Check).OnChanged = func(c bool) {
-				AppStatus.currentView = VIEW_TAGS
+				main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
 				t := o.(*widget.Check).Text
 				if c {
 					//fmt.Printf("tag %s is checked, add to checkedTags\n", t)
-					if !slices.Contains(AppStatus.tagsChecked, t) {
-						AppStatus.tagsChecked = append(AppStatus.tagsChecked, t)
+					if !slices.Contains(main_app.AppStatus.TagsChecked, t) {
+						main_app.AppStatus.TagsChecked = append(main_app.AppStatus.TagsChecked, t)
 					}
 				} else {
 					//fmt.Printf("tag unchecked, remove %s from checkedTags\n", t)
-					if i := slices.Index(AppStatus.tagsChecked, t); i > -1 {
-						AppStatus.tagsChecked = slices.Delete(AppStatus.tagsChecked, i, i+1)
+					if i := slices.Index(main_app.AppStatus.TagsChecked, t); i > -1 {
+						main_app.AppStatus.TagsChecked = slices.Delete(main_app.AppStatus.TagsChecked, i, i+1)
 					}
 				}
 				//fmt.Println(AppStatus.tagsChecked)

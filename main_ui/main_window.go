@@ -277,7 +277,13 @@ func ShowNotesInGrid(notes []note.NoteData, noteSize fyne.Size) {
 
 	for i := PageView.CurrentPage - 1; i < numPages; i++ {
 		richText := NewScribeNoteText(notes[i].Content, func() {
-			fmt.Println("Note clicked in grid view")
+			if slices.Contains(main_app.AppStatus.OpenNotes, notes[i].Id) {
+				//note is already open
+				fmt.Println("note is already open")
+			} else {
+				main_app.AppStatus.OpenNotes = append(main_app.AppStatus.OpenNotes, notes[i].Id)
+				note_ui.NewNoteWindow(notes[i].Id, mainWindow)
+			}
 		})
 		richText.Wrapping = fyne.TextWrapWord
 		themeBackground := canvas.NewRectangle(main_app.AppTheme.NoteBgColour)
@@ -421,18 +427,18 @@ func UpdateView() error {
 	switch main_app.AppStatus.CurrentLayout {
 	case main_app.LAYOUT_GRID:
 		if len(main_app.AppStatus.Notes) <= main_app.Conf.Settings.GridMaxPages {
-			AppWidgets.Toolbar.Items[2].ToolbarObject().Hide()
-			AppWidgets.Toolbar.Items[3].ToolbarObject().Hide()
+			AppWidgets.Toolbar.Items[2].ToolbarObject().Hide() //page back
+			AppWidgets.Toolbar.Items[3].ToolbarObject().Hide() //page forward
 			AppWidgets.pageLabel.Hide()
 		} else {
-			AppWidgets.Toolbar.Items[2].ToolbarObject().Show()
-			AppWidgets.Toolbar.Items[3].ToolbarObject().Show()
+			AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // page back
+			AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
 			AppWidgets.pageLabel.Show()
 		}
 		ShowNotesInGrid(main_app.AppStatus.Notes, main_app.AppStatus.NoteSize)
 	case main_app.LAYOUT_PAGE:
-		AppWidgets.Toolbar.Items[2].ToolbarObject().Show()
-		AppWidgets.Toolbar.Items[3].ToolbarObject().Show()
+		AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // page back
+		AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
 		ShowNotesAsPages(main_app.AppStatus.Notes)
 	default:
 		err = errors.New("undefined layout")

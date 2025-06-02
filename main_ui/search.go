@@ -8,24 +8,25 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+	"github.com/marcs100/minote/main_app"
 )
 
 func CreateSearchPanel() *fyne.Container {
 
 	AppWidgets.searchResultsLabel = widget.NewLabel("")
 	filterLabel := widget.NewLabel("Filter: -")
-	searchFilter := widget.NewCheckGroup([]string{SEARCH_FILT_WOLE_WORDS, SEARCH_FILT_PINNED}, func(selected []string) {
-		AppStatus.searchFilter.Pinned = false
-		AppStatus.currentView = VIEW_SEARCH
-		AppStatus.searchFilter.WholeWords = false
+	searchFilter := widget.NewCheckGroup([]string{main_app.SEARCH_FILT_WOLE_WORDS, main_app.SEARCH_FILT_PINNED}, func(selected []string) {
+		main_app.AppStatus.SearchFilter.Pinned = false
+		main_app.AppStatus.CurrentView = main_app.VIEW_SEARCH
+		main_app.AppStatus.SearchFilter.WholeWords = false
 		for _, sel := range selected {
 			fmt.Println("selected: " + sel)
-			if sel == SEARCH_FILT_PINNED {
-				AppStatus.searchFilter.Pinned = true
+			if sel == main_app.SEARCH_FILT_PINNED {
+				main_app.AppStatus.SearchFilter.Pinned = true
 			}
 
-			if sel == SEARCH_FILT_WOLE_WORDS {
-				AppStatus.searchFilter.WholeWords = true
+			if sel == main_app.SEARCH_FILT_WOLE_WORDS {
+				main_app.AppStatus.SearchFilter.WholeWords = true
 			}
 		}
 		var err error = UpdateView()
@@ -38,7 +39,7 @@ func CreateSearchPanel() *fyne.Container {
 	searchLabel := widget.NewLabel("               Search:               ")
 	AppWidgets.searchEntry = widget.NewEntry()
 	AppWidgets.searchEntry.OnSubmitted = func(text string) {
-		AppStatus.currentView = VIEW_SEARCH
+		main_app.AppStatus.CurrentView = main_app.VIEW_SEARCH
 		var err error = UpdateView()
 		mainWindow.Canvas().Unfocus() //unfocuses entry to allow keyboard shortcits ro work
 		if err != nil {

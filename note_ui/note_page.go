@@ -13,7 +13,6 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
-	//"github.com/marcs100/minote/main_ui"
 	"github.com/marcs100/minote/conversions"
 	"github.com/marcs100/minote/main_app"
 	"github.com/marcs100/minote/note"
@@ -80,7 +79,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 		case main_app.ScNoteColour.ShortcutName():
 			np.ChangeNoteColour()
 		case main_app.ScShowInfo.ShortcutName():
-			ShowProperties(np.NoteInfo)
+			np.ShowProperties()
 		}
 	}, func() {
 		np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
@@ -137,10 +136,10 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	})
 
 	tagsBtn := widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
-		ToggleTagsNotePanel()
+		np.ToggleTagsNotePanel()
 	})
 
-	propertiesButton := widget.NewButtonWithIcon("", theme.InfoIcon(), func() { ShowProperties(&np.NoteInfo) })
+	propertiesButton := widget.NewButtonWithIcon("", theme.InfoIcon(), func() { np.ShowProperties() })
 
 	np.NotePageWidgets.DeleteButton.Hide()
 
@@ -159,16 +158,18 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 		np.NotePageWidgets.ModeSelect.Hide()
 	}
 
-	np.NotePageContainers.PropertiesPanel = NewProperetiesPanel()
+	CreateProperetiesPanel(np)
 
 	np.NotePageWidgets.ModeSelect.SetSelected("View")
 	np.NotePageWidgets.ModeSelect.Horizontal = true
 	toolbar := container.NewHBox(np.NotePageWidgets.ModeSelect, spacerLabel, np.NotePageWidgets.PinButton, colourButton, changeNotebookBtn, tagsBtn, propertiesButton, np.NotePageWidgets.DeleteButton)
 
-	if err := CreateNotesTagPanel(&np.NoteInfo, parentWindow); err != nil {
-		dialog.ShowError(err, parentWindow)
-		log.Panicln("Error creating tags panel!")
+	if err := CreateNotesTagPanel(np); err != nil {
+		dialog.ShowError(err, np.ParentWindow)
+		log.Panicln("Error creating tags panel")
 	}
+	np.UpdateTags()
+
 	topVBox := container.NewVBox(toolbar, np.NotePageContainers.TagsPanel)
 
 	np.NotePageContainers.PropertiesPanel.Hide()
@@ -214,7 +215,7 @@ func NewChangeNotebookButton(np *NotePage) *widget.Button {
 								//log.Panic(err)
 							}
 							//main_ui.UpdateNotebooksList() // ******* NEED THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-							//UpdateProperties(np.NoteInfo) // ******* NEED THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							np.UpdateProperties()
 						}
 					} else {
 						dialog.ShowError(err, np.ParentWindow)
@@ -233,7 +234,7 @@ func NewChangeNotebookButton(np *NotePage) *widget.Button {
 				np.NoteInfo.Notebook = notebook
 				//fmt.Println("Change notebook to " + notebook)
 				np.ParentWindow.SetTitle(fmt.Sprintf("Notebook: %s --- Note id: %d", np.NoteInfo.Notebook, np.NoteInfo.Id))
-				//UpdateProperties(&np.NoteInfo) ********* NEED This!!!!!!!!!!!!!
+				np.UpdateProperties()
 			})
 			nbMenu.Items = append(nbMenu.Items, menuItem)
 		}
@@ -315,7 +316,7 @@ func (np *NotePage) PinNote() {
 		}
 	}
 
-	//UpdateProperties(np.NoteInfo) // ******* NEED THIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	np.UpdateProperties()
 
 	if main_app.AppStatus.CurrentView == main_app.VIEW_PINNED {
 		//UpdateView() //updates view on main window c
@@ -361,24 +362,14 @@ func (np *NotePage) ChangeNoteColour() {
 	}, np.ParentWindow)
 	picker.Advanced = true
 	picker.Show()
-	//UpdateProperties(np) // ************** NEED THIS **********************************
+	np.UpdateProperties()
 }
 
-//Pass a pointer to the note page - *NotePage
-// Make sure this functiion is thread safe, as multiple note instances can be calling this function
-
-//var sn_mut sync.Mutex
-
 func (np *NotePage) SaveNote() {
-
-	//sn_mut.Lock()
-	//defer sn_mut.Unlock()
-
 	var noteChanges note.NoteChanges
 
 	if np.NoteInfo.Deleted {
 		//main_ui.UpdateView() // ************** NEED THIS *******************************
-		//ch <- true
 		return
 	}
 
@@ -458,8 +449,6 @@ func (np *NotePage) AddNoteKeyboardShortcuts() {
 	})
 }
 
-func NoteContainerRefresh() {
-	//if noteContainer != nil { // ************ NEED THIS *******************************
-	//	noteContainer.Refresh()
-	//}
+func (np *NotePage) RefreshWindow() {
+	np.ParentWindow.Content().Refresh()
 }

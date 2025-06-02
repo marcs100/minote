@@ -34,7 +34,8 @@ type NotePageContainers struct {
 	Markdown        *fyne.Container
 	PropertiesPanel *fyne.Container
 	TagsPanel       *container.Scroll
-	TagLabels       *fyne.Container
+	//TagsPanel *fyne.Container
+	TagLabels *fyne.Container
 }
 
 type NotePageCanvas struct {
