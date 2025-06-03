@@ -24,7 +24,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	np.AllowEdit = allowEdit
 	np.RetrievedNote = *retrievedNote
 	np.NoteInfo.NewNote = false
-	if retrievedNote == nil {
+	if retrievedNote.Id == 0 {
 		//New note
 		np.NoteInfo = note.NoteInfo{
 			Id:           0,
@@ -36,6 +36,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 			Colour:       "#FFFFFF",
 			Content:      "",
 			Deleted:      false,
+			NewNote:      true,
 		}
 	} else {
 		np.NoteInfo = note.NoteInfo{
@@ -47,6 +48,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 			Colour:       retrievedNote.BackgroundColour,
 			Content:      retrievedNote.Content,
 			Deleted:      false,
+			NewNote:      false,
 		}
 
 		if retrievedNote.Pinned > 0 {
@@ -83,6 +85,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 		}
 	}, func() {
 		np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
+		fmt.Println("Focus lost will try and save note")
 		np.SaveNote()
 		//<-ch
 	},
@@ -367,6 +370,7 @@ func (np *NotePage) ChangeNoteColour() {
 
 func (np *NotePage) SaveNote() {
 	var noteChanges note.NoteChanges
+	np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
 
 	if np.NoteInfo.Deleted {
 		//main_ui.UpdateView() // ************** NEED THIS *******************************

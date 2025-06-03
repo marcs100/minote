@@ -187,7 +187,7 @@ func CreateSidePanel() *fyne.Container {
 	AppContainers.tagsPanel = CreateTagsPanel()
 
 	newNoteBtn := widget.NewButtonWithIcon("+", theme.DocumentCreateIcon(), func() {
-		//CreateNewNote()
+		note_ui.NewNoteWindow(0, mainWindow)
 	})
 
 	searchBtn := widget.NewButtonWithIcon("", theme.SearchIcon(), func() {

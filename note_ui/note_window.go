@@ -25,6 +25,9 @@ func NewNoteWindow(noteId uint, parentWindow fyne.Window) {
 			dialog.ShowError(err, parentWindow)
 			log.Panic(err)
 		}
+	} else {
+		//new note
+		retrievedNote.Id = 0
 	}
 
 	noteWindow := main_app.MainApp.NewWindow("")
@@ -40,7 +43,6 @@ func NewNoteWindow(noteId uint, parentWindow fyne.Window) {
 	noteWindow.SetOnClosed(func() {
 		fmt.Println(fmt.Sprintf("Closing note %d", np.NoteInfo.Id))
 		np.SaveNote()
-
 		if index := slices.Index(main_app.AppStatus.OpenNotes, np.NoteInfo.Id); index != -1 {
 			main_app.AppStatus.OpenNotes = slices.Delete(main_app.AppStatus.OpenNotes, index, index+1)
 		}
