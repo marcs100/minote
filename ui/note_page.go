@@ -69,10 +69,6 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	note.UpdateHash(&np.NoteInfo)
 
 	//setup keyboard shortcuts
-	//
-	// FOR EACH OD THESE FUNCTIONS BELOW, I WIIL NEED TO PASS an INSTANCE OF THIS STRUCT
-	// AS THE STRUCT WILL HOLD THE DATA ELEMENTS THAT WERE ACCESSD BY e.g., NOTEWIDGETS.blah IN SCRIBE-NB
-	//ch := make(chan bool)
 	np.NotePageWidgets.Entry = NewEntryCustom(func(cs *desktop.CustomShortcut) {
 		switch cs.ShortcutName() {
 		case main_app.ScViewMode.ShortcutName():
@@ -115,7 +111,6 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	background := canvas.NewRectangle(main_app.AppTheme.NoteBgColour)
 	content := container.NewStack(background, scrolledMarkdown, np.NotePageWidgets.Entry)
 
-	//var btnLabel = "Pin"
 	btnIcon := theme.RadioButtonIcon()
 	if np.NoteInfo.Pinned {
 		btnIcon = theme.RadioButtonCheckedIcon()
@@ -126,8 +121,6 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 		np.PinNote()
 	})
 
-	//changeNotebookBtn := NewButtonWithPos("Change Notebook", func(e *fyne.PointEvent){
-	//ch = make(chan bool)
 	changeNotebookBtn := NewChangeNotebookButton(np)
 
 	colourButton := widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), func() {
@@ -199,7 +192,6 @@ func NewChangeNotebookButton(np *NotePage) *widget.Button {
 
 		//Add new notebook entry to menu
 		nbMenuItem := fyne.NewMenuItem("*New*", func() {
-			//fmt.Println("Need to ask use for new notebook name here!!!!!!!!")
 			notebookEntry := widget.NewEntry()
 			eNotebookEntry := widget.NewFormItem("Name", notebookEntry)
 			newNotebookDialog := dialog.NewForm("New Notebook?", "OK", "Cancel", []*widget.FormItem{eNotebookEntry}, func(confirmed bool) {
@@ -217,7 +209,7 @@ func NewChangeNotebookButton(np *NotePage) *widget.Button {
 								dialog.ShowError(err, np.ParentWindow)
 								//log.Panic(err)
 							}
-							UpdateNotebooksList() // ******* NEED THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							UpdateNotebooksList()
 							np.UpdateProperties()
 						}
 					} else {
@@ -448,8 +440,10 @@ func (np *NotePage) AddNoteKeyboardShortcuts() {
 
 	//Keyboard shortcut to show properties panel
 	np.ParentWindow.Canvas().AddShortcut(main_app.ScShowInfo, func(shortcut fyne.Shortcut) {
-		//ShowProperties(noteInfo) // ***********  NEED THIS ****************************
+		np.ShowProperties()
+		np.RefreshWindow()
 	})
+
 }
 
 func (np *NotePage) RefreshWindow() {
