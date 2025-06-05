@@ -23,16 +23,17 @@ type ApplicationContainers struct {
 	listPanel         *fyne.Container
 	searchPanel       *fyne.Container
 	tagsPanel         *fyne.Container
+	tagsList          *fyne.Container
 }
 
 // widgets for main window
 type ApplicationWidgets struct {
-	Toolbar            *widget.Toolbar
-	singleNotePage     *widget.RichText
-	viewLabel          *widget.Label
-	pageLabel          *widget.Label
-	notebooksList      *widget.List
-	tagsList           *widget.List
+	Toolbar        *widget.Toolbar
+	singleNotePage *widget.RichText
+	viewLabel      *widget.Label
+	pageLabel      *widget.Label
+	notebooksList  *widget.List
+	//tagsList           *widget.List
 	searchEntry        *widget.Entry
 	searchResultsLabel *widget.Label
 }

@@ -10,6 +10,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
+	"github.com/marcs100/minote/main_app"
 	"github.com/marcs100/minote/note"
 )
 
@@ -69,6 +70,9 @@ func (np *NotePage) UpdateTags() error {
 		np.NotePageContainers.TagLabels.Refresh()
 		np.UpdateProperties()
 		np.RefreshWindow()
+		if main_app.AppStatus.CurrentView == main_app.VIEW_TAGS {
+			UpdateMainTagsList()
+		}
 	}
 
 	np.NotePageContainers.TagLabels.Add(np.NotePageWidgets.AddTagButton)

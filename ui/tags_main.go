@@ -14,15 +14,14 @@ import (
 
 // For main window
 func CreateTagsPanel() *fyne.Container {
-	var err error = nil
-	AppWidgets.tagsList, err = CreateMainTagsList()
+	tagsList, err := CreateMainTagsList()
 	if err != nil {
 		dialog.ShowError(err, mainWindow)
 		log.Panicln("Error creating tags list")
 	}
 	tagLabel := widget.NewRichTextFromMarkdown("**Tags:**            ")
-	listCont := container.NewStack(AppWidgets.tagsList)
-	tagsPanel := container.NewBorder(tagLabel, nil, nil, nil, listCont)
+	AppContainers.tagsList = container.NewStack(tagsList)
+	tagsPanel := container.NewBorder(tagLabel, nil, nil, nil, AppContainers.tagsList)
 	return tagsPanel
 }
 
@@ -63,7 +62,21 @@ func CreateMainTagsList() (*widget.List, error) {
 			o.Refresh()
 		},
 	)
+	if err == nil {
+		tagsList.Refresh()
+	}
 	return tagsList, err
+}
+
+func UpdateMainTagsList() {
+	if AppContainers.tagsList != nil && AppContainers.tagsPanel != nil {
+		tagsList, err := CreateMainTagsList()
+		if err == nil {
+			AppContainers.tagsList.RemoveAll()
+			AppContainers.tagsList.Add(tagsList)
+			AppContainers.tagsPanel.Refresh()
+		}
+	}
 }
 
 // For main window
@@ -71,7 +84,7 @@ func ToggleMainTagsPanel() {
 	if AppContainers.tagsPanel.Visible() {
 		AppContainers.tagsPanel.Hide()
 	} else {
-		CreateMainTagsList()
+		UpdateMainTagsList()
 		AppContainers.tagsPanel.Show()
 	}
 }
