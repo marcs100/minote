@@ -9,11 +9,11 @@ import (
 	"runtime"
 
 	"github.com/marcs100/minote/config"
-	"github.com/marcs100/minote/ui"
 	"github.com/marcs100/minote/minotedb"
+	"github.com/marcs100/minote/ui"
 )
 
-const VERSION = "0.001"
+const VERSION = "0.002"
 
 func main() {
 	var err error
