@@ -1,4 +1,4 @@
-package note_ui
+package ui
 
 import (
 	"fyne.io/fyne/v2"
@@ -8,6 +8,34 @@ import (
 	"github.com/marcs100/minote/note"
 )
 
+type PageViewStatus struct {
+	NumberOfPages int
+	CurrentPage   int
+	Step          int
+}
+
+// containers for main window
+type ApplicationContainers struct {
+	grid              *fyne.Container
+	singleNoteStack   *fyne.Container
+	mainGridContainer *container.Scroll
+	mainPageContainer *container.Scroll
+	listPanel         *fyne.Container
+	searchPanel       *fyne.Container
+	tagsPanel         *fyne.Container
+}
+
+// widgets for main window
+type ApplicationWidgets struct {
+	Toolbar            *widget.Toolbar
+	singleNotePage     *widget.RichText
+	viewLabel          *widget.Label
+	pageLabel          *widget.Label
+	notebooksList      *widget.List
+	tagsList           *widget.List
+	searchEntry        *widget.Entry
+	searchResultsLabel *widget.Label
+}
 type NotePage struct {
 	Id                 uint
 	ParentWindow       fyne.Window

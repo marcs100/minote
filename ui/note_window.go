@@ -1,4 +1,4 @@
-package note_ui
+package ui
 
 import (
 	"fmt"

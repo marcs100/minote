@@ -1,4 +1,4 @@
-package main_ui
+package ui
 
 import "fmt"
 

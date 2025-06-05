@@ -1,9 +1,10 @@
-package note_ui
+package ui
 
 import (
 	"fmt"
 	"image/color"
 	"log"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -87,7 +88,6 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 		np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
 		fmt.Println("Focus lost will try and save note")
 		np.SaveNote()
-		//<-ch
 	},
 	)
 
@@ -217,7 +217,7 @@ func NewChangeNotebookButton(np *NotePage) *widget.Button {
 								dialog.ShowError(err, np.ParentWindow)
 								//log.Panic(err)
 							}
-							//main_ui.UpdateNotebooksList() // ******* NEED THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							UpdateNotebooksList() // ******* NEED THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 							np.UpdateProperties()
 						}
 					} else {
@@ -283,7 +283,6 @@ func (np *NotePage) PinNote() {
 	if np.NoteInfo.Pinned {
 		if np.NoteInfo.NewNote {
 			//new note that hasn't been saved yet'
-			np.NoteInfo.Pinned = false
 			res = true
 		} else {
 			res, err = notes.UnpinNote(np.NoteInfo.Id)
@@ -301,6 +300,7 @@ func (np *NotePage) PinNote() {
 		if np.NoteInfo.Id == 0 {
 			//new note that hasn't been saved yet'
 			np.NoteInfo.Pinned = true
+			np.NoteInfo.PinnedDate = time.Now().String()[0:19]
 			res = true
 		} else {
 			res, err = notes.PinNote(np.NoteInfo.Id)
@@ -322,7 +322,7 @@ func (np *NotePage) PinNote() {
 	np.UpdateProperties()
 
 	if main_app.AppStatus.CurrentView == main_app.VIEW_PINNED {
-		//UpdateView() //updates view on main window c
+		UpdateView() //updates view on main window c
 	}
 }
 
@@ -373,7 +373,7 @@ func (np *NotePage) SaveNote() {
 	np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
 
 	if np.NoteInfo.Deleted {
-		//main_ui.UpdateView() // ************** NEED THIS *******************************
+		UpdateView()
 		return
 	}
 
@@ -401,8 +401,10 @@ func (np *NotePage) SaveNote() {
 			if np.RetrievedNote, err = notes.GetNote(np.NoteInfo.Id); err != nil {
 				log.Println("Error getting updated note")
 				dialog.ShowError(err, np.ParentWindow)
+				return
 			}
-			//main_ui.UpdateView() // *********** NEED THIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+			UpdateView()
 		}
 	} else if noteChanges.PinStatusChanged {
 		// we do not want a create or modified time stamp for just pinning/unpinning notes
@@ -410,9 +412,7 @@ func (np *NotePage) SaveNote() {
 		if err != nil {
 			log.Println("Error saving note")
 			dialog.ShowError(err, np.ParentWindow)
-			//ch <- true
 			return
-			//log.Panic()
 		}
 
 		if res == 0 {
@@ -423,10 +423,9 @@ func (np *NotePage) SaveNote() {
 				log.Println("Error getting updated note")
 				dialog.ShowError(err, np.ParentWindow)
 			}
-			//main_ui.UpdateView() // ******************** NEED THIS !!!!!!!!!!!!!!!!!!!!!!!
+			UpdateView()
 		}
 	}
-	//ch <- true
 }
 
 func (np *NotePage) AddNoteKeyboardShortcuts() {

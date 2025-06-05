@@ -9,7 +9,7 @@ import (
 	"runtime"
 
 	"github.com/marcs100/minote/config"
-	"github.com/marcs100/minote/main_ui"
+	"github.com/marcs100/minote/ui"
 	"github.com/marcs100/minote/minotedb"
 )
 
@@ -74,7 +74,7 @@ func main() {
 		log.Panicln(err)
 	}
 
-	main_ui.StartUI(appConfig, confFile, VERSION)
+	ui.StartUI(appConfig, confFile, VERSION)
 }
 
 func CreateAppConfig(homeDir string) config.Config {

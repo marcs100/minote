@@ -1,4 +1,4 @@
-package main_ui
+package ui
 
 import (
 	"errors"
@@ -17,7 +17,6 @@ import (
 	"github.com/marcs100/minote/main_app"
 	"github.com/marcs100/minote/minotedb"
 	"github.com/marcs100/minote/note"
-	"github.com/marcs100/minote/note_ui"
 	"github.com/marcs100/minote/notes"
 
 	"fyne.io/fyne/v2/dialog"
@@ -187,7 +186,7 @@ func CreateSidePanel() *fyne.Container {
 	AppContainers.tagsPanel = CreateTagsPanel()
 
 	newNoteBtn := widget.NewButtonWithIcon("+", theme.DocumentCreateIcon(), func() {
-		note_ui.NewNoteWindow(0, mainWindow)
+		NewNoteWindow(0, mainWindow)
 	})
 
 	searchBtn := widget.NewButtonWithIcon("", theme.SearchIcon(), func() {
@@ -282,7 +281,7 @@ func ShowNotesInGrid(notes []note.NoteData, noteSize fyne.Size) {
 				fmt.Println("note is already open")
 			} else {
 				main_app.AppStatus.OpenNotes = append(main_app.AppStatus.OpenNotes, notes[i].Id)
-				note_ui.NewNoteWindow(notes[i].Id, mainWindow)
+				NewNoteWindow(notes[i].Id, mainWindow)
 			}
 		})
 		richText.Wrapping = fyne.TextWrapWord
@@ -344,7 +343,7 @@ func ShowNotesAsPages(notesIn []note.NoteData) {
 		allowEdit = false
 	}
 
-	var np note_ui.NotePage
+	var np NotePage
 	noteContainer := np.NewNotePage(&retrievedNote, allowEdit, mainWindow)
 	np.AddNoteKeyboardShortcuts()
 	AppContainers.singleNoteStack.Add(noteContainer)
