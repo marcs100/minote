@@ -346,6 +346,7 @@ func (np *NotePage) SetViewMode() {
 	np.NotePageWidgets.ModeSelect.SetSelected(main_app.VIEW_MODE)
 	np.ParentWindow.Canvas().Focus(nil) // this allows the canvas keyboard shortcuts to work rather than the entry widget shortcuts
 	np.NotePageContainers.Markdown.Show()
+	np.ParentWindow.Content().Refresh()
 }
 
 func (np *NotePage) ChangeNoteColour() {
