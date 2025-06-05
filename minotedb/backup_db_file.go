@@ -11,7 +11,7 @@ import (
 func BackupDatabase(backupPath string, dbFile string) (int64, string, error) {
 
 	ts := time.Now().String()[:22]
-	dbBakFile := filepath.Join(backupPath, fmt.Sprintf("scribeNB.db-%s", ts))
+	dbBakFile := filepath.Join(backupPath, fmt.Sprintf("minote.db-%s", ts))
 
 	src, err := os.Open(dbFile)
 	if err != nil {
