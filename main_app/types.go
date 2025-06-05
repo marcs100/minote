@@ -27,15 +27,16 @@ type AppColours struct {
 }
 
 type ApplicationStatus struct {
-	ConfigFile      string
-	CurrentView     string
-	CurrentNotebook string
-	CurrentLayout   string
-	Notes           []note.NoteData
-	Notebooks       []string
-	Tags            []string
-	TagsChecked     []string
-	OpenNotes       []uint //maintain a list of notes that are currently open
-	NoteSize        fyne.Size
-	SearchFilter    notes.SearchFilter
+	ConfigFile           string
+	CurrentView          string
+	CurrentNotebook      string
+	CurrentLayout        string
+	Notes                []note.NoteData
+	Notebooks            []string
+	Tags                 []string
+	TagsChecked          []string
+	OpenNotes            []uint //maintain a list of notes that are currently open
+	NoteSize             fyne.Size
+	SearchFilter         notes.SearchFilter
+	SettingsWindowOpened bool
 }

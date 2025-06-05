@@ -15,6 +15,11 @@ import (
 
 func NewSettingsWindow() {
 
+	//only allow one instance of the settings window
+	if main_app.AppStatus.SettingsWindowOpened {
+		return
+	}
+
 	newConf := CopySettings()
 
 	var themeVar main_app.ThemeVariant
@@ -111,9 +116,11 @@ func NewSettingsWindow() {
 				dialog.ShowError(err, settingsWindow)
 			}
 		}
+		main_app.AppStatus.SettingsWindowOpened = false
 	})
 
 	settingsWindow.SetContent(stack)
+	main_app.AppStatus.SettingsWindowOpened = true
 	settingsWindow.Show()
 }
 
