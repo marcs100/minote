@@ -3,11 +3,11 @@ package ui
 import (
 	"fmt"
 	"log"
-	"slices"
 
 	"github.com/marcs100/minote/main_app"
 	"github.com/marcs100/minote/note"
 	"github.com/marcs100/minote/notes"
+	"github.com/marcs100/minote/tracker"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
@@ -43,9 +43,7 @@ func NewNoteWindow(noteId uint, parentWindow fyne.Window) {
 	noteWindow.SetOnClosed(func() {
 		fmt.Println(fmt.Sprintf("Closing note %d", np.NoteInfo.Id))
 		np.SaveNote()
-		if index := slices.Index(main_app.AppStatus.OpenNotes, np.NoteInfo.Id); index != -1 {
-			main_app.AppStatus.OpenNotes = slices.Delete(main_app.AppStatus.OpenNotes, index, index+1)
-		}
+		tracker.DelFromTracker(np.NoteInfo.Id)
 	})
 
 	np.AddNoteKeyboardShortcuts()

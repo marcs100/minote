@@ -15,11 +15,6 @@ import (
 
 func NewSettingsWindow() {
 
-	//only allow one instance of the settings window
-	if main_app.AppStatus.SettingsWindowOpened {
-		return
-	}
-
 	newConf := CopySettings()
 
 	var themeVar main_app.ThemeVariant
@@ -115,12 +110,11 @@ func NewSettingsWindow() {
 			if err := config.WriteConfig(main_app.AppStatus.ConfigFile, newConf); err != nil {
 				dialog.ShowError(err, settingsWindow)
 			}
+			main_app.AppStatus.SettingsOpen = false
 		}
-		main_app.AppStatus.SettingsWindowOpened = false
 	})
 
 	settingsWindow.SetContent(stack)
-	main_app.AppStatus.SettingsWindowOpened = true
 	settingsWindow.Show()
 }
 
@@ -140,6 +134,8 @@ func CopySettings() config.Config {
 			LightColourNote:  main_app.Conf.Settings.LightColourNote,
 			DarkColourBg:     main_app.Conf.Settings.DarkColourBg,
 			LightColourBg:    main_app.Conf.Settings.LightColourBg,
+			DarkColourCtBg:   main_app.Conf.Settings.DarkColourCtBg,
+			LightColourCtBg:  main_app.Conf.Settings.LightColourCtBg,
 		},
 	}
 }

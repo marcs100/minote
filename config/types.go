@@ -18,4 +18,6 @@ type AppSettings struct {
 	LightColourNote  string  `toml:"light_colour_note"`
 	DarkColourBg     string  `toml:"dark_colour_bg"`
 	LightColourBg    string  `toml:"light_colour_bg"`
+	DarkColourCtBg   string  `toml:"dark_colour_ct_bg"`
+	LightColourCtBg  string  `toml:"light_colour_ct_bg"`
 }

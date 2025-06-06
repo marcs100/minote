@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"slices"
 
 	"strings"
 
@@ -18,6 +17,7 @@ import (
 	"github.com/marcs100/minote/minotedb"
 	"github.com/marcs100/minote/note"
 	"github.com/marcs100/minote/notes"
+	"github.com/marcs100/minote/tracker"
 
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
@@ -29,10 +29,10 @@ func StartUI(appConfigIn *config.Config, configFile string, version string) {
 	main_app.Conf = appConfigIn
 	main_app.MainApp = app.NewWithID("minote")
 	main_app.AppStatus.ConfigFile = configFile
-	CreateMainWindow(version)
+	createMainWindow(version)
 }
 
-func CreateMainWindow(version string) {
+func createMainWindow(version string) {
 
 	main_app.AppStatus.NoteSize = fyne.NewSize(main_app.Conf.Settings.NoteWidth, main_app.Conf.Settings.NoteHeight)
 
@@ -62,11 +62,11 @@ func CreateMainWindow(version string) {
 	PageView.NumberOfPages = 0
 
 	//Create The main panel
-	main := CreateMainPanel()
+	main := createMainPanel()
 
-	top := CreateTopPanel()
+	top := createTopPanel()
 
-	side := CreateSidePanel()
+	side := createSidePanel()
 
 	//layout the main window
 	appContainer := container.NewBorder(top, nil, side, nil, main)
@@ -84,11 +84,11 @@ func CreateMainWindow(version string) {
 	}
 
 	//keyboard shortcuts
-	AddMainKeyboardShortcuts()
+	addMainKeyboardShortcuts()
 
 	mainWindow.SetCloseIntercept(func() {
-		if len(main_app.AppStatus.OpenNotes) > 0 {
-			fmt.Println(fmt.Sprintf("len of open notes array is %d", len(main_app.AppStatus.OpenNotes)))
+		if tracker.TrackerLen() > 0 {
+			fmt.Println(fmt.Sprintf("len of open notes array is %d", tracker.TrackerLen()))
 			//do not close if there are notes open
 			dlg := dialog.NewInformation("Error", "There are notes open, please close them before closing the application!", mainWindow)
 			dlg.Show()
@@ -100,7 +100,7 @@ func CreateMainWindow(version string) {
 	mainWindow.ShowAndRun()
 }
 
-func CreateMainPanel() *fyne.Container {
+func createMainPanel() *fyne.Container {
 
 	mainGridContainer := container.NewScroll(AppContainers.grid)
 	AppContainers.mainGridContainer = mainGridContainer
@@ -113,7 +113,7 @@ func CreateMainPanel() *fyne.Container {
 	return mainStackedContainer
 }
 
-func CreateTopPanel() *fyne.Container {
+func createTopPanel() *fyne.Container {
 	//AppWidgets.viewLabel = widget.NewLabelWithStyle("Pinned Notes", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
 	spacerLabel := widget.NewLabel("                                ")
 	AppWidgets.viewLabel = widget.NewLabelWithStyle("Pinned Notes      >", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
@@ -162,12 +162,16 @@ func CreateTopPanel() *fyne.Container {
 
 		//display settings
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
-			NewSettingsWindow()
+			if !main_app.AppStatus.SettingsOpen {
+				main_app.AppStatus.SettingsOpen = true
+				NewSettingsWindow()
+			}
 		}),
 	)
 
 	AppWidgets.Toolbar = toolbar
-	topPanel := container.New(layout.NewHBoxLayout(),
+	//rect := canvas.NewRectangle(main_app.AppTheme.)
+	topBar := container.New(layout.NewHBoxLayout(),
 		spacerLabel,
 		AppWidgets.viewLabel,
 		layout.NewSpacer(),
@@ -178,10 +182,12 @@ func CreateTopPanel() *fyne.Container {
 		settingsBar,
 	)
 
+	rect := canvas.NewRectangle(main_app.AppTheme.MainCtrlsBgColour)
+	topPanel := container.NewStack(rect, topBar)
 	return topPanel
 }
 
-func CreateSidePanel() *fyne.Container {
+func createSidePanel() *fyne.Container {
 	AppContainers.searchPanel = CreateSearchPanel()
 	AppContainers.tagsPanel = CreateTagsPanel()
 
@@ -234,7 +240,7 @@ func CreateSidePanel() *fyne.Container {
 	CreateNotebooksList()
 
 	notebooksBtn := widget.NewButtonWithIcon("Notebooks", theme.FolderOpenIcon(), func() {
-		ShowNotebooksPanel()
+		showNotebooksPanel()
 	})
 
 	spacerLabel := widget.NewLabel(" ")
@@ -244,12 +250,15 @@ func CreateSidePanel() *fyne.Container {
 	AppContainers.listPanel.Hide()
 	AppContainers.tagsPanel.Hide()
 
-	sideContainer := container.NewHBox(btnPanel, AppContainers.listPanel, AppContainers.searchPanel, AppContainers.tagsPanel)
+	sidePanel := container.NewHBox(btnPanel, AppContainers.listPanel, AppContainers.searchPanel, AppContainers.tagsPanel)
+
+	rect := canvas.NewRectangle(main_app.AppTheme.MainCtrlsBgColour)
+	sideContainer := container.NewStack(rect, sidePanel)
 
 	return sideContainer
 }
 
-func ShowNotesInGrid(notes []note.NoteData, noteSize fyne.Size) {
+func showNotesInGrid(notes []note.NoteData) {
 	if AppContainers.grid == nil || AppContainers.mainGridContainer == nil {
 		return
 	}
@@ -276,12 +285,10 @@ func ShowNotesInGrid(notes []note.NoteData, noteSize fyne.Size) {
 
 	for i := PageView.CurrentPage - 1; i < numPages; i++ {
 		richText := NewScribeNoteText(notes[i].Content, func() {
-			if slices.Contains(main_app.AppStatus.OpenNotes, notes[i].Id) {
-				//note is already open
-				fmt.Println("note is already open")
-			} else {
-				main_app.AppStatus.OpenNotes = append(main_app.AppStatus.OpenNotes, notes[i].Id)
+			if tracker.AddToTracker(notes[i].Id) {
 				NewNoteWindow(notes[i].Id, mainWindow)
+			} else {
+				fmt.Println("note is already open")
 			}
 		})
 		richText.Wrapping = fyne.TextWrapWord
@@ -303,7 +310,7 @@ func ShowNotesInGrid(notes []note.NoteData, noteSize fyne.Size) {
 	AppContainers.mainGridContainer.Show()
 }
 
-func ShowNotesAsPages(notesIn []note.NoteData) {
+func showNotesAsPages(notesIn []note.NoteData) {
 	//var noteInfo note.NoteInfo
 	var retrievedNote note.NoteData
 	var err error = nil
@@ -338,7 +345,7 @@ func ShowNotesAsPages(notesIn []note.NoteData) {
 	}
 
 	var allowEdit bool = true
-	if slices.Contains(main_app.AppStatus.OpenNotes, noteId) {
+	if tracker.TrackerCheck(noteId) {
 		dialog.ShowInformation("Warning", "This note is already open in a separate window.\nClose it first if you want to edit it here!", mainWindow)
 		allowEdit = false
 	}
@@ -423,6 +430,13 @@ func UpdateView() error {
 		return err
 	}
 
+	err = showCurrentLayout()
+
+	return err
+}
+
+func showCurrentLayout() error {
+	var err error = nil
 	switch main_app.AppStatus.CurrentLayout {
 	case main_app.LAYOUT_GRID:
 		if len(main_app.AppStatus.Notes) <= main_app.Conf.Settings.GridMaxPages {
@@ -434,11 +448,11 @@ func UpdateView() error {
 			AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
 			AppWidgets.pageLabel.Show()
 		}
-		ShowNotesInGrid(main_app.AppStatus.Notes, main_app.AppStatus.NoteSize)
+		showNotesInGrid(main_app.AppStatus.Notes)
 	case main_app.LAYOUT_PAGE:
 		AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // page back
 		AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
-		ShowNotesAsPages(main_app.AppStatus.Notes)
+		showNotesAsPages(main_app.AppStatus.Notes)
 	default:
 		err = errors.New("undefined layout")
 	}
@@ -489,7 +503,7 @@ func UpdateNotebooksList() {
 	AppWidgets.notebooksList.Refresh()
 }
 
-func ShowNotebooksPanel() {
+func showNotebooksPanel() {
 	UpdateNotebooksList()
 	if main_app.AppStatus.CurrentView != main_app.VIEW_NOTEBOOK {
 		AppWidgets.viewLabel.SetText("Notebooks")
@@ -504,7 +518,7 @@ func ShowNotebooksPanel() {
 	}
 }
 
-func AddMainKeyboardShortcuts() {
+func addMainKeyboardShortcuts() {
 	//Keyboard shortcut to show Pinned Notes
 	mainWindow.Canvas().AddShortcut(main_app.ScViewPinned, func(shortcut fyne.Shortcut) {
 		var err error
@@ -554,6 +568,6 @@ func AddMainKeyboardShortcuts() {
 
 	//Keyboard shortcut to show notebooks list
 	mainWindow.Canvas().AddShortcut(main_app.ScShowNotebooks, func(shortcut fyne.Shortcut) {
-		ShowNotebooksPanel()
+		showNotebooksPanel()
 	})
 }

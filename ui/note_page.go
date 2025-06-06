@@ -18,6 +18,7 @@ import (
 	"github.com/marcs100/minote/main_app"
 	"github.com/marcs100/minote/note"
 	"github.com/marcs100/minote/notes"
+	"github.com/marcs100/minote/tracker"
 )
 
 func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, parentWindow fyne.Window) *fyne.Container {
@@ -91,6 +92,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	np.NotePageWidgets.Entry.Wrapping = fyne.TextWrapWord
 
 	themeBackground := canvas.NewRectangle(main_app.AppTheme.NoteBgColour)
+	topBarBackground := canvas.NewRectangle(main_app.AppTheme.MainCtrlsBgColour)
 	noteColour, _ := conversions.RGBStringToFyneColor(np.NoteInfo.Colour)
 
 	np.NotePageCanvas.NoteBackground = canvas.NewRectangle(noteColour)
@@ -121,7 +123,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 		np.PinNote()
 	})
 
-	changeNotebookBtn := NewChangeNotebookButton(np)
+	changeNotebookBtn := newChangeNotebookButton(np)
 
 	colourButton := widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), func() {
 		np.ChangeNoteColour()
@@ -167,17 +169,18 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	np.UpdateTags()
 
 	topVBox := container.NewVBox(toolbar, np.NotePageContainers.TagsPanel)
+	topBar := container.NewStack(topBarBackground, topVBox)
 
 	np.NotePageContainers.PropertiesPanel.Hide()
 	np.NotePageContainers.TagsPanel.Hide()
 
-	return container.NewBorder(topVBox, nil, nil, np.NotePageContainers.PropertiesPanel, content)
+	return container.NewBorder(topBar, nil, nil, np.NotePageContainers.PropertiesPanel, content)
 }
 
 // Thread safe function
 //var chn_mut sync.Mutex
 
-func NewChangeNotebookButton(np *NotePage) *widget.Button {
+func newChangeNotebookButton(np *NotePage) *widget.Button {
 	//chn_mut.Lock()
 	//defer chn_mut.Unlock()
 	changeNotebookBtn := widget.NewButtonWithIcon("", theme.FolderOpenIcon(), func() {
@@ -330,7 +333,7 @@ func (np *NotePage) SetEditMode() {
 	np.NotePageWidgets.ModeSelect.SetSelected(main_app.EDIT_MODE)
 	np.NotePageWidgets.Entry.Show()
 	np.ParentWindow.Canvas().Focus(np.NotePageWidgets.Entry)
-	np.ParentWindow.Content().Refresh()
+	go UpdateView()
 }
 
 func (np *NotePage) SetViewMode() {
@@ -346,7 +349,7 @@ func (np *NotePage) SetViewMode() {
 	np.NotePageWidgets.ModeSelect.SetSelected(main_app.VIEW_MODE)
 	np.ParentWindow.Canvas().Focus(nil) // this allows the canvas keyboard shortcuts to work rather than the entry widget shortcuts
 	np.NotePageContainers.Markdown.Show()
-	np.ParentWindow.Content().Refresh()
+	go UpdateView()
 }
 
 func (np *NotePage) ChangeNoteColour() {
@@ -366,7 +369,7 @@ func (np *NotePage) SaveNote() {
 	np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
 
 	if np.NoteInfo.Deleted {
-		UpdateView()
+		go UpdateView()
 		return
 	}
 
@@ -396,8 +399,11 @@ func (np *NotePage) SaveNote() {
 				dialog.ShowError(err, np.ParentWindow)
 				return
 			}
+			//track new note as open.
+			// Only wroks as new notes are always opned in a new window
+			tracker.AddToTracker(np.NoteInfo.Id)
 
-			UpdateView()
+			go UpdateView()
 		}
 	} else if noteChanges.PinStatusChanged {
 		// we do not want a create or modified time stamp for just pinning/unpinning notes
@@ -416,7 +422,7 @@ func (np *NotePage) SaveNote() {
 				log.Println("Error getting updated note")
 				dialog.ShowError(err, np.ParentWindow)
 			}
-			UpdateView()
+			go UpdateView()
 		}
 	}
 }

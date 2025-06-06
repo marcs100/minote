@@ -22,21 +22,21 @@ const (
 )
 
 type AppColours struct {
-	NoteBgColour color.Color
-	MainBgColour color.Color
+	NoteBgColour      color.Color
+	MainBgColour      color.Color
+	MainCtrlsBgColour color.Color
 }
 
 type ApplicationStatus struct {
-	ConfigFile           string
-	CurrentView          string
-	CurrentNotebook      string
-	CurrentLayout        string
-	Notes                []note.NoteData
-	Notebooks            []string
-	Tags                 []string
-	TagsChecked          []string
-	OpenNotes            []uint //maintain a list of notes that are currently open
-	NoteSize             fyne.Size
-	SearchFilter         notes.SearchFilter
-	SettingsWindowOpened bool
+	ConfigFile      string
+	CurrentView     string
+	CurrentNotebook string
+	CurrentLayout   string
+	Notes           []note.NoteData
+	Notebooks       []string
+	Tags            []string
+	TagsChecked     []string
+	NoteSize        fyne.Size
+	SearchFilter    notes.SearchFilter
+	SettingsOpen    bool
 }

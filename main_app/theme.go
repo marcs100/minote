@@ -24,6 +24,11 @@ func GetThemeColours(themeVarIn ThemeVariant) AppColours {
 		if err != nil {
 			log.Panicln(err)
 		}
+
+		appColours.MainCtrlsBgColour, err = conversions.RGBStringToFyneColor(Conf.Settings.DarkColourCtBg)
+		if err != nil {
+			log.Panicln(err)
+		}
 	case LIGHT_THEME:
 		fmt.Println("Using Light theme")
 		appColours.MainBgColour, err = conversions.RGBStringToFyneColor(Conf.Settings.LightColourBg)
@@ -31,6 +36,10 @@ func GetThemeColours(themeVarIn ThemeVariant) AppColours {
 			log.Panicln(err)
 		}
 		appColours.NoteBgColour, err = conversions.RGBStringToFyneColor(Conf.Settings.LightColourNote)
+		if err != nil {
+			log.Panicln(err)
+		}
+		appColours.MainCtrlsBgColour, err = conversions.RGBStringToFyneColor(Conf.Settings.LightColourCtBg)
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -47,6 +56,11 @@ func GetThemeColours(themeVarIn ThemeVariant) AppColours {
 				log.Panicln(err)
 			}
 
+			appColours.MainCtrlsBgColour, err = conversions.RGBStringToFyneColor(Conf.Settings.DarkColourCtBg)
+			if err != nil {
+				log.Panicln(err)
+			}
+
 		} else if themeVariant == theme.VariantLight {
 			log.Println("Using system theme light")
 			appColours.MainBgColour, err = conversions.RGBStringToFyneColor(Conf.Settings.LightColourBg)
@@ -54,6 +68,10 @@ func GetThemeColours(themeVarIn ThemeVariant) AppColours {
 				log.Panicln(err)
 			}
 			appColours.NoteBgColour, err = conversions.RGBStringToFyneColor(Conf.Settings.LightColourNote)
+			if err != nil {
+				log.Panicln(err)
+			}
+			appColours.MainCtrlsBgColour, err = conversions.RGBStringToFyneColor(Conf.Settings.LightColourCtBg)
 			if err != nil {
 				log.Panicln(err)
 			}
