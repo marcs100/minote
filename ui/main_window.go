@@ -351,7 +351,9 @@ func showNotesAsPages(notesIn []note.NoteData) {
 	}
 
 	var np NotePage
+	fmt.Println("********** 1 Debug here!!!!!!!!***************")
 	noteContainer := np.NewNotePage(&retrievedNote, allowEdit, mainWindow)
+	fmt.Println(" **********2 Debug here!!!!!!!!****************")
 	np.AddNoteKeyboardShortcuts()
 	AppContainers.singleNoteStack.Add(noteContainer)
 	AppContainers.mainPageContainer.Show()

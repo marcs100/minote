@@ -177,9 +177,6 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 	return container.NewBorder(topBar, nil, nil, np.NotePageContainers.PropertiesPanel, content)
 }
 
-// Thread safe function
-//var chn_mut sync.Mutex
-
 func newChangeNotebookButton(np *NotePage) *widget.Button {
 	//chn_mut.Lock()
 	//defer chn_mut.Unlock()
@@ -333,7 +330,7 @@ func (np *NotePage) SetEditMode() {
 	np.NotePageWidgets.ModeSelect.SetSelected(main_app.EDIT_MODE)
 	np.NotePageWidgets.Entry.Show()
 	np.ParentWindow.Canvas().Focus(np.NotePageWidgets.Entry)
-	go UpdateView()
+	UpdateView()
 }
 
 func (np *NotePage) SetViewMode() {
@@ -349,7 +346,7 @@ func (np *NotePage) SetViewMode() {
 	np.NotePageWidgets.ModeSelect.SetSelected(main_app.VIEW_MODE)
 	np.ParentWindow.Canvas().Focus(nil) // this allows the canvas keyboard shortcuts to work rather than the entry widget shortcuts
 	np.NotePageContainers.Markdown.Show()
-	go UpdateView()
+	UpdateView()
 }
 
 func (np *NotePage) ChangeNoteColour() {
@@ -369,7 +366,7 @@ func (np *NotePage) SaveNote() {
 	np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
 
 	if np.NoteInfo.Deleted {
-		go UpdateView()
+		UpdateView()
 		return
 	}
 
@@ -403,7 +400,7 @@ func (np *NotePage) SaveNote() {
 			// Only wroks as new notes are always opned in a new window
 			tracker.AddToTracker(np.NoteInfo.Id)
 
-			go UpdateView()
+			UpdateView()
 		}
 	} else if noteChanges.PinStatusChanged {
 		// we do not want a create or modified time stamp for just pinning/unpinning notes
@@ -422,7 +419,7 @@ func (np *NotePage) SaveNote() {
 				log.Println("Error getting updated note")
 				dialog.ShowError(err, np.ParentWindow)
 			}
-			go UpdateView()
+			UpdateView()
 		}
 	}
 }
