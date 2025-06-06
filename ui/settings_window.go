@@ -110,8 +110,8 @@ func NewSettingsWindow() {
 			if err := config.WriteConfig(main_app.AppStatus.ConfigFile, newConf); err != nil {
 				dialog.ShowError(err, settingsWindow)
 			}
-			main_app.AppStatus.SettingsOpen = false
 		}
+		main_app.AppStatus.SettingsOpen = false
 	})
 
 	settingsWindow.SetContent(stack)
