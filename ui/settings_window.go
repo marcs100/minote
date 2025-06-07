@@ -115,6 +115,7 @@ func NewSettingsWindow() {
 	})
 
 	settingsWindow.SetContent(stack)
+	main_app.AppStatus.SettingsOpen = true //we only allow one settings window
 	settingsWindow.Show()
 }
 
