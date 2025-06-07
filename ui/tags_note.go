@@ -61,7 +61,7 @@ func (np *NotePage) UpdateTags() error {
 						if err != nil {
 							log.Println(err)
 						}
-						np.UpdateTags()
+						//np.UpdateTags()
 					}
 				}, np.ParentWindow)
 				tagDialog.Show()

@@ -330,7 +330,7 @@ func (np *NotePage) SetEditMode() {
 	np.NotePageWidgets.ModeSelect.SetSelected(main_app.EDIT_MODE)
 	np.NotePageWidgets.Entry.Show()
 	np.ParentWindow.Canvas().Focus(np.NotePageWidgets.Entry)
-	()
+
 }
 
 func (np *NotePage) SetViewMode() {
@@ -346,7 +346,7 @@ func (np *NotePage) SetViewMode() {
 	np.NotePageWidgets.ModeSelect.SetSelected(main_app.VIEW_MODE)
 	np.ParentWindow.Canvas().Focus(nil) // this allows the canvas keyboard shortcuts to work rather than the entry widget shortcuts
 	np.NotePageContainers.Markdown.Show()
-	()
+	//UpdateView()
 }
 
 func (np *NotePage) ChangeNoteColour() {
@@ -365,7 +365,7 @@ func (np *NotePage) SaveNote() {
 	var noteChanges note.NoteChanges
 	np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
 	if np.NoteInfo.Deleted {
-		()
+		//UpdateView()
 		return
 	}
 
@@ -399,7 +399,7 @@ func (np *NotePage) SaveNote() {
 			// Only wroks as new notes are always opned in a new window
 			tracker.AddToTracker(np.NoteInfo.Id)
 
-			()
+			//UpdateView()
 		}
 	} else if noteChanges.PinStatusChanged {
 		// we do not want a create or modified time stamp for just pinning/unpinning notes
@@ -418,7 +418,7 @@ func (np *NotePage) SaveNote() {
 				log.Println("Error getting updated note")
 				dialog.ShowError(err, np.ParentWindow)
 			}
-			()
+			//UpdateView()
 		}
 	}
 }
