@@ -61,7 +61,7 @@ func (np *NotePage) UpdateTags() error {
 						if err != nil {
 							log.Println(err)
 						}
-						//np.UpdateTags()
+						np.UpdateTags()
 					}
 				}, np.ParentWindow)
 				tagDialog.Show()
@@ -69,7 +69,7 @@ func (np *NotePage) UpdateTags() error {
 		}
 		np.NotePageContainers.TagLabels.Refresh()
 		np.UpdateProperties()
-		//np.RefreshWindow()
+		np.RefreshWindow()
 		if main_app.AppStatus.CurrentView == main_app.VIEW_TAGS {
 			UpdateMainTagsList()
 		}

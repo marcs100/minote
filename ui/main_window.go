@@ -351,9 +351,8 @@ func showNotesAsPages(notesIn []note.NoteData) {
 	}
 
 	var np NotePage
-	fmt.Println("********** About to call NewNotePage here!!!!!!!!***************")
 	noteContainer := np.NewNotePage(&retrievedNote, allowEdit, mainWindow)
-	fmt.Println(" ********** Finished NewNotePage here****************")
+	np.NotePageWidgets.ModeSelect.SetSelected("View")
 	np.AddNoteKeyboardShortcuts()
 	AppContainers.singleNoteStack.Add(noteContainer)
 	AppContainers.mainPageContainer.Show()
@@ -362,7 +361,6 @@ func showNotesAsPages(notesIn []note.NoteData) {
 
 func UpdateView() error {
 	//var notes []minotedb.NoteData
-	fmt.Println("******* Entering UpdateView() ************")
 	var err error
 	//fyne.CurrentApp().SendNotification(fyne.NewNotification("Current View: ", currentView))
 	switch main_app.AppStatus.CurrentView {
@@ -428,25 +426,16 @@ func UpdateView() error {
 		err = errors.New("undefined view")
 	}
 
-	fmt.Println("UodateView() DEBUG 1 ************************")
-
 	if err != nil {
-		fmt.Println("UodateView() DEBUG 2 ************************")
-		log.Println("Error in view update!")
 		return err
 	}
-
-	fmt.Println("UodateView() DEBUG 3 ************************")
-
 	err = showCurrentLayout()
 
-	fmt.Println("******* Leaving UpdateView() ************")
 	return err
 }
 
 func showCurrentLayout() error {
 	var err error = nil
-	fmt.Println("********** Entered ShowCurrentLayout ************************")
 	switch main_app.AppStatus.CurrentLayout {
 	case main_app.LAYOUT_GRID:
 		if len(main_app.AppStatus.Notes) <= main_app.Conf.Settings.GridMaxPages {
@@ -466,7 +455,6 @@ func showCurrentLayout() error {
 	default:
 		err = errors.New("undefined layout")
 	}
-	fmt.Println("*************Leaving showCurrentLayout ************************")
 
 	return err
 }
