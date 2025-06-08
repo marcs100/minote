@@ -43,6 +43,7 @@ type NotePage struct {
 	NoteInfo           note.NoteInfo
 	RetrievedNote      note.NoteData
 	AllowEdit          bool
+	NewWindowMode      bool
 	NotePageWidgets    NotePageWidgets
 	NotePageContainers NotePageContainers
 	NotePageCanvas     NotePageCanvas

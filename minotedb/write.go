@@ -81,7 +81,7 @@ func InsertNote(notebook string, content string, pinned uint, pinnedDate string,
 		pinnedDate = time.Now().String()[0:19]
 	}
 
-	res, err := db.Exec("INSERT INTO notes VALUES(NULL,?,?,?,?,?,?,?)", notebook, content, created, modified, pinned, colour, pinnedDate)
+	res, err := db.Exec("INSERT INTO notes VALUES(NULL,?,?,?,?,?,?,?)", notebook, content, created, modified, pinned, pinnedDate, colour)
 	rows, _ := res.RowsAffected()
 	id, _ = res.LastInsertId()
 

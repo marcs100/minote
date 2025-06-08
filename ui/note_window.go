@@ -32,7 +32,7 @@ func NewNoteWindow(noteId uint, parentWindow fyne.Window) {
 
 	noteWindow := main_app.MainApp.NewWindow("")
 	var np NotePage
-	noteContainer := np.NewNotePage(&retrievedNote, true, noteWindow)
+	noteContainer := np.NewNotePage(&retrievedNote, true, true, noteWindow)
 
 	//fmt.Println(fmt.Sprintf("************Notebook is %s", "debug"))
 	noteWindow.SetTitle(fmt.Sprintf("Notebook: %s", np.NoteInfo.Notebook))

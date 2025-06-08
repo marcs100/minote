@@ -21,9 +21,10 @@ import (
 	"github.com/marcs100/minote/tracker"
 )
 
-func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, parentWindow fyne.Window) *fyne.Container {
+func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWindowMode bool, parentWindow fyne.Window) *fyne.Container {
 	np.ParentWindow = parentWindow
 	np.AllowEdit = allowEdit
+	np.NewWindowMode = newWindowMode
 	np.RetrievedNote = *retrievedNote
 	np.NoteInfo.NewNote = false
 	if retrievedNote.Id == 0 {
@@ -82,9 +83,11 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit bool, pa
 			np.ShowProperties()
 		}
 	}, func() {
-		np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
-		fmt.Println("Focus lost will try and save note")
-		np.SaveNote()
+		if !np.NoteInfo.Deleted {
+			np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
+			fmt.Println("Focus lost will try and save note")
+			np.SaveNote()
+		}
 	},
 	)
 
@@ -261,7 +264,10 @@ func (np *NotePage) DeleteNote() {
 				//log.Panicln(err)
 			} else {
 				np.NoteInfo.Deleted = true
-				np.ParentWindow.Close() //This needs fixing - will close main window on single page view
+				if np.NewWindowMode {
+					np.ParentWindow.Close()
+				}
+				UpdateView()
 			}
 		}
 	}, np.ParentWindow)
