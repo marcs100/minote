@@ -347,21 +347,29 @@ func (np *NotePage) SetViewMode() {
 	}
 	np.NotePageWidgets.MarkdownText.ParseMarkdown(np.NotePageWidgets.Entry.Text)
 	np.NotePageWidgets.MarkdownText.Show()
-	np.NotePageWidgets.ModeSelect.SetSelected(main_app.VIEW_MODE)
 	np.ParentWindow.Canvas().Focus(nil) // this allows the canvas keyboard shortcuts to work rather than the entry widget shortcuts
 	np.NotePageContainers.Markdown.Show()
+	np.NotePageWidgets.ModeSelect.SetSelected(main_app.VIEW_MODE)
+	if np.NewWindowMode {
+		np.ParentWindow.Show()
+	}
 }
 
 func (np *NotePage) ChangeNoteColour() {
+	var colourChanged = false
 	picker := dialog.NewColorPicker("Note Color", "Pick colour", func(c color.Color) {
 		fmt.Println(c)
 		hex := conversions.FyneColourToRGBHex(c)
 		np.NoteInfo.Colour = fmt.Sprintf("%s%s", "#", hex)
 		np.NotePageCanvas.NoteBackground.FillColor = c
+		colourChanged = true
 	}, np.ParentWindow)
 	picker.Advanced = true
 	picker.Show()
-	np.UpdateProperties()
+	if colourChanged {
+		np.UpdateProperties()
+		UpdateView()
+	}
 }
 
 func (np *NotePage) SaveNote() {
@@ -399,8 +407,10 @@ func (np *NotePage) SaveNote() {
 				return
 			}
 			//track new note as open.
-			// Only wroks as new notes are always opned in a new window
-			tracker.AddToTracker(np.NoteInfo.Id)
+			// Only works as new notes are always opned in a new window
+			if np.NewWindowMode {
+				tracker.AddToTracker(np.NoteInfo.Id)
+			}
 
 			UpdateView()
 		}
