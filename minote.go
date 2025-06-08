@@ -92,6 +92,8 @@ func CreateAppConfig(homeDir string) config.Config {
 		LightColourNote:  "#e2e2e2",
 		DarkColourBg:     "#1e1e1e",
 		LightColourBg:    "#efefef",
+		DarkColourCtBg:   "#1e1e1e",
+		LightColourCtBg:  "#efefef",
 	}
 	newConfig := config.Config{
 		Title:    "Minote config",
