@@ -23,6 +23,12 @@ var ScShowNotebooks = &desktop.CustomShortcut{
 	Modifier: fyne.KeyModifierControl,
 }
 
+// View Tags (toggles taggles list panel)
+var ScShowTags = &desktop.CustomShortcut{
+	KeyName:  fyne.KeyT,
+	Modifier: fyne.KeyModifierControl,
+}
+
 // open search panel
 var ScFind = &desktop.CustomShortcut{
 	KeyName:  fyne.KeyF,

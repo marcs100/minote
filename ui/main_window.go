@@ -572,4 +572,18 @@ func addMainKeyboardShortcuts() {
 	mainWindow.Canvas().AddShortcut(main_app.ScShowNotebooks, func(shortcut fyne.Shortcut) {
 		showNotebooksPanel()
 	})
+
+	//Keyboard shortcut to show notebooks list
+	mainWindow.Canvas().AddShortcut(main_app.ScShowTags, func(shortcut fyne.Shortcut) {
+		ToggleMainTagsPanel()
+		main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
+		PageView.Reset()
+		err := UpdateView()
+		if err != nil {
+			log.Print("Error getting tagged notes: ")
+			dialog.ShowError(err, mainWindow)
+			log.Panic(err)
+		}
+
+	})
 }
