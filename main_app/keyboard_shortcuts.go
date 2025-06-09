@@ -69,6 +69,12 @@ var ScPinNote = &desktop.CustomShortcut{
 	Modifier: fyne.KeyModifierControl | fyne.KeyModifierShift,
 }
 
+// Show note tags
+var ScNoteTags = &desktop.CustomShortcut{
+	KeyName:  fyne.KeyT,
+	Modifier: fyne.KeyModifierControl | fyne.KeyModifierShift,
+}
+
 // Change note colour
 var ScNoteColour = &desktop.CustomShortcut{
 	KeyName:  fyne.KeyC,

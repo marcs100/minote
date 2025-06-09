@@ -81,6 +81,8 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 			np.ChangeNoteColour()
 		case main_app.ScShowInfo.ShortcutName():
 			np.ShowProperties()
+		case main_app.ScNoteTags.ShortcutName():
+			np.ToggleTagsNotePanel()
 		}
 	}, func() {
 		if !np.NoteInfo.Deleted {
@@ -457,6 +459,12 @@ func (np *NotePage) AddNoteKeyboardShortcuts() {
 	//Keyboard shortcut to show properties panel
 	np.ParentWindow.Canvas().AddShortcut(main_app.ScShowInfo, func(shortcut fyne.Shortcut) {
 		np.ShowProperties()
+		np.RefreshWindow()
+	})
+
+	//Keyboard shortcut to show tags panel
+	np.ParentWindow.Canvas().AddShortcut(main_app.ScNoteTags, func(shortcut fyne.Shortcut) {
+		np.ToggleTagsNotePanel()
 		np.RefreshWindow()
 	})
 
