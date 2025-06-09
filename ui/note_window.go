@@ -28,6 +28,11 @@ func NewNoteWindow(noteId uint, parentWindow fyne.Window) {
 	} else {
 		//new note
 		retrievedNote.Id = 0
+		if main_app.AppStatus.CurrentView == main_app.VIEW_NOTEBOOK {
+			retrievedNote.Notebook = main_app.AppStatus.CurrentNotebook
+		} else {
+			retrievedNote.Notebook = "General"
+		}
 	}
 
 	noteWindow := main_app.MainApp.NewWindow("")

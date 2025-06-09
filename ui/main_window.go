@@ -29,6 +29,7 @@ func StartUI(appConfigIn *config.Config, configFile string, version string) {
 	main_app.Conf = appConfigIn
 	main_app.MainApp = app.NewWithID("minote")
 	main_app.AppStatus.ConfigFile = configFile
+	main_app.AppStatus.CurrentNotebook = "General" // default for new noteooks if note in notrbook view
 	createMainWindow(version)
 }
 

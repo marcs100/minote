@@ -31,7 +31,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 		//New note
 		np.NoteInfo = note.NoteInfo{
 			Id:           0,
-			Notebook:     "General",
+			Notebook:     retrievedNote.Notebook,
 			DateCreated:  "",
 			DateModified: "",
 			Pinned:       false,
