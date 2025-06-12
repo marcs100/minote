@@ -481,7 +481,11 @@ func CreateNotebooksList() {
 		},
 		func(id widget.ListItemID, o fyne.CanvasObject) {
 			main_app.AppStatus.Notes, _ = notes.GetNotebook(main_app.AppStatus.Notebooks[id])
-			o.(*widget.Button).SetText(fmt.Sprintf("%s (%d)", main_app.AppStatus.Notebooks[id], len(main_app.AppStatus.Notes)))
+			var name = main_app.AppStatus.Notebooks[id]
+			if len(name) > 15 {
+				name = fmt.Sprint(name[:len(name)-3], "...")
+			}
+			o.(*widget.Button).SetText(fmt.Sprintf("%s (%d)", name, len(main_app.AppStatus.Notes)))
 			o.(*widget.Button).OnTapped = func() {
 				//AppStatus.Notes,_ = minotedb.GetNotebook(AppStatus.Notebooks[id])
 				main_app.AppStatus.CurrentView = main_app.VIEW_NOTEBOOK
