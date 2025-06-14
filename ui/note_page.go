@@ -138,7 +138,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 		np.DeleteNote()
 	})
 
-	tagsBtn := widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
+	np.NotePageWidgets.TagsButton = widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
 		np.ToggleTagsNotePanel()
 	})
 
@@ -165,7 +165,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 
 	np.NotePageWidgets.ModeSelect.SetSelected("View")
 	np.NotePageWidgets.ModeSelect.Horizontal = true
-	toolbar := container.NewHBox(np.NotePageWidgets.ModeSelect, spacerLabel, np.NotePageWidgets.PinButton, colourButton, changeNotebookBtn, tagsBtn, propertiesButton, np.NotePageWidgets.DeleteButton)
+	toolbar := container.NewHBox(np.NotePageWidgets.ModeSelect, spacerLabel, np.NotePageWidgets.PinButton, colourButton, changeNotebookBtn, np.NotePageWidgets.TagsButton, propertiesButton, np.NotePageWidgets.DeleteButton)
 
 	if err := CreateNotesTagPanel(np); err != nil {
 		dialog.ShowError(err, np.ParentWindow)
@@ -328,6 +328,7 @@ func (np *NotePage) SetEditMode() {
 	np.NotePageWidgets.MarkdownText.Hide()
 	np.NotePageContainers.Markdown.Hide()
 	np.NotePageWidgets.DeleteButton.Show()
+	np.TagsButtonDisplay()
 	if main_app.AppStatus.CurrentLayout == main_app.LAYOUT_PAGE {
 		//Hide page back & forward for edit mode
 		//main_ui.AppWidgets.Toolbar.Items[2].ToolbarObject().Hide() // needs review
@@ -342,6 +343,7 @@ func (np *NotePage) SetEditMode() {
 func (np *NotePage) SetViewMode() {
 	np.NotePageWidgets.Entry.Hide()
 	np.NotePageWidgets.DeleteButton.Hide()
+	np.TagsButtonDisplay()
 	if main_app.AppStatus.CurrentLayout == main_app.LAYOUT_PAGE {
 		//Show page back & forward for edit mode
 		//AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // needs review

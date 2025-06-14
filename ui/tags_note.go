@@ -18,7 +18,6 @@ func CreateNotesTagPanel(np *NotePage) error {
 	np.NotePageContainers.TagLabels = container.NewHBox()
 	np.NotePageContainers.TagsPanel = container.NewHScroll(np.NotePageContainers.TagLabels)
 	np.NotePageWidgets.AddTagButton = widget.NewButtonWithIcon("", theme.ContentAddIcon(), func() {
-		//fmt.Println("add tag button tapped")
 		tagEntry := widget.NewEntry()
 		tagEntryItem := widget.NewFormItem("tag entry", tagEntry)
 		tagEntryDialog := dialog.NewForm("      Enter tag name      ", "OK", "Cancel", []*widget.FormItem{tagEntryItem}, func(confirmed bool) {
@@ -91,5 +90,15 @@ func (np *NotePage) ToggleTagsNotePanel() {
 		np.NotePageContainers.TagsPanel.Hide()
 	} else {
 		np.NotePageContainers.TagsPanel.Show()
+	}
+}
+
+func (np *NotePage) TagsButtonDisplay() {
+	if np.NoteInfo.NewNote {
+		np.NotePageWidgets.TagsButton.Hide()
+	} else {
+		if np.NotePageWidgets.TagsButton.Hidden {
+			np.NotePageWidgets.TagsButton.Show()
+		}
 	}
 }

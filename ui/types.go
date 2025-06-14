@@ -58,6 +58,7 @@ type NotePageWidgets struct {
 	ModeSelect     *widget.RadioGroup
 	PropertiesText *widget.Label
 	AddTagButton   *widget.Button
+	TagsButton     *widget.Button
 }
 
 type NotePageContainers struct {
