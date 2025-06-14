@@ -147,18 +147,20 @@ func getColumn(query string) ([]string, error) {
 
 	rows, err := db.Query(query)
 	var fields []string
-	defer rows.Close()
-	for rows.Next() {
-		var field string
-		err := rows.Scan(&field)
 
-		if err != nil {
-			return nil, err
+	if rows != nil{	
+		for rows.Next() {
+			var field string
+			err := rows.Scan(&field)
+
+			if err != nil {
+				return nil, err
+			}
+
+			fields = append(fields, field)
 		}
-
-		fields = append(fields, field)
+		rows.Close()
 	}
-
 	return fields, err
 }
 

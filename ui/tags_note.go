@@ -50,6 +50,11 @@ func (np *NotePage) UpdateTags() error {
 	np.NotePageContainers.TagLabels.RemoveAll()
 	np.NotePageContainers.TagLabels.Add(widget.NewLabel("Tags:  "))
 
+	if np.NoteInfo.NewNote {
+		np.NotePageContainers.TagLabels.Add(np.NotePageWidgets.AddTagButton)
+		return nil
+	}
+
 	if tags, err = note.GetTagsForNote(np.NoteInfo.Id); err == nil {
 		//fmt.Println(tags)
 		for _, tag := range tags {
