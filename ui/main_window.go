@@ -166,11 +166,20 @@ func createTopPanel() *fyne.Container {
 		//display settings
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
 			if !main_app.AppStatus.SettingsOpen {
-				NewSettingsWindow()
+				settingsWindow := NewSettingsWindow()
+				main_app.AppStatus.SettingsOpen = true //we only allow one settings window
+				settingsWindow.Show()
+				settingsWindow.RequestFocus()
 			}
 
 		}),
 	)
+
+	sortLabel := widget.NewLabel("sort:")
+	sort := widget.NewSelect([]string{"newer first", "older first"}, func(s string) {
+		fmt.Println("sort view selected")
+	})
+	sort.SetSelectedIndex(0)
 
 	AppWidgets.Toolbar = toolbar
 	//rect := canvas.NewRectangle(main_app.AppTheme.)
@@ -181,6 +190,8 @@ func createTopPanel() *fyne.Container {
 		toolbar,
 		AppWidgets.pageLabel,
 		layout.NewSpacer(),
+		sortLabel,
+		sort,
 		spacerLabel,
 		settingsBar,
 	)

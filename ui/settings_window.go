@@ -13,7 +13,7 @@ import (
 	"github.com/marcs100/minote/main_app"
 )
 
-func NewSettingsWindow() {
+func NewSettingsWindow() fyne.Window {
 
 	newConf := CopySettings()
 
@@ -115,8 +115,7 @@ func NewSettingsWindow() {
 	})
 
 	settingsWindow.SetContent(stack)
-	main_app.AppStatus.SettingsOpen = true //we only allow one settings window
-	settingsWindow.Show()
+	return settingsWindow
 }
 
 func CopySettings() config.Config {
