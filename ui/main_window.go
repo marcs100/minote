@@ -176,7 +176,7 @@ func createTopPanel() *fyne.Container {
 	)
 
 	sortLabel := widget.NewLabel("sort:")
-	sort := widget.NewSelect([]string{"newer first", "older first"}, func(s string) {
+	sort := widget.NewSelect([]string{"newest first", "oldest first"}, func(s string) {
 		fmt.Println("sort view selected")
 	})
 	sort.SetSelectedIndex(0)
@@ -215,7 +215,7 @@ func createSidePanel() *fyne.Container {
 	})
 
 	//pinnedBtn := widget.NewButton("P", func(){
-	pinnedBtn := widget.NewButtonWithIcon("Pinned", theme.RadioButtonCheckedIcon(), func() {
+	pinnedBtn := widget.NewButtonWithIcon("", theme.RadioButtonCheckedIcon(), func() {
 		main_app.AppStatus.CurrentView = main_app.VIEW_PINNED
 		PageView.Reset()
 		err := UpdateView()
@@ -226,7 +226,7 @@ func createSidePanel() *fyne.Container {
 		}
 	})
 
-	RecentBtn := widget.NewButtonWithIcon("Recent", theme.HistoryIcon(), func() {
+	RecentBtn := widget.NewButtonWithIcon("", theme.HistoryIcon(), func() {
 		//AppStatus.Notes,err = minotedb.GetRecentNotes(Conf.Settings.RecentNotesLimit)
 		main_app.AppStatus.CurrentView = main_app.VIEW_RECENT
 		PageView.Reset()
@@ -238,7 +238,7 @@ func createSidePanel() *fyne.Container {
 		}
 	})
 
-	tagsBtn := widget.NewButtonWithIcon("Tags", theme.CheckButtonIcon(), func() {
+	tagsBtn := widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
 		ToggleMainTagsPanel()
 		main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
 		PageView.Reset()
@@ -253,7 +253,7 @@ func createSidePanel() *fyne.Container {
 
 	CreateNotebooksList()
 
-	notebooksBtn := widget.NewButtonWithIcon("Notebooks", theme.FolderOpenIcon(), func() {
+	notebooksBtn := widget.NewButtonWithIcon("", theme.FolderOpenIcon(), func() {
 		showNotebooksPanel()
 	})
 
@@ -389,7 +389,7 @@ func UpdateView() error {
 			AppContainers.tagsPanel.Hide()
 		}
 		AppWidgets.viewLabel.SetText("Pinned Notes")
-		main_app.AppStatus.Notes, err = notes.GetPinnedNotes()
+		main_app.AppStatus.Notes, err = notes.GetPinnedNotes(notes.SORT_PINNED_FIRST) // ******* this needs updating to be dynamic*************
 		main_app.AppStatus.CurrentNotebook = ""
 	case main_app.VIEW_RECENT:
 		if AppContainers.listPanel != nil {

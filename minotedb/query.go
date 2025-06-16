@@ -18,8 +18,21 @@ func GetNote(id uint) (NoteDataDB, error) {
 	return notes[0], err
 }
 
-func GetPinnedNotes() ([]NoteDataDB, error) {
-	var query string = "select * from notes where pinned = 1 order by pinnedDate desc"
+func GetPinnedNotes(sortBy int) ([]NoteDataDB, error) {
+	var sortField string = ""
+	switch sortBy {
+	case SORT_NEWEST:
+		sortField = "created desc"
+	case SORT_OLDEST:
+		sortField = "created asc"
+	case SORT_PINNED_FIRST:
+		sortField = "pinnedDate desc"
+	case SORT_PINNED_LAST:
+		sortField = "pinnedData asc"
+	default:
+		return nil, errors.New("undefined/unallowed sort mode")
+	}
+	var query string = fmt.Sprintf("select * from notes where pinned = 1 order by %s", sortField)
 	return getNotes(query)
 }
 
@@ -31,7 +44,7 @@ func GetPinnedDate(noteId uint) (string, error) {
 		return "", err
 	}
 
-	return fields[0], err
+	return fields[0], errors.New("undefined sort mode")
 }
 
 func GetNotebook(notebookName string) ([]NoteDataDB, error) {
@@ -148,7 +161,7 @@ func getColumn(query string) ([]string, error) {
 	rows, err := db.Query(query)
 	var fields []string
 
-	if rows != nil{	
+	if rows != nil {
 		for rows.Next() {
 			var field string
 			err := rows.Scan(&field)

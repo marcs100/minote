@@ -15,9 +15,9 @@ func GetAllTags() []string {
 	return tags
 }
 
-func GetPinnedNotes() ([]note.NoteData, error) {
+func GetPinnedNotes(sortBy int) ([]note.NoteData, error) {
 	var pinnedNotes []note.NoteData = nil
-	notesDB, err := minotedb.GetPinnedNotes()
+	notesDB, err := minotedb.GetPinnedNotes(sortBy)
 	if err == nil {
 		for _, noteDB := range notesDB {
 			pinnedNotes = append(pinnedNotes, note.NoteData(noteDB))
