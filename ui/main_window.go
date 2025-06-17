@@ -11,6 +11,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"github.com/marcs100/minote/config"
 	"github.com/marcs100/minote/conversions"
 	"github.com/marcs100/minote/main_app"
@@ -176,10 +177,9 @@ func createTopPanel() *fyne.Container {
 	)
 
 	sortLabel := widget.NewLabel("sort:")
-	sort := widget.NewSelect([]string{"newest first", "oldest first"}, func(s string) {
-		fmt.Println("sort view selected")
-	})
-	sort.SetSelectedIndex(0)
+	main_app.AppStatus.CurrentSortSelected = binding.NewString()
+	sortSelect := widget.NewSelectWithData([]string{"newest first", "oldest first"}, main_app.AppStatus.CurrentSortSelected)
+	sortSelect.SetSelectedIndex(0)
 
 	AppWidgets.Toolbar = toolbar
 	//rect := canvas.NewRectangle(main_app.AppTheme.)
@@ -191,7 +191,7 @@ func createTopPanel() *fyne.Container {
 		AppWidgets.pageLabel,
 		layout.NewSpacer(),
 		sortLabel,
-		sort,
+		sortSelect,
 		spacerLabel,
 		settingsBar,
 	)

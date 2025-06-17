@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/data/binding"
 	"github.com/marcs100/minote/note"
 	"github.com/marcs100/minote/notes"
 )
@@ -28,15 +29,16 @@ type AppColours struct {
 }
 
 type ApplicationStatus struct {
-	ConfigFile      string
-	CurrentView     string
-	CurrentNotebook string
-	CurrentLayout   string
-	Notes           []note.NoteData
-	Notebooks       []string
-	Tags            []string
-	TagsChecked     []string
-	NoteSize        fyne.Size
-	SearchFilter    notes.SearchFilter
-	SettingsOpen    bool
+	ConfigFile          string
+	CurrentView         string
+	CurrentNotebook     string
+	CurrentLayout       string
+	CurrentSortSelected binding.String
+	Notes               []note.NoteData
+	Notebooks           []string
+	Tags                []string
+	TagsChecked         []string
+	NoteSize            fyne.Size
+	SearchFilter        notes.SearchFilter
+	SettingsOpen        bool
 }
