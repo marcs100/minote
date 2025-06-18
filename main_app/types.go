@@ -4,7 +4,6 @@ import (
 	"image/color"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/data/binding"
 	"github.com/marcs100/minote/note"
 	"github.com/marcs100/minote/notes"
 )
@@ -33,7 +32,7 @@ type ApplicationStatus struct {
 	CurrentView         string
 	CurrentNotebook     string
 	CurrentLayout       string
-	CurrentSortSelected binding.String
+	CurrentSortSelected string
 	Notes               []note.NoteData
 	Notebooks           []string
 	Tags                []string

@@ -11,7 +11,6 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
 	"github.com/marcs100/minote/config"
 	"github.com/marcs100/minote/conversions"
 	"github.com/marcs100/minote/main_app"
@@ -82,6 +81,7 @@ func createMainWindow(version string) {
 	main_app.AppStatus.CurrentView = main_app.Conf.Settings.InitialView
 	fmt.Println("initial view = " + main_app.Conf.Settings.InitialView)
 	main_app.AppStatus.CurrentLayout = main_app.Conf.Settings.InitialLayout
+	setSortOptions(main_app.AppStatus.CurrentView)
 
 	if err := UpdateView(); err != nil {
 		fmt.Println(err)
@@ -169,17 +169,21 @@ func createTopPanel() *fyne.Container {
 			if !main_app.AppStatus.SettingsOpen {
 				settingsWindow := NewSettingsWindow()
 				main_app.AppStatus.SettingsOpen = true //we only allow one settings window
+				settingsWindow.Content().Refresh()
 				settingsWindow.Show()
-				settingsWindow.RequestFocus()
+				fmt.Println("Showing Settings window!")
 			}
 
 		}),
 	)
 
 	sortLabel := widget.NewLabel("sort:")
-	main_app.AppStatus.CurrentSortSelected = binding.NewString()
-	sortSelect := widget.NewSelectWithData([]string{"newest first", "oldest first"}, main_app.AppStatus.CurrentSortSelected)
-	sortSelect.SetSelectedIndex(0)
+	main_app.AppStatus.CurrentSortSelected = "newest first"
+	AppWidgets.sortSelect = widget.NewSelect([]string{"newest first", "oldest first"}, func(s string) {
+		main_app.AppStatus.CurrentSortSelected = s
+		UpdateView()
+	})
+	AppWidgets.sortSelect.SetSelectedIndex(0)
 
 	AppWidgets.Toolbar = toolbar
 	//rect := canvas.NewRectangle(main_app.AppTheme.)
@@ -191,7 +195,7 @@ func createTopPanel() *fyne.Container {
 		AppWidgets.pageLabel,
 		layout.NewSpacer(),
 		sortLabel,
-		sortSelect,
+		AppWidgets.sortSelect,
 		spacerLabel,
 		settingsBar,
 	)
@@ -211,12 +215,14 @@ func createSidePanel() *fyne.Container {
 
 	searchBtn := widget.NewButtonWithIcon("", theme.SearchIcon(), func() {
 		//Display the search panel here
+		setSortOptions(main_app.VIEW_SEARCH)
 		ShowSearchPanel()
 	})
 
 	//pinnedBtn := widget.NewButton("P", func(){
 	pinnedBtn := widget.NewButtonWithIcon("", theme.RadioButtonCheckedIcon(), func() {
 		main_app.AppStatus.CurrentView = main_app.VIEW_PINNED
+		setSortOptions(main_app.AppStatus.CurrentView)
 		PageView.Reset()
 		err := UpdateView()
 		if err != nil {
@@ -231,6 +237,7 @@ func createSidePanel() *fyne.Container {
 		main_app.AppStatus.CurrentView = main_app.VIEW_RECENT
 		PageView.Reset()
 		err := UpdateView()
+		setSortOptions(main_app.AppStatus.CurrentView)
 		if err != nil {
 			log.Print("Error getting recent notes: ")
 			dialog.ShowError(err, mainWindow)
@@ -242,6 +249,7 @@ func createSidePanel() *fyne.Container {
 		ToggleMainTagsPanel()
 		main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
 		PageView.Reset()
+		setSortOptions(main_app.AppStatus.CurrentView)
 		err := UpdateView()
 		if err != nil {
 			log.Print("Error getting tagged notes: ")
@@ -254,6 +262,7 @@ func createSidePanel() *fyne.Container {
 	CreateNotebooksList()
 
 	notebooksBtn := widget.NewButtonWithIcon("", theme.FolderOpenIcon(), func() {
+		setSortOptions(main_app.AppStatus.CurrentView)
 		showNotebooksPanel()
 	})
 
@@ -601,4 +610,24 @@ func addMainKeyboardShortcuts() {
 		}
 
 	})
+}
+
+func setSortOptions(view string) {
+
+	switch view {
+	case main_app.VIEW_PINNED:
+		AppWidgets.sortSelect.Options = []string{"Pinned First", "Pinned Last", "Newest First", "Oldest First"}
+	case main_app.VIEW_RECENT:
+		AppWidgets.sortSelect.Options = []string{"Newest First", "Oldest First"}
+	case main_app.VIEW_NOTEBOOK:
+		AppWidgets.sortSelect.Options = []string{"Newest First", "Oldest First"}
+	case main_app.VIEW_TAGS:
+		AppWidgets.sortSelect.Options = []string{"Newest First", "Oldest First"}
+	case main_app.VIEW_SEARCH:
+		AppWidgets.sortSelect.Options = []string{"Newest First", "Oldest First", "Created First", "Created Last"}
+
+	}
+
+	AppWidgets.sortSelect.SetSelectedIndex(0)
+	AppWidgets.sortSelect.Refresh()
 }

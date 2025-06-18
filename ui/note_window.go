@@ -56,5 +56,7 @@ func NewNoteWindow(noteId uint, parentWindow fyne.Window) {
 		np.SetEditMode()
 	}
 
+	np.RefreshWindow()
+
 	noteWindow.Show()
 }

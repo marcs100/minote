@@ -36,6 +36,7 @@ type ApplicationWidgets struct {
 	//tagsList           *widget.List
 	searchEntry        *widget.Entry
 	searchResultsLabel *widget.Label
+	sortSelect         *widget.Select
 }
 type NotePage struct {
 	Id                 uint

@@ -29,7 +29,7 @@ func NewSettingsWindow() fyne.Window {
 	main_app.AppTheme = main_app.GetThemeColours(themeVar)
 
 	settingsWindow := main_app.MainApp.NewWindow("Settings")
-	settingsWindow.Resize(fyne.NewSize(500, 400))
+	settingsWindow.Resize(fyne.NewSize(500, 450))
 
 	bg := canvas.NewRectangle(main_app.AppTheme.MainBgColour)
 
