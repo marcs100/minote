@@ -169,7 +169,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 
 	if err := CreateNotesTagPanel(np); err != nil {
 		dialog.ShowError(err, np.ParentWindow)
-		log.Panicln("Error creating tags panel")
+		//log.Panicln("Error creating tags panel")
 	}
 	np.UpdateTags()
 

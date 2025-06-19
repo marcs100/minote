@@ -1,4 +1,4 @@
-package  minotedb
+package minotedb
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ func CreateNew(dbFileName string, dbFilePath string) error {
 	err = Open(filepath.Join(dbFilePath, dbFileName))
 	if err == nil {
 		noteTableCom := "create table if not exists notes (id INTEGER PRIMARY KEY, notebook TEXT, content TEXT, created TEXT,modified TEXT, pinned INTEGER, pinnedDate TEXT ,BGColour TEXT)"
-		tagTableCom := "create table if not exists tags (id INTEGER PRIMARY KEY, name TEXT, noteId INTEGER)"
+		tagTableCom := "create table if not exists tags (id INTEGER PRIMARY KEY, tag TEXT, noteId INTEGER)"
 
 		if err = createTable(noteTableCom); err != nil {
 			return err
