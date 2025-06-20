@@ -220,7 +220,9 @@ func createSidePanel() *fyne.Container {
 
 	searchBtn := widget.NewButtonWithIcon("", theme.SearchIcon(), func() {
 		//Display the search panel here
+		main_app.AppStatus.CurrentView = main_app.VIEW_SEARCH
 		setSortOptions(main_app.VIEW_SEARCH)
+		AppWidgets.sortSelect.SetSelectedIndex(0)
 		ShowSearchPanel()
 	})
 
@@ -229,25 +231,27 @@ func createSidePanel() *fyne.Container {
 		main_app.AppStatus.CurrentView = main_app.VIEW_PINNED
 		setSortOptions(main_app.AppStatus.CurrentView)
 		PageView.Reset()
-		err := UpdateView()
-		if err != nil {
-			log.Print("Error getting pinned notes: ")
-			dialog.ShowError(err, mainWindow)
-			log.Panic(err)
-		}
+		AppWidgets.sortSelect.SetSelectedIndex(0)
+		// err := UpdateView()
+		// if err != nil {
+		// 	log.Print("Error getting pinned notes: ")
+		// 	dialog.ShowError(err, mainWindow)
+		// 	log.Panic(err)
+		// }
 	})
 
 	RecentBtn := widget.NewButtonWithIcon("", theme.HistoryIcon(), func() {
 		//AppStatus.Notes,err = minotedb.GetRecentNotes(Conf.Settings.RecentNotesLimit)
 		main_app.AppStatus.CurrentView = main_app.VIEW_RECENT
 		PageView.Reset()
-		err := UpdateView()
 		setSortOptions(main_app.AppStatus.CurrentView)
-		if err != nil {
-			log.Print("Error getting recent notes: ")
-			dialog.ShowError(err, mainWindow)
-			log.Panic(err)
-		}
+		AppWidgets.sortSelect.SetSelectedIndex(0)
+		// err := UpdateView()
+		// if err != nil {
+		// 	log.Print("Error getting recent notes: ")
+		// 	dialog.ShowError(err, mainWindow)
+		// 	log.Panic(err)
+		// }
 	})
 
 	tagsBtn := widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
@@ -255,18 +259,20 @@ func createSidePanel() *fyne.Container {
 		main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
 		PageView.Reset()
 		setSortOptions(main_app.AppStatus.CurrentView)
-		err := UpdateView()
-		if err != nil {
-			log.Print("Error getting tagged notes: ")
-			dialog.ShowError(err, mainWindow)
-			log.Panic(err)
-		}
+		AppWidgets.sortSelect.SetSelectedIndex(0)
+		// err := UpdateView()
+		// if err != nil {
+		// 	log.Print("Error getting tagged notes: ")
+		// 	dialog.ShowError(err, mainWindow)
+		// 	log.Panic(err)
+		// }
 
 	})
 
 	CreateNotebooksList()
 
 	notebooksBtn := widget.NewButtonWithIcon("", theme.FolderOpenIcon(), func() {
+		main_app.AppStatus.CurrentView = main_app.VIEW_NOTEBOOK
 		setSortOptions(main_app.AppStatus.CurrentView)
 		showNotebooksPanel()
 	})
@@ -537,14 +543,17 @@ func UpdateNotebooksList() {
 
 func showNotebooksPanel() {
 	UpdateNotebooksList()
+	fmt.Printf("Current view: %s\n", main_app.AppStatus.CurrentView) // ******* debug only ***********
 	if main_app.AppStatus.CurrentView != main_app.VIEW_NOTEBOOK {
 		AppWidgets.viewLabel.SetText("Notebooks")
 	}
 
 	if AppContainers.listPanel != nil {
 		if AppContainers.listPanel.Visible() {
+			fmt.Println("Will hide notebooks panel")
 			AppContainers.listPanel.Hide()
 		} else {
+			fmt.Println("Will show notebooks panel")
 			AppContainers.listPanel.Show()
 		}
 	}
