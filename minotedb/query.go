@@ -19,22 +19,9 @@ func GetNote(id uint) (NoteDataDB, error) {
 }
 
 func GetPinnedNotes(sortBy int) ([]NoteDataDB, error) {
-	var sortField string = ""
-	switch sortBy {
-	case SORT_NEWEST:
-		sortField = "modified desc"
-		fmt.Println("newest first")
-	case SORT_OLDEST:
-		sortField = "modified asc"
-		fmt.Println("oldest first")
-	case SORT_PINNED_NEWER:
-		sortField = "pinnedDate desc"
-		fmt.Println("new pinned first")
-	case SORT_PINNED_OLDER_:
-		sortField = "pinnedDate asc"
-		fmt.Println("new pinned last")
-	default:
-		return nil, errors.New("undefined/unallowed sort mode")
+	sortField, err := getSortField(sortBy)
+	if err != nil {
+		return nil, err
 	}
 	var query string = fmt.Sprintf("select * from notes where pinned = 1 order by %s", sortField)
 	return getNotes(query)
@@ -75,8 +62,12 @@ func CheckNotebookExists(notebook string) (bool, error) {
 	return false, err
 }
 
-func GetRecentNotes(noteCount int) ([]NoteDataDB, error) {
-	var query string = fmt.Sprintf("select * from notes order by modified desc LIMIT %d", noteCount)
+func GetRecentNotes(noteCount int, sortBy int) ([]NoteDataDB, error) {
+	sortField, err := getSortField(sortBy)
+	if err != nil {
+		return nil, err
+	}
+	var query string = fmt.Sprintf("select * from notes order by %s LIMIT %d", sortField, noteCount)
 	return getNotes(query)
 }
 
@@ -258,4 +249,28 @@ func getSearchResults(searchText string, filter SearchFilter) ([]NoteDataDB, err
 		notes = append(notes, note)
 	}
 	return notes, err
+}
+
+func getSortField(sortBy int) (string, error) {
+
+	var sortField string = ""
+	var err error = nil
+	switch sortBy {
+	case SORT_NEWEST:
+		sortField = "modified desc"
+	case SORT_OLDEST:
+		sortField = "modified asc"
+	case SORT_PINNED_NEWER:
+		sortField = "pinnedDate desc"
+	case SORT_PINNED_OLDER_:
+		sortField = "pinnedDate asc"
+	case SORT_CREATED_FIRST:
+		sortField = "created desc"
+	case SORT_CREATED_LAST:
+		sortField = "created asc"
+	default:
+		err = errors.New("undefined/unallowed sort mode")
+	}
+
+	return sortField, err
 }

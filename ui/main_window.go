@@ -184,7 +184,6 @@ func createTopPanel() *fyne.Container {
 	sortLabel := widget.NewLabel("sort:")
 	AppWidgets.sortSelect = widget.NewSelect([]string{""}, func(s string) {
 		main_app.AppStatus.CurrentSortSelected = s
-		fmt.Printf("Current sort is: %s\n", s)
 		UpdateView()
 	})
 	AppWidgets.sortSelect.PlaceHolder = "This is how the size "
@@ -409,7 +408,6 @@ func UpdateView() error {
 			AppContainers.tagsPanel.Hide()
 		}
 		AppWidgets.viewLabel.SetText("Pinned Notes")
-		fmt.Printf("sort index: %d\n", SortViews[main_app.AppStatus.CurrentSortSelected]) // **** debug only ******
 		main_app.AppStatus.Notes, err = notes.GetPinnedNotes(SortViews[main_app.AppStatus.CurrentSortSelected])
 		main_app.AppStatus.CurrentNotebook = ""
 	case main_app.VIEW_RECENT:
@@ -424,7 +422,7 @@ func UpdateView() error {
 		}
 
 		AppWidgets.viewLabel.SetText(("Recent Notes"))
-		main_app.AppStatus.Notes, err = notes.GetRecentNotes(main_app.Conf.Settings.RecentNotesLimit)
+		main_app.AppStatus.Notes, err = notes.GetRecentNotes(main_app.Conf.Settings.RecentNotesLimit, SortViews[main_app.AppStatus.CurrentSortSelected])
 		main_app.AppStatus.CurrentNotebook = ""
 	case main_app.VIEW_NOTEBOOK:
 		if AppContainers.tagsPanel != nil {
@@ -543,17 +541,14 @@ func UpdateNotebooksList() {
 
 func showNotebooksPanel() {
 	UpdateNotebooksList()
-	fmt.Printf("Current view: %s\n", main_app.AppStatus.CurrentView) // ******* debug only ***********
 	if main_app.AppStatus.CurrentView != main_app.VIEW_NOTEBOOK {
 		AppWidgets.viewLabel.SetText("Notebooks")
 	}
 
 	if AppContainers.listPanel != nil {
 		if AppContainers.listPanel.Visible() {
-			fmt.Println("Will hide notebooks panel")
 			AppContainers.listPanel.Hide()
 		} else {
-			fmt.Println("Will show notebooks panel")
 			AppContainers.listPanel.Show()
 		}
 	}
@@ -630,20 +625,20 @@ func addMainKeyboardShortcuts() {
 func setSortOptions(view string) {
 
 	switch view {
+	// note - these options must match values in the sortViews map
 	case main_app.VIEW_PINNED:
-		AppWidgets.sortSelect.Options = []string{"Newly Pinned First", "Newly Pinned Last", "Newest First", "Oldest First"}
+		AppWidgets.sortSelect.Options = []string{"Newly Pinned First", "Newly Pinned Last", "Modified First", "Modified Last"}
 	case main_app.VIEW_RECENT:
-		AppWidgets.sortSelect.Options = []string{"Newest First", "Oldest First"}
+		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last"}
 	case main_app.VIEW_NOTEBOOK:
-		AppWidgets.sortSelect.Options = []string{"Newest First", "Oldest First"}
+		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last"}
 	case main_app.VIEW_TAGS:
-		AppWidgets.sortSelect.Options = []string{"Newest First", "Oldest First"}
+		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last"}
 	case main_app.VIEW_SEARCH:
-		AppWidgets.sortSelect.Options = []string{"Newest First", "Oldest First", "Created First", "Created Last"}
+		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
 
 	}
 
 	AppWidgets.sortSelect.ClearSelected()
-	// AppWidgets.sortSelect.SetSelectedIndex(0)
 	AppWidgets.sortSelect.Refresh()
 }

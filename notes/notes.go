@@ -26,9 +26,9 @@ func GetPinnedNotes(sortBy int) ([]note.NoteData, error) {
 	return pinnedNotes, err
 }
 
-func GetRecentNotes(recentNotesLimit int) ([]note.NoteData, error) {
+func GetRecentNotes(recentNotesLimit int, sortBy int) ([]note.NoteData, error) {
 	var recentNotes []note.NoteData = nil
-	recentNotesDB, err := minotedb.GetRecentNotes(recentNotesLimit)
+	recentNotesDB, err := minotedb.GetRecentNotes(recentNotesLimit, sortBy)
 	if err == nil {
 		for _, noteDB := range recentNotesDB {
 			recentNotes = append(recentNotes, note.NoteData(noteDB))
