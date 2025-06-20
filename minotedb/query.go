@@ -22,13 +22,17 @@ func GetPinnedNotes(sortBy int) ([]NoteDataDB, error) {
 	var sortField string = ""
 	switch sortBy {
 	case SORT_NEWEST:
-		sortField = "created desc"
+		sortField = "modified desc"
+		fmt.Println("newest first")
 	case SORT_OLDEST:
-		sortField = "created asc"
-	case SORT_PINNED_FIRST:
+		sortField = "modified asc"
+		fmt.Println("oldest first")
+	case SORT_PINNED_NEWER:
 		sortField = "pinnedDate desc"
-	case SORT_PINNED_LAST:
-		sortField = "pinnedData asc"
+		fmt.Println("new pinned first")
+	case SORT_PINNED_OLDER_:
+		sortField = "pinnedDate asc"
+		fmt.Println("new pinned last")
 	default:
 		return nil, errors.New("undefined/unallowed sort mode")
 	}

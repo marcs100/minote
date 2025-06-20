@@ -31,6 +31,7 @@ func StartUI(appConfigIn *config.Config, configFile string, version string) {
 	main_app.AppStatus.ConfigFile = configFile
 	main_app.AppStatus.CurrentNotebook = "General" // default for new noteooks if note in notrbook view
 	createMainWindow(version)
+	main_app.MainApp.Run()
 }
 
 func createMainWindow(version string) {
@@ -81,11 +82,13 @@ func createMainWindow(version string) {
 	main_app.AppStatus.CurrentView = main_app.Conf.Settings.InitialView
 	fmt.Println("initial view = " + main_app.Conf.Settings.InitialView)
 	main_app.AppStatus.CurrentLayout = main_app.Conf.Settings.InitialLayout
-	setSortOptions(main_app.AppStatus.CurrentView)
 
-	if err := UpdateView(); err != nil {
-		fmt.Println(err)
-	}
+	setSortOptions(main_app.AppStatus.CurrentView)
+	AppWidgets.sortSelect.SetSelectedIndex(0) // this will also initiate UpdateView()
+
+	// if err := UpdateView(); err != nil {
+	// 	fmt.Println(err)
+	// }
 
 	//keyboard shortcuts
 	addMainKeyboardShortcuts()
@@ -101,7 +104,8 @@ func createMainWindow(version string) {
 		}
 	})
 
-	mainWindow.ShowAndRun()
+	mainWindow.SetMaster()
+	mainWindow.Show()
 }
 
 func createMainPanel() *fyne.Container {
@@ -178,11 +182,12 @@ func createTopPanel() *fyne.Container {
 	)
 
 	sortLabel := widget.NewLabel("sort:")
-	main_app.AppStatus.CurrentSortSelected = "newest first"
-	AppWidgets.sortSelect = widget.NewSelect([]string{"newest first", "oldest first"}, func(s string) {
+	AppWidgets.sortSelect = widget.NewSelect([]string{""}, func(s string) {
 		main_app.AppStatus.CurrentSortSelected = s
+		fmt.Printf("Current sort is: %s\n", s)
 		UpdateView()
 	})
+	AppWidgets.sortSelect.PlaceHolder = "This is how the size "
 	AppWidgets.sortSelect.SetSelectedIndex(0)
 
 	AppWidgets.Toolbar = toolbar
@@ -398,7 +403,8 @@ func UpdateView() error {
 			AppContainers.tagsPanel.Hide()
 		}
 		AppWidgets.viewLabel.SetText("Pinned Notes")
-		main_app.AppStatus.Notes, err = notes.GetPinnedNotes(notes.SORT_PINNED_FIRST) // ******* this needs updating to be dynamic*************
+		fmt.Printf("sort index: %d\n", SortViews[main_app.AppStatus.CurrentSortSelected]) // **** debug only ******
+		main_app.AppStatus.Notes, err = notes.GetPinnedNotes(SortViews[main_app.AppStatus.CurrentSortSelected])
 		main_app.AppStatus.CurrentNotebook = ""
 	case main_app.VIEW_RECENT:
 		if AppContainers.listPanel != nil {
@@ -616,7 +622,7 @@ func setSortOptions(view string) {
 
 	switch view {
 	case main_app.VIEW_PINNED:
-		AppWidgets.sortSelect.Options = []string{"Pinned First", "Pinned Last", "Newest First", "Oldest First"}
+		AppWidgets.sortSelect.Options = []string{"Newly Pinned First", "Newly Pinned Last", "Newest First", "Oldest First"}
 	case main_app.VIEW_RECENT:
 		AppWidgets.sortSelect.Options = []string{"Newest First", "Oldest First"}
 	case main_app.VIEW_NOTEBOOK:
@@ -628,6 +634,7 @@ func setSortOptions(view string) {
 
 	}
 
-	AppWidgets.sortSelect.SetSelectedIndex(0)
+	AppWidgets.sortSelect.ClearSelected()
+	// AppWidgets.sortSelect.SetSelectedIndex(0)
 	AppWidgets.sortSelect.Refresh()
 }
