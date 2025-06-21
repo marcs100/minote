@@ -37,9 +37,9 @@ func GetRecentNotes(recentNotesLimit int, sortBy int) ([]note.NoteData, error) {
 	return recentNotes, err
 }
 
-func GetNotebook(name string) ([]note.NoteData, error) {
+func GetNotebook(name string, sortBy int) ([]note.NoteData, error) {
 	var notebook_notes []note.NoteData = nil
-	notebook_notesDB, err := minotedb.GetNotebook(name)
+	notebook_notesDB, err := minotedb.GetNotebook(name, sortBy)
 	if err == nil {
 		for _, noteDB := range notebook_notesDB {
 			notebook_notes = append(notebook_notes, note.NoteData(noteDB))
@@ -48,9 +48,9 @@ func GetNotebook(name string) ([]note.NoteData, error) {
 	return notebook_notes, err
 }
 
-func GetTaggedNotes(tags []string) ([]note.NoteData, error) {
+func GetTaggedNotes(tags []string, sortBy int) ([]note.NoteData, error) {
 	var taggedNotes []note.NoteData = nil
-	taggedNotesDB, err := minotedb.GetTaggedNotes(tags)
+	taggedNotesDB, err := minotedb.GetTaggedNotes(tags, sortBy)
 	if err == nil {
 		for _, noteDB := range taggedNotesDB {
 			taggedNotes = append(taggedNotes, note.NoteData(noteDB))
@@ -59,9 +59,9 @@ func GetTaggedNotes(tags []string) ([]note.NoteData, error) {
 	return taggedNotes, err
 }
 
-func GetSearchResults(searchText string, filter SearchFilter) ([]note.NoteData, error) {
+func GetSearchResults(searchText string, filter SearchFilter, sortBy int) ([]note.NoteData, error) {
 	var searchNotes []note.NoteData = nil
-	searchNotesDB, err := minotedb.GetSearchResults(searchText, minotedb.SearchFilter(filter))
+	searchNotesDB, err := minotedb.GetSearchResults(searchText, minotedb.SearchFilter(filter), sortBy)
 	if err == nil {
 		for _, noteDB := range searchNotesDB {
 			searchNotes = append(searchNotes, note.NoteData(noteDB))

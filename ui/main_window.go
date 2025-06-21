@@ -257,7 +257,7 @@ func createSidePanel() *fyne.Container {
 		ToggleMainTagsPanel()
 		main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
 		PageView.Reset()
-		setSortOptions(main_app.AppStatus.CurrentView)
+		setSortOptions(main_app.VIEW_TAGS)
 		AppWidgets.sortSelect.SetSelectedIndex(0)
 		// err := UpdateView()
 		// if err != nil {
@@ -273,6 +273,7 @@ func createSidePanel() *fyne.Container {
 	notebooksBtn := widget.NewButtonWithIcon("", theme.FolderOpenIcon(), func() {
 		main_app.AppStatus.CurrentView = main_app.VIEW_NOTEBOOK
 		setSortOptions(main_app.AppStatus.CurrentView)
+		AppWidgets.sortSelect.SetSelectedIndex(0)
 		showNotebooksPanel()
 	})
 
@@ -429,7 +430,7 @@ func UpdateView() error {
 			AppContainers.tagsPanel.Hide()
 		}
 		AppWidgets.viewLabel.SetText("Notebook - " + main_app.AppStatus.CurrentNotebook)
-		main_app.AppStatus.Notes, err = notes.GetNotebook(main_app.AppStatus.CurrentNotebook)
+		main_app.AppStatus.Notes, err = notes.GetNotebook(main_app.AppStatus.CurrentNotebook, SortViews[main_app.AppStatus.CurrentSortSelected])
 	case main_app.VIEW_TAGS:
 		if AppContainers.listPanel != nil {
 			AppContainers.listPanel.Hide()
@@ -439,7 +440,7 @@ func UpdateView() error {
 		}
 		//if len(AppStatus.TagsChecked) > 0 {
 		AppWidgets.viewLabel.SetText("Tagged Notes")
-		main_app.AppStatus.Notes, err = notes.GetTaggedNotes(main_app.AppStatus.TagsChecked)
+		main_app.AppStatus.Notes, err = notes.GetTaggedNotes(main_app.AppStatus.TagsChecked, SortViews[main_app.AppStatus.CurrentSortSelected])
 		//} else {
 		//	AppStatus.Notes = nil
 		//}
@@ -448,7 +449,7 @@ func UpdateView() error {
 			AppContainers.tagsPanel.Hide()
 		}
 		if len(strings.TrimSpace(AppWidgets.searchEntry.Text)) > 0 {
-			main_app.AppStatus.Notes, err = notes.GetSearchResults(AppWidgets.searchEntry.Text, main_app.AppStatus.SearchFilter)
+			main_app.AppStatus.Notes, err = notes.GetSearchResults(AppWidgets.searchEntry.Text, main_app.AppStatus.SearchFilter, SortViews[main_app.AppStatus.CurrentSortSelected])
 			if err == nil {
 				AppWidgets.searchResultsLabel.SetText(fmt.Sprintf("Found (%d) > ", len(main_app.AppStatus.Notes)))
 				AppWidgets.viewLabel.SetText("Search Results")
@@ -510,7 +511,7 @@ func CreateNotebooksList() {
 
 		},
 		func(id widget.ListItemID, o fyne.CanvasObject) {
-			main_app.AppStatus.Notes, _ = notes.GetNotebook(main_app.AppStatus.Notebooks[id])
+			main_app.AppStatus.Notes, _ = notes.GetNotebook(main_app.AppStatus.Notebooks[id], SortViews[main_app.AppStatus.CurrentSortSelected])
 			var name = main_app.AppStatus.Notebooks[id]
 			if len(name) > 15 {
 				name = fmt.Sprint(name[:len(name)-3], "...")
@@ -521,7 +522,8 @@ func CreateNotebooksList() {
 				main_app.AppStatus.CurrentView = main_app.VIEW_NOTEBOOK
 				main_app.AppStatus.CurrentNotebook = main_app.AppStatus.Notebooks[id]
 				PageView.Reset()
-				UpdateView()
+				setSortOptions(main_app.VIEW_NOTEBOOK)
+				AppWidgets.sortSelect.SetSelectedIndex(0) //this will also trigger UpdateView()
 			}
 		},
 	)
@@ -629,11 +631,11 @@ func setSortOptions(view string) {
 	case main_app.VIEW_PINNED:
 		AppWidgets.sortSelect.Options = []string{"Newly Pinned First", "Newly Pinned Last", "Modified First", "Modified Last"}
 	case main_app.VIEW_RECENT:
-		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last"}
+		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
 	case main_app.VIEW_NOTEBOOK:
-		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last"}
+		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
 	case main_app.VIEW_TAGS:
-		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last"}
+		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
 	case main_app.VIEW_SEARCH:
 		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
 

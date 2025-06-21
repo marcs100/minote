@@ -38,8 +38,12 @@ func GetPinnedDate(noteId uint) (string, error) {
 	return fields[0], errors.New("undefined sort mode")
 }
 
-func GetNotebook(notebookName string) ([]NoteDataDB, error) {
-	var query string = fmt.Sprintf("select * from notes where notebook = '%s' order by modified desc", notebookName)
+func GetNotebook(notebookName string, sortBy int) ([]NoteDataDB, error) {
+	sortField, err := getSortField(sortBy)
+	if err != nil {
+		return nil, err
+	}
+	var query string = fmt.Sprintf("select * from notes where notebook = '%s' order by %s", notebookName, sortField)
 	return getNotes(query)
 }
 
@@ -71,8 +75,12 @@ func GetRecentNotes(noteCount int, sortBy int) ([]NoteDataDB, error) {
 	return getNotes(query)
 }
 
-func GetSearchResults(searchQuery string, filter SearchFilter) ([]NoteDataDB, error) {
-	return getSearchResults(searchQuery, filter)
+func GetSearchResults(searchQuery string, filter SearchFilter, sortBy int) ([]NoteDataDB, error) {
+	sortField, err := getSortField(sortBy)
+	if err != nil {
+		return nil, err
+	}
+	return getSearchResults(searchQuery, filter, sortField)
 }
 
 func GetAllTags() ([]string, error) {
@@ -86,11 +94,16 @@ func GetTagsForNote(noteId uint) ([]string, error) {
 	return tags, err
 }
 
-func GetTaggedNotes(taggedNotes []string) ([]NoteDataDB, error) {
+func GetTaggedNotes(taggedNotes []string, sortBy int) ([]NoteDataDB, error) {
 	var err error = nil
 	var notes []NoteDataDB
 	var ids []string
 	var taggedNotesMod []string
+
+	sortField, sortErr := getSortField(sortBy)
+	if err != nil {
+		return nil, sortErr
+	}
 
 	//Add single quotes to string in each slice
 	for _, s := range taggedNotes {
@@ -109,7 +122,7 @@ func GetTaggedNotes(taggedNotes []string) ([]NoteDataDB, error) {
 
 	// Now get all the notes that conatain the retreived note id's
 	idsCSV := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(ids)), ", "), "[]")
-	query = fmt.Sprintf("select * from notes where id in (%s) order by modified desc", idsCSV)
+	query = fmt.Sprintf("select * from notes where id in (%s) order by %s", idsCSV, sortField)
 	notes, err = getNotes(query)
 
 	return notes, err
@@ -198,7 +211,7 @@ func getNotes(query string) ([]NoteDataDB, error) {
 	return notes, err
 }
 
-func getSearchResults(searchText string, filter SearchFilter) ([]NoteDataDB, error) {
+func getSearchResults(searchText string, filter SearchFilter, sortField string) ([]NoteDataDB, error) {
 	var st1, st2, st3 string
 
 	if !connected {
@@ -212,16 +225,13 @@ func getSearchResults(searchText string, filter SearchFilter) ([]NoteDataDB, err
 		st1 = fmt.Sprint(searchText, " %")
 		st2 = fmt.Sprint("% ", searchText, " %")
 		st3 = fmt.Sprint("% ", searchText)
-		/*fmt.Println(st1)
-		fmt.Println(st2)
-		fmt.Println(st3)*/
 	}
 
 	if filter.Pinned {
 		query = fmt.Sprintf("%s and pinned = 1", query)
 	}
 
-	query = fmt.Sprintf("%s order by modified desc", query)
+	query = fmt.Sprintf("%s order by %s", query, sortField)
 	fmt.Println(query)
 
 	var rows *sql.Rows
