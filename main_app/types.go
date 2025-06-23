@@ -39,5 +39,4 @@ type ApplicationStatus struct {
 	TagsChecked         []string
 	NoteSize            fyne.Size
 	SearchFilter        notes.SearchFilter
-	SettingsOpen        bool
 }

@@ -51,8 +51,6 @@ func createMainWindow(version string) {
 
 	main_app.AppTheme = main_app.GetThemeColours(themeVar)
 
-	main_app.AppStatus.SettingsOpen = false
-
 	//Main Grid container for displaying notes
 	grid := container.NewGridWrap(main_app.AppStatus.NoteSize)
 	AppContainers.grid = grid //store to allow interaction in other functions
@@ -170,13 +168,12 @@ func createTopPanel() *fyne.Container {
 
 		//display settings
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
-			if !main_app.AppStatus.SettingsOpen {
-				settingsWindow := NewSettingsWindow()
-				main_app.AppStatus.SettingsOpen = true //we only allow one settings window
-				settingsWindow.Content().Refresh()
-				settingsWindow.Show()
-				fmt.Println("Showing Settings window!")
-			}
+			// if !main_app.AppStatus.SettingsOpen {
+			//NewSettingsWindow()
+			ShowSettings(mainWindow)
+			// main_app.AppStatus.SettingsOpen = true //we only allow one settings window
+			fmt.Println("Showing Settings window!")
+			// }
 
 		}),
 	)

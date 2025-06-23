@@ -13,7 +13,7 @@ import (
 	"github.com/marcs100/minote/main_app"
 )
 
-func NewSettingsWindow() fyne.Window {
+func ShowSettings(parentWindow fyne.Window) {
 
 	newConf := CopySettings()
 
@@ -27,9 +27,6 @@ func NewSettingsWindow() fyne.Window {
 		themeVar = main_app.SYSTEM_THEME
 	}
 	main_app.AppTheme = main_app.GetThemeColours(themeVar)
-
-	settingsWindow := main_app.MainApp.NewWindow("Settings")
-	settingsWindow.Resize(fyne.NewSize(500, 450))
 
 	bg := canvas.NewRectangle(main_app.AppTheme.MainBgColour)
 
@@ -51,7 +48,7 @@ func NewSettingsWindow() fyne.Window {
 			return
 		}
 		if i < 1 {
-			dialog.ShowInformation("Setting Error", "Recent notes limit must be > 1", settingsWindow)
+			dialog.ShowInformation("Setting Error", "Recent notes limit must be > 1", parentWindow)
 		} else {
 			newConf.Settings.RecentNotesLimit = i
 		}
@@ -77,7 +74,7 @@ func NewSettingsWindow() fyne.Window {
 		}
 
 		if i < 1 {
-			dialog.ShowInformation("Setting Error", "Grid pages limit must be > 1", settingsWindow)
+			dialog.ShowInformation("Setting Error", "Grid pages limit must be > 1", parentWindow)
 		}
 		newConf.Settings.GridMaxPages = i
 	}
@@ -101,21 +98,25 @@ func NewSettingsWindow() fyne.Window {
 		layoutGrid,
 		gridLimitGrid,
 		appearanceHeading,
-		appearanceGrid)
+		appearanceGrid,
+		widget.NewLabel(" "),
+	)
 
 	stack := container.NewStack(bg, vbox)
 
-	settingsWindow.SetOnClosed(func() {
-		if newConf != *main_app.Conf {
-			if err := config.WriteConfig(main_app.AppStatus.ConfigFile, newConf); err != nil {
-				dialog.ShowError(err, settingsWindow)
+	formItem := widget.NewFormItem("", stack)
+	d := dialog.NewForm("      Settings      ", "Save", "Cancel", []*widget.FormItem{formItem}, func(confirmed bool) {
+		if confirmed {
+			if newConf != *main_app.Conf {
+				if err := config.WriteConfig(main_app.AppStatus.ConfigFile, newConf); err != nil {
+					dialog.ShowError(err, parentWindow)
+				}
 			}
 		}
-		main_app.AppStatus.SettingsOpen = false
-	})
+	}, parentWindow)
 
-	settingsWindow.SetContent(stack)
-	return settingsWindow
+	d.Show()
+
 }
 
 func CopySettings() config.Config {
