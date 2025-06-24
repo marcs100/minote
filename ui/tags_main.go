@@ -1,12 +1,10 @@
 package ui
 
 import (
-	"log"
 	"slices"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/marcs100/minote/main_app"
 	"github.com/marcs100/minote/notes"
@@ -14,26 +12,20 @@ import (
 
 // For main window
 func CreateTagsPanel() *fyne.Container {
-	tagsList, err := CreateMainTagsList()
-	if err != nil {
-		dialog.ShowError(err, mainWindow)
-		log.Panicln("Error creating tags list")
-	}
+	tagsList := CreateMainTagsList(notes.GetAllTags())
 	tagLabel := widget.NewRichTextFromMarkdown("**Tags:**            ")
+	searchEntry := widget.NewEntry()
+	vbox := container.NewVBox(tagLabel, searchEntry)
 	AppContainers.tagsList = container.NewStack(tagsList)
-	tagsPanel := container.NewBorder(tagLabel, nil, nil, nil, AppContainers.tagsList)
+	tagsPanel := container.NewBorder(vbox, nil, nil, nil, AppContainers.tagsList)
 	return tagsPanel
 }
 
 // For main window
-func CreateMainTagsList() (*widget.List, error) {
-	var err error = nil
-
-	main_app.AppStatus.Tags = notes.GetAllTags()
-
+func CreateMainTagsList(tags []string) *widget.List {
 	tagsList := widget.NewList(
 		func() int {
-			return len(main_app.AppStatus.Tags)
+			return len(tags)
 		},
 
 		func() fyne.CanvasObject {
@@ -41,7 +33,7 @@ func CreateMainTagsList() (*widget.List, error) {
 		},
 
 		func(id widget.ListItemID, o fyne.CanvasObject) {
-			o.(*widget.Check).Text = main_app.AppStatus.Tags[id]
+			o.(*widget.Check).Text = tags[id]
 			o.(*widget.Check).OnChanged = func(c bool) {
 				main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
 				t := o.(*widget.Check).Text
@@ -62,21 +54,23 @@ func CreateMainTagsList() (*widget.List, error) {
 			o.Refresh()
 		},
 	)
-	if err == nil {
-		tagsList.Refresh()
-	}
-	return tagsList, err
+
+	tagsList.Refresh()
+
+	return tagsList
 }
 
 func UpdateMainTagsList() {
 	if AppContainers.tagsList != nil && AppContainers.tagsPanel != nil {
-		tagsList, err := CreateMainTagsList()
-		if err == nil {
-			AppContainers.tagsList.RemoveAll()
-			AppContainers.tagsList.Add(tagsList)
-			AppContainers.tagsPanel.Refresh()
-		}
+		tagsList := CreateMainTagsList(notes.GetAllTags())
+		AppContainers.tagsList.RemoveAll()
+		AppContainers.tagsList.Add(tagsList)
+		AppContainers.tagsPanel.Refresh()
 	}
+}
+
+func UpdateTagsFromSearch(search string) {
+	// to do ................
 }
 
 // For main window

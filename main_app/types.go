@@ -35,8 +35,8 @@ type ApplicationStatus struct {
 	CurrentSortSelected string
 	Notes               []note.NoteData
 	Notebooks           []string
-	Tags                []string
-	TagsChecked         []string
-	NoteSize            fyne.Size
-	SearchFilter        notes.SearchFilter
+	// Tags                []string
+	TagsChecked  []string
+	NoteSize     fyne.Size
+	SearchFilter notes.SearchFilter
 }
