@@ -15,6 +15,13 @@ func CreateTagsPanel() *fyne.Container {
 	tagsList := CreateMainTagsList(notes.GetAllTags())
 	tagLabel := widget.NewRichTextFromMarkdown("**Tags:**            ")
 	searchEntry := widget.NewEntry()
+	searchEntry.OnChanged = func(t string) {
+		if len(t) > 1 {
+			UpdateTagsFromSearch(t)
+		} else {
+			UpdateMainTagsList()
+		}
+	}
 	vbox := container.NewVBox(tagLabel, searchEntry)
 	AppContainers.tagsList = container.NewStack(tagsList)
 	tagsPanel := container.NewBorder(vbox, nil, nil, nil, AppContainers.tagsList)
@@ -34,6 +41,11 @@ func CreateMainTagsList(tags []string) *widget.List {
 
 		func(id widget.ListItemID, o fyne.CanvasObject) {
 			o.(*widget.Check).Text = tags[id]
+			if slices.Contains(main_app.AppStatus.TagsChecked, tags[id]) {
+				o.(*widget.Check).Checked = true
+			} else {
+				o.(*widget.Check).Checked = false
+			}
 			o.(*widget.Check).OnChanged = func(c bool) {
 				main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
 				t := o.(*widget.Check).Text
@@ -70,7 +82,11 @@ func UpdateMainTagsList() {
 }
 
 func UpdateTagsFromSearch(search string) {
-	// to do ................
+	tagsList := CreateMainTagsList(notes.GetTagsWithSearch(search))
+	AppContainers.tagsList.RemoveAll()
+	AppContainers.tagsList.Add(tagsList)
+	AppContainers.tagsPanel.Refresh()
+
 }
 
 // For main window

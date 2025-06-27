@@ -60,30 +60,3 @@ func NewEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut), onFocusLo
 	e.ExtendBaseWidget(e)
 	return e
 }
-
-/*
-//The code below is pointless becuase widget.RichText is not focusable.
-//Only widgets that are focusable can receive keybard shortcuts
-type RichTextFromMarkdownCustom struct {
-	widget.RichText
-	onCustomShortCut func(cs *desktop.CustomShortcut)
-}
-
-func (md *RichTextFromMarkdownCustom) TypedShortcut(s fyne.Shortcut) {
-	var ok bool
-	var cs *desktop.CustomShortcut
-	if cs, ok = s.(*desktop.CustomShortcut); !ok {
-		fmt.Println("** Not a custom shortcut!!")
-		return
-	}
-	//var name = cs.ShortcutName()
-	md.onCustomShortCut(cs)
-}
-
-func NewRichTextFromMarkdownCustom(content string, onCustomShortcut func(cs *desktop.CustomShortcut)) *RichTextFromMarkdownCustom {
-	md := &RichTextFromMarkdownCustom{}
-	md.onCustomShortCut = onCustomShortcut
-	md.AppendMarkdown(content)
-	md.ExtendBaseWidget(md)
-	return md
-	}*/

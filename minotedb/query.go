@@ -88,6 +88,13 @@ func GetAllTags() ([]string, error) {
 	return getColumn(query)
 }
 
+func GetTags(searchQuery string) ([]string, error) {
+	query := fmt.Sprintf("select distinct tag from tags where tag like %s", searchQuery)
+	tags, err := getColumn(query)
+	return tags, err
+
+}
+
 func GetTagsForNote(noteId uint) ([]string, error) {
 	query := fmt.Sprintf("select tag from tags where noteId = %d", noteId)
 	tags, err := getColumn(query)

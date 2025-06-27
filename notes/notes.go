@@ -10,7 +10,16 @@ import (
 func GetAllTags() []string {
 	tags, err := minotedb.GetAllTags()
 	if err != nil {
-		log.Printf("Error tags - &s\n", err)
+		log.Printf("Error tags - %s\n", err)
+	}
+	return tags
+}
+
+func GetTagsWithSearch(searchQuery string) []string {
+	searchQuery = "'%" + searchQuery + "%'"
+	tags, err := minotedb.GetTags(searchQuery)
+	if err != nil {
+		log.Printf("Error tags - %s\n", err)
 	}
 	return tags
 }
