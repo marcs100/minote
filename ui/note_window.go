@@ -15,7 +15,7 @@ import (
 	//"github.com/fyne-io/terminal"
 )
 
-func NewNoteWindow(noteId uint, parentWindow fyne.Window) {
+func NewNoteWindow(noteId uint, parentWindow fyne.Window, mainAppWindow *MainWindow) {
 	var retrievedNote note.NoteData
 	var err error
 
@@ -37,7 +37,7 @@ func NewNoteWindow(noteId uint, parentWindow fyne.Window) {
 
 	noteWindow := main_app.MainApp.NewWindow("")
 	var np NotePage
-	noteContainer := np.NewNotePage(&retrievedNote, true, true, noteWindow)
+	noteContainer := np.NewNotePage(&retrievedNote, true, true, noteWindow, mainAppWindow)
 
 	noteWindow.SetTitle(fmt.Sprintf("Notebook: %s", np.NoteInfo.Notebook))
 	noteWindow.Resize(fyne.NewSize(900, 750))

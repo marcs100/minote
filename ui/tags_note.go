@@ -75,7 +75,7 @@ func (np *NotePage) UpdateTags() error {
 		np.UpdateProperties()
 		np.RefreshWindow()
 		if main_app.AppStatus.CurrentView == main_app.VIEW_TAGS {
-			UpdateMainTagsList()
+			np.MainAppWindow.UpdateMainTagsList()
 		}
 	}
 

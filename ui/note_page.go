@@ -21,8 +21,9 @@ import (
 	"github.com/marcs100/minote/tracker"
 )
 
-func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWindowMode bool, parentWindow fyne.Window) *fyne.Container {
+func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWindowMode bool, parentWindow fyne.Window, mainWindow *MainWindow) *fyne.Container {
 	np.ParentWindow = parentWindow
+	np.MainAppWindow = mainWindow
 	np.AllowEdit = allowEdit
 	np.NewWindowMode = newWindowMode
 	np.RetrievedNote = *retrievedNote
@@ -128,7 +129,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 		np.PinNote()
 	})
 
-	changeNotebookBtn := newChangeNotebookButton(np)
+	changeNotebookBtn := np.newChangeNotebookButton()
 
 	colourButton := widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), func() {
 		np.ChangeNoteColour()
@@ -182,7 +183,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 	return container.NewBorder(topBar, nil, nil, np.NotePageContainers.PropertiesPanel, content)
 }
 
-func newChangeNotebookButton(np *NotePage) *widget.Button {
+func (np *NotePage) newChangeNotebookButton() *widget.Button {
 	changeNotebookBtn := widget.NewButtonWithIcon("", theme.FolderOpenIcon(), func() {
 		var notebooks []string
 		var err error
@@ -212,7 +213,7 @@ func newChangeNotebookButton(np *NotePage) *widget.Button {
 								dialog.ShowError(err, np.ParentWindow)
 								//log.Panic(err)
 							}
-							UpdateNotebooksList()
+							np.MainAppWindow.UpdateNotebooksList()
 							np.UpdateProperties()
 						}
 					} else {
@@ -269,7 +270,7 @@ func (np *NotePage) DeleteNote() {
 				if np.NewWindowMode {
 					np.ParentWindow.Close()
 				}
-				UpdateView()
+				np.MainAppWindow.UpdateView()
 			}
 		}
 	}, np.ParentWindow)
@@ -320,7 +321,7 @@ func (np *NotePage) PinNote() {
 	np.UpdateProperties()
 
 	if main_app.AppStatus.CurrentView == main_app.VIEW_PINNED {
-		UpdateView() //updates view on main window c
+		np.MainAppWindow.UpdateView() //updates view on main window c
 	}
 }
 
@@ -372,7 +373,7 @@ func (np *NotePage) ChangeNoteColour() {
 	picker.Show()
 	if colourChanged {
 		np.UpdateProperties()
-		UpdateView()
+		np.MainAppWindow.UpdateView()
 	}
 }
 
@@ -380,7 +381,7 @@ func (np *NotePage) SaveNote() {
 	var noteChanges note.NoteChanges
 	np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
 	if np.NoteInfo.Deleted {
-		UpdateView()
+		np.MainAppWindow.UpdateView()
 		return
 	}
 
@@ -416,7 +417,7 @@ func (np *NotePage) SaveNote() {
 				tracker.AddToTracker(np.NoteInfo.Id)
 			}
 
-			UpdateView()
+			np.MainAppWindow.UpdateView()
 		}
 	} else if noteChanges.PinStatusChanged {
 		// we do not want a create or modified time stamp for just pinning/unpinning notes
@@ -435,7 +436,7 @@ func (np *NotePage) SaveNote() {
 				log.Println("Error getting updated note")
 				dialog.ShowError(err, np.ParentWindow)
 			}
-			UpdateView()
+			np.MainAppWindow.UpdateView()
 		}
 	}
 }

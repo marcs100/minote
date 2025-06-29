@@ -11,25 +11,25 @@ import (
 )
 
 // For main window
-func CreateTagsPanel() *fyne.Container {
-	tagsList := CreateMainTagsList(notes.GetAllTags())
+func (mw *MainWindow) CreateTagsPanel() *fyne.Container {
+	tagsList := mw.CreateMainTagsList(notes.GetAllTags())
 	tagLabel := widget.NewRichTextFromMarkdown("**Tags:**            ")
 	searchEntry := widget.NewEntry()
 	searchEntry.OnChanged = func(t string) {
 		if len(t) > 1 {
-			UpdateTagsFromSearch(t)
+			mw.UpdateTagsFromSearch(t)
 		} else {
-			UpdateMainTagsList()
+			mw.UpdateMainTagsList()
 		}
 	}
 	vbox := container.NewVBox(tagLabel, searchEntry)
-	AppContainers.tagsList = container.NewStack(tagsList)
-	tagsPanel := container.NewBorder(vbox, nil, nil, nil, AppContainers.tagsList)
+	mw.AppContainers.tagsList = container.NewStack(tagsList)
+	tagsPanel := container.NewBorder(vbox, nil, nil, nil, mw.AppContainers.tagsList)
 	return tagsPanel
 }
 
 // For main window
-func CreateMainTagsList(tags []string) *widget.List {
+func (mw *MainWindow) CreateMainTagsList(tags []string) *widget.List {
 	tagsList := widget.NewList(
 		func() int {
 			return len(tags)
@@ -61,7 +61,7 @@ func CreateMainTagsList(tags []string) *widget.List {
 					}
 				}
 				//fmt.Println(AppStatus.tagsChecked)
-				UpdateView()
+				mw.UpdateView()
 			}
 			o.Refresh()
 		},
@@ -72,29 +72,29 @@ func CreateMainTagsList(tags []string) *widget.List {
 	return tagsList
 }
 
-func UpdateMainTagsList() {
-	if AppContainers.tagsList != nil && AppContainers.tagsPanel != nil {
-		tagsList := CreateMainTagsList(notes.GetAllTags())
-		AppContainers.tagsList.RemoveAll()
-		AppContainers.tagsList.Add(tagsList)
-		AppContainers.tagsPanel.Refresh()
+func (mw *MainWindow) UpdateMainTagsList() {
+	if mw.AppContainers.tagsList != nil && mw.AppContainers.tagsPanel != nil {
+		tagsList := mw.CreateMainTagsList(notes.GetAllTags())
+		mw.AppContainers.tagsList.RemoveAll()
+		mw.AppContainers.tagsList.Add(tagsList)
+		mw.AppContainers.tagsPanel.Refresh()
 	}
 }
 
-func UpdateTagsFromSearch(search string) {
-	tagsList := CreateMainTagsList(notes.GetTagsWithSearch(search))
-	AppContainers.tagsList.RemoveAll()
-	AppContainers.tagsList.Add(tagsList)
-	AppContainers.tagsPanel.Refresh()
+func (mw *MainWindow) UpdateTagsFromSearch(search string) {
+	tagsList := mw.CreateMainTagsList(notes.GetTagsWithSearch(search))
+	mw.AppContainers.tagsList.RemoveAll()
+	mw.AppContainers.tagsList.Add(tagsList)
+	mw.AppContainers.tagsPanel.Refresh()
 
 }
 
 // For main window
-func ToggleMainTagsPanel() {
-	if AppContainers.tagsPanel.Visible() {
-		AppContainers.tagsPanel.Hide()
+func (mw *MainWindow) ToggleMainTagsPanel() {
+	if mw.AppContainers.tagsPanel.Visible() {
+		mw.AppContainers.tagsPanel.Hide()
 	} else {
-		UpdateMainTagsList()
-		AppContainers.tagsPanel.Show()
+		mw.UpdateMainTagsList()
+		mw.AppContainers.tagsPanel.Show()
 	}
 }

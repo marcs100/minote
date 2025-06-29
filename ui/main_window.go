@@ -36,9 +36,11 @@ func StartUI(appConfigIn *config.Config, configFile string, version string) {
 
 func createMainWindow(version string) {
 
+	var mw MainWindow
+
 	main_app.AppStatus.NoteSize = fyne.NewSize(main_app.Conf.Settings.NoteWidth, main_app.Conf.Settings.NoteHeight)
 
-	mainWindow = main_app.MainApp.NewWindow(fmt.Sprintf("Minote   v%s", version))
+	mw.window = main_app.MainApp.NewWindow(fmt.Sprintf("Minote   v%s", version))
 	var themeVar main_app.ThemeVariant
 	switch main_app.Conf.Settings.ThemeVariant {
 	case "light":
@@ -53,65 +55,65 @@ func createMainWindow(version string) {
 
 	//Main Grid container for displaying notes
 	grid := container.NewGridWrap(main_app.AppStatus.NoteSize)
-	AppContainers.grid = grid //store to allow interaction in other functions
+	mw.AppContainers.grid = grid //store to allow interaction in other functions
 
 	singleNotePage := widget.NewRichTextFromMarkdown("")
-	AppWidgets.singleNotePage = singleNotePage
+	mw.AppWidgets.singleNotePage = singleNotePage
 	singleNoteStack := container.NewStack()
-	AppContainers.singleNoteStack = singleNoteStack
+	mw.AppContainers.singleNoteStack = singleNoteStack
 
 	PageView.CurrentPage = 0
 	PageView.NumberOfPages = 0
 
 	//Create The main panel
-	main := createMainPanel()
+	main := mw.createMainPanel()
 
-	top := createTopPanel()
+	top := mw.createTopPanel()
 
-	side := createSidePanel()
+	side := mw.createSidePanel()
 
 	//layout the main window
 	appContainer := container.NewBorder(top, nil, side, nil, main)
 
-	mainWindow.SetContent(appContainer)
-	mainWindow.Resize(fyne.NewSize(2000, 1200))
+	mw.window.SetContent(appContainer)
+	mw.window.Resize(fyne.NewSize(2000, 1200))
 
 	//set default view and layout`
 	main_app.AppStatus.CurrentView = main_app.Conf.Settings.InitialView
 	fmt.Println("initial view = " + main_app.Conf.Settings.InitialView)
 	main_app.AppStatus.CurrentLayout = main_app.Conf.Settings.InitialLayout
 
-	setSortOptions(main_app.AppStatus.CurrentView)
-	AppWidgets.sortSelect.SetSelectedIndex(0) // this will also initiate UpdateView()
+	mw.setSortOptions(main_app.AppStatus.CurrentView)
+	mw.AppWidgets.sortSelect.SetSelectedIndex(0) // this will also initiate UpdateView()
 
 	// if err := UpdateView(); err != nil {
 	// 	fmt.Println(err)
 	// }
 
 	//keyboard shortcuts
-	addMainKeyboardShortcuts()
+	mw.addMainKeyboardShortcuts()
 
-	mainWindow.SetCloseIntercept(func() {
+	mw.window.SetCloseIntercept(func() {
 		if tracker.TrackerLen() > 0 {
 			fmt.Println(fmt.Sprintf("len of open notes array is %d", tracker.TrackerLen()))
 			//do not close if there are notes open
-			dlg := dialog.NewInformation("Error", "There are notes open, please close them before closing the application!", mainWindow)
+			dlg := dialog.NewInformation("Error", "There are notes open, please close them before closing the application!", mw.window)
 			dlg.Show()
 		} else {
-			mainWindow.Close()
+			mw.window.Close()
 		}
 	})
 
-	mainWindow.SetMaster()
-	mainWindow.Show()
+	mw.window.SetMaster()
+	mw.window.Show()
 }
 
-func createMainPanel() *fyne.Container {
+func (mw *MainWindow) createMainPanel() *fyne.Container {
 
-	mainGridContainer := container.NewScroll(AppContainers.grid)
-	AppContainers.mainGridContainer = mainGridContainer
-	mainPageContainer := container.NewScroll(AppContainers.singleNoteStack)
-	AppContainers.mainPageContainer = mainPageContainer
+	mainGridContainer := container.NewScroll(mw.AppContainers.grid)
+	mw.AppContainers.mainGridContainer = mainGridContainer
+	mainPageContainer := container.NewScroll(mw.AppContainers.singleNoteStack)
+	mw.AppContainers.mainPageContainer = mainPageContainer
 	bgRect := canvas.NewRectangle(main_app.AppTheme.MainBgColour)
 
 	mainStackedContainer := container.NewStack(bgRect, mainPageContainer, mainGridContainer)
@@ -119,13 +121,13 @@ func createMainPanel() *fyne.Container {
 	return mainStackedContainer
 }
 
-func createTopPanel() *fyne.Container {
+func (mw *MainWindow) createTopPanel() *fyne.Container {
 	//AppWidgets.viewLabel = widget.NewLabelWithStyle("Pinned Notes", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
 	spacerLabel := widget.NewLabel("                                ")
-	AppWidgets.viewLabel = widget.NewLabelWithStyle("Pinned Notes      >", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	mw.AppWidgets.viewLabel = widget.NewLabelWithStyle("Pinned Notes      >", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
 
-	AppWidgets.pageLabel = widget.NewLabel("Page: ")
-	AppWidgets.pageLabel.Hide()
+	mw.AppWidgets.pageLabel = widget.NewLabel("Page: ")
+	mw.AppWidgets.pageLabel.Hide()
 
 	toolbar := widget.NewToolbar(
 		//show grid view
@@ -133,7 +135,7 @@ func createTopPanel() *fyne.Container {
 			if main_app.AppStatus.CurrentLayout != main_app.LAYOUT_GRID {
 				main_app.AppStatus.CurrentLayout = main_app.LAYOUT_GRID
 				PageView.Reset()
-				UpdateView()
+				mw.UpdateView()
 			}
 		}),
 		//show single page view
@@ -141,20 +143,20 @@ func createTopPanel() *fyne.Container {
 			if main_app.AppStatus.CurrentLayout != main_app.LAYOUT_PAGE {
 				main_app.AppStatus.CurrentLayout = main_app.LAYOUT_PAGE
 				PageView.Reset()
-				UpdateView()
+				mw.UpdateView()
 			}
 		}),
 		//page forward
 		widget.NewToolbarAction(theme.NavigateBackIcon(), func() {
 			if PageView.PageBack() > 0 {
-				UpdateView()
+				mw.UpdateView()
 			}
 
 		}),
 		//page back
 		widget.NewToolbarAction(theme.NavigateNextIcon(), func() {
 			if PageView.PageForward() > 0 {
-				UpdateView()
+				mw.UpdateView()
 			}
 
 		}),
@@ -163,14 +165,14 @@ func createTopPanel() *fyne.Container {
 	settingsBar := widget.NewToolbar(
 		//backup database
 		widget.NewToolbarAction(theme.DownloadIcon(), func() {
-			BackupNotes(main_app.Conf.Settings.Database, mainWindow)
+			BackupNotes(main_app.Conf.Settings.Database, mw.window)
 		}),
 
 		//display settings
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
 			// if !main_app.AppStatus.SettingsOpen {
 			//NewSettingsWindow()
-			ShowSettings(mainWindow)
+			ShowSettings(mw.window)
 			// main_app.AppStatus.SettingsOpen = true //we only allow one settings window
 			fmt.Println("Showing Settings window!")
 			// }
@@ -179,24 +181,24 @@ func createTopPanel() *fyne.Container {
 	)
 
 	sortLabel := widget.NewLabel("sort:")
-	AppWidgets.sortSelect = widget.NewSelect([]string{""}, func(s string) {
+	mw.AppWidgets.sortSelect = widget.NewSelect([]string{""}, func(s string) {
 		main_app.AppStatus.CurrentSortSelected = s
-		UpdateView()
+		mw.UpdateView()
 	})
-	AppWidgets.sortSelect.PlaceHolder = "This is how the size "
-	AppWidgets.sortSelect.SetSelectedIndex(0)
+	mw.AppWidgets.sortSelect.PlaceHolder = "This is how the size "
+	mw.AppWidgets.sortSelect.SetSelectedIndex(0)
 
-	AppWidgets.Toolbar = toolbar
+	mw.AppWidgets.Toolbar = toolbar
 	//rect := canvas.NewRectangle(main_app.AppTheme.)
 	topBar := container.New(layout.NewHBoxLayout(),
 		spacerLabel,
-		AppWidgets.viewLabel,
+		mw.AppWidgets.viewLabel,
 		layout.NewSpacer(),
 		toolbar,
-		AppWidgets.pageLabel,
+		mw.AppWidgets.pageLabel,
 		layout.NewSpacer(),
 		sortLabel,
-		AppWidgets.sortSelect,
+		mw.AppWidgets.sortSelect,
 		spacerLabel,
 		settingsBar,
 	)
@@ -206,28 +208,28 @@ func createTopPanel() *fyne.Container {
 	return topPanel
 }
 
-func createSidePanel() *fyne.Container {
-	AppContainers.searchPanel = CreateSearchPanel()
-	AppContainers.tagsPanel = CreateTagsPanel()
+func (mw *MainWindow) createSidePanel() *fyne.Container {
+	mw.AppContainers.searchPanel = mw.CreateSearchPanel()
+	mw.AppContainers.tagsPanel = mw.CreateTagsPanel()
 
 	newNoteBtn := widget.NewButtonWithIcon("+", theme.DocumentCreateIcon(), func() {
-		NewNoteWindow(0, mainWindow)
+		NewNoteWindow(0, mw.window, mw)
 	})
 
 	searchBtn := widget.NewButtonWithIcon("", theme.SearchIcon(), func() {
 		//Display the search panel here
 		main_app.AppStatus.CurrentView = main_app.VIEW_SEARCH
-		setSortOptions(main_app.VIEW_SEARCH)
-		AppWidgets.sortSelect.SetSelectedIndex(0)
-		ShowSearchPanel()
+		mw.setSortOptions(main_app.VIEW_SEARCH)
+		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
+		mw.ShowSearchPanel()
 	})
 
 	//pinnedBtn := widget.NewButton("P", func(){
 	pinnedBtn := widget.NewButtonWithIcon("", theme.RadioButtonCheckedIcon(), func() {
 		main_app.AppStatus.CurrentView = main_app.VIEW_PINNED
-		setSortOptions(main_app.AppStatus.CurrentView)
+		mw.setSortOptions(main_app.AppStatus.CurrentView)
 		PageView.Reset()
-		AppWidgets.sortSelect.SetSelectedIndex(0)
+		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
 		// err := UpdateView()
 		// if err != nil {
 		// 	log.Print("Error getting pinned notes: ")
@@ -240,8 +242,8 @@ func createSidePanel() *fyne.Container {
 		//AppStatus.Notes,err = minotedb.GetRecentNotes(Conf.Settings.RecentNotesLimit)
 		main_app.AppStatus.CurrentView = main_app.VIEW_RECENT
 		PageView.Reset()
-		setSortOptions(main_app.AppStatus.CurrentView)
-		AppWidgets.sortSelect.SetSelectedIndex(0)
+		mw.setSortOptions(main_app.AppStatus.CurrentView)
+		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
 		// err := UpdateView()
 		// if err != nil {
 		// 	log.Print("Error getting recent notes: ")
@@ -251,11 +253,11 @@ func createSidePanel() *fyne.Container {
 	})
 
 	tagsBtn := widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
-		ToggleMainTagsPanel()
+		mw.ToggleMainTagsPanel()
 		main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
 		PageView.Reset()
-		setSortOptions(main_app.VIEW_TAGS)
-		AppWidgets.sortSelect.SetSelectedIndex(0)
+		mw.setSortOptions(main_app.VIEW_TAGS)
+		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
 		// err := UpdateView()
 		// if err != nil {
 		// 	log.Print("Error getting tagged notes: ")
@@ -265,23 +267,23 @@ func createSidePanel() *fyne.Container {
 
 	})
 
-	CreateNotebooksList()
+	mw.CreateNotebooksList()
 
 	notebooksBtn := widget.NewButtonWithIcon("", theme.FolderOpenIcon(), func() {
 		main_app.AppStatus.CurrentView = main_app.VIEW_NOTEBOOK
-		setSortOptions(main_app.AppStatus.CurrentView)
-		AppWidgets.sortSelect.SetSelectedIndex(0)
-		showNotebooksPanel()
+		mw.setSortOptions(main_app.AppStatus.CurrentView)
+		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
+		mw.showNotebooksPanel()
 	})
 
 	spacerLabel := widget.NewLabel(" ")
 
 	btnPanel := container.NewVBox(searchBtn, newNoteBtn, spacerLabel, pinnedBtn, RecentBtn, notebooksBtn, tagsBtn)
-	AppContainers.listPanel = container.NewStack(AppWidgets.notebooksList)
-	AppContainers.listPanel.Hide()
-	AppContainers.tagsPanel.Hide()
+	mw.AppContainers.listPanel = container.NewStack(mw.AppWidgets.notebooksList)
+	mw.AppContainers.listPanel.Hide()
+	mw.AppContainers.tagsPanel.Hide()
 
-	sidePanel := container.NewHBox(btnPanel, AppContainers.listPanel, AppContainers.searchPanel, AppContainers.tagsPanel)
+	sidePanel := container.NewHBox(btnPanel, mw.AppContainers.listPanel, mw.AppContainers.searchPanel, mw.AppContainers.tagsPanel)
 
 	rect := canvas.NewRectangle(main_app.AppTheme.MainCtrlsBgColour)
 	sideContainer := container.NewStack(rect, sidePanel)
@@ -289,13 +291,13 @@ func createSidePanel() *fyne.Container {
 	return sideContainer
 }
 
-func showNotesInGrid(notes []note.NoteData) {
-	if AppContainers.grid == nil || AppContainers.mainGridContainer == nil {
+func (mw *MainWindow) showNotesInGrid(notes []note.NoteData) {
+	if mw.AppContainers.grid == nil || mw.AppContainers.mainGridContainer == nil {
 		return
 	}
 
-	if AppContainers.mainPageContainer != nil {
-		AppContainers.mainPageContainer.Hide()
+	if mw.AppContainers.mainPageContainer != nil {
+		mw.AppContainers.mainPageContainer.Hide()
 	}
 
 	PageView.NumberOfPages = len(notes)
@@ -304,20 +306,20 @@ func showNotesInGrid(notes []note.NoteData) {
 		PageView.CurrentPage = 1
 	}
 
-	AppContainers.grid.RemoveAll()
+	mw.AppContainers.grid.RemoveAll()
 	numPages := (PageView.CurrentPage + PageView.Step) - 1
 	if numPages > len(notes) {
 		numPages = PageView.NumberOfPages
 	}
 
-	if AppWidgets.pageLabel.Hidden != true {
-		AppWidgets.pageLabel.SetText(PageView.GetGridLabelText())
+	if mw.AppWidgets.pageLabel.Hidden != true {
+		mw.AppWidgets.pageLabel.SetText(PageView.GetGridLabelText())
 	}
 
 	for i := PageView.CurrentPage - 1; i < numPages; i++ {
 		richText := NewScribeNoteText(notes[i].Content, func() {
 			if tracker.AddToTracker(notes[i].Id) {
-				NewNoteWindow(notes[i].Id, mainWindow)
+				NewNoteWindow(notes[i].Id, mw.window, mw)
 			} else {
 				fmt.Println("note is already open")
 			}
@@ -335,19 +337,19 @@ func showNotesInGrid(notes []note.NoteData) {
 		noteStack := container.NewStack(colourStack, textPadded)
 
 		//borderLayout := container.NewBorder(noteBackground,noteBackground,noteBackground, noteBackground,textStack)
-		AppContainers.grid.Add(noteStack)
+		mw.AppContainers.grid.Add(noteStack)
 	}
-	AppContainers.grid.Refresh()
-	AppContainers.mainGridContainer.Show()
+	mw.AppContainers.grid.Refresh()
+	mw.AppContainers.mainGridContainer.Show()
 }
 
-func showNotesAsPages(notesIn []note.NoteData) {
+func (mw *MainWindow) showNotesAsPages(notesIn []note.NoteData) {
 	//var noteInfo note.NoteInfo
 	var retrievedNote note.NoteData
 	var err error = nil
 
-	if AppContainers.mainGridContainer != nil {
-		AppContainers.mainGridContainer.Hide()
+	if mw.AppContainers.mainGridContainer != nil {
+		mw.AppContainers.mainGridContainer.Hide()
 	}
 
 	PageView.NumberOfPages = len(notesIn)
@@ -362,94 +364,94 @@ func showNotesAsPages(notesIn []note.NoteData) {
 
 	var noteId = notesIn[PageView.CurrentPage-1].Id
 
-	AppWidgets.pageLabel.SetText(PageView.GetLabelText())
-	AppWidgets.pageLabel.Show()
+	mw.AppWidgets.pageLabel.SetText(PageView.GetLabelText())
+	mw.AppWidgets.pageLabel.Show()
 
-	AppContainers.singleNoteStack.RemoveAll()
+	mw.AppContainers.singleNoteStack.RemoveAll()
 
 	if noteId != 0 {
 		retrievedNote, err = notes.GetNote(noteId)
 		if err != nil {
-			dialog.ShowError(err, mainWindow)
+			dialog.ShowError(err, mw.window)
 			log.Panic(err)
 		}
 	}
 
 	var allowEdit bool = true
 	if tracker.TrackerCheck(noteId) {
-		dialog.ShowInformation("Warning", "This note is already open in a separate window.\nClose it first if you want to edit it here!", mainWindow)
+		dialog.ShowInformation("Warning", "This note is already open in a separate window.\nClose it first if you want to edit it here!", mw.window)
 		allowEdit = false
 	}
 
 	var np NotePage
-	noteContainer := np.NewNotePage(&retrievedNote, allowEdit, false, mainWindow)
+	noteContainer := np.NewNotePage(&retrievedNote, allowEdit, false, mw.window, mw)
 	np.NotePageWidgets.ModeSelect.SetSelected("View")
 	np.AddNoteKeyboardShortcuts()
-	AppContainers.singleNoteStack.Add(noteContainer)
-	AppContainers.mainPageContainer.Show()
-	AppContainers.mainPageContainer.Refresh()
+	mw.AppContainers.singleNoteStack.Add(noteContainer)
+	mw.AppContainers.mainPageContainer.Show()
+	mw.AppContainers.mainPageContainer.Refresh()
 }
 
-func UpdateView() error {
+func (mw *MainWindow) UpdateView() error {
 	//var notes []minotedb.NoteData
 	var err error
 	//fyne.CurrentApp().SendNotification(fyne.NewNotification("Current View: ", currentView))
 	switch main_app.AppStatus.CurrentView {
 	case main_app.VIEW_PINNED:
-		if AppContainers.listPanel != nil {
-			AppContainers.listPanel.Hide()
+		if mw.AppContainers.listPanel != nil {
+			mw.AppContainers.listPanel.Hide()
 		}
-		if AppContainers.searchPanel != nil {
-			AppContainers.searchPanel.Hide()
+		if mw.AppContainers.searchPanel != nil {
+			mw.AppContainers.searchPanel.Hide()
 		}
-		if AppContainers.tagsPanel != nil {
-			AppContainers.tagsPanel.Hide()
+		if mw.AppContainers.tagsPanel != nil {
+			mw.AppContainers.tagsPanel.Hide()
 		}
-		AppWidgets.viewLabel.SetText("Pinned Notes")
+		mw.AppWidgets.viewLabel.SetText("Pinned Notes")
 		main_app.AppStatus.Notes, err = notes.GetPinnedNotes(SortViews[main_app.AppStatus.CurrentSortSelected])
 		main_app.AppStatus.CurrentNotebook = ""
 	case main_app.VIEW_RECENT:
-		if AppContainers.listPanel != nil {
-			AppContainers.listPanel.Hide()
+		if mw.AppContainers.listPanel != nil {
+			mw.AppContainers.listPanel.Hide()
 		}
-		if AppContainers.searchPanel != nil {
-			AppContainers.searchPanel.Hide()
+		if mw.AppContainers.searchPanel != nil {
+			mw.AppContainers.searchPanel.Hide()
 		}
-		if AppContainers.tagsPanel != nil {
-			AppContainers.tagsPanel.Hide()
+		if mw.AppContainers.tagsPanel != nil {
+			mw.AppContainers.tagsPanel.Hide()
 		}
 
-		AppWidgets.viewLabel.SetText(("Recent Notes"))
+		mw.AppWidgets.viewLabel.SetText(("Recent Notes"))
 		main_app.AppStatus.Notes, err = notes.GetRecentNotes(main_app.Conf.Settings.RecentNotesLimit, SortViews[main_app.AppStatus.CurrentSortSelected])
 		main_app.AppStatus.CurrentNotebook = ""
 	case main_app.VIEW_NOTEBOOK:
-		if AppContainers.tagsPanel != nil {
-			AppContainers.tagsPanel.Hide()
+		if mw.AppContainers.tagsPanel != nil {
+			mw.AppContainers.tagsPanel.Hide()
 		}
-		AppWidgets.viewLabel.SetText("Notebook - " + main_app.AppStatus.CurrentNotebook)
+		mw.AppWidgets.viewLabel.SetText("Notebook - " + main_app.AppStatus.CurrentNotebook)
 		main_app.AppStatus.Notes, err = notes.GetNotebook(main_app.AppStatus.CurrentNotebook, SortViews[main_app.AppStatus.CurrentSortSelected])
 	case main_app.VIEW_TAGS:
-		if AppContainers.listPanel != nil {
-			AppContainers.listPanel.Hide()
+		if mw.AppContainers.listPanel != nil {
+			mw.AppContainers.listPanel.Hide()
 		}
-		if AppContainers.searchPanel != nil {
-			AppContainers.searchPanel.Hide()
+		if mw.AppContainers.searchPanel != nil {
+			mw.AppContainers.searchPanel.Hide()
 		}
 		//if len(AppStatus.TagsChecked) > 0 {
-		AppWidgets.viewLabel.SetText("Tagged Notes")
+		mw.AppWidgets.viewLabel.SetText("Tagged Notes")
 		main_app.AppStatus.Notes, err = notes.GetTaggedNotes(main_app.AppStatus.TagsChecked, SortViews[main_app.AppStatus.CurrentSortSelected])
 		//} else {
 		//	AppStatus.Notes = nil
 		//}
 	case main_app.VIEW_SEARCH:
-		if AppContainers.tagsPanel != nil {
-			AppContainers.tagsPanel.Hide()
+		if mw.AppContainers.tagsPanel != nil {
+			mw.AppContainers.tagsPanel.Hide()
 		}
-		if len(strings.TrimSpace(AppWidgets.searchEntry.Text)) > 0 {
-			main_app.AppStatus.Notes, err = notes.GetSearchResults(AppWidgets.searchEntry.Text, main_app.AppStatus.SearchFilter, SortViews[main_app.AppStatus.CurrentSortSelected])
+		if len(strings.TrimSpace(mw.AppWidgets.searchEntry.Text)) > 0 {
+			main_app.AppStatus.Notes, err = notes.GetSearchResults(mw.AppWidgets.searchEntry.Text, main_app.AppStatus.SearchFilter, SortViews[main_app.AppStatus.CurrentSortSelected])
 			if err == nil {
-				AppWidgets.searchResultsLabel.SetText(fmt.Sprintf("Found (%d) > ", len(main_app.AppStatus.Notes)))
-				AppWidgets.viewLabel.SetText("Search Results")
+				mw.AppWidgets.searchResultsLabel.SetText(fmt.Sprintf("Found (%d) > ", len(main_app.AppStatus.Notes)))
+				mw.AppWidgets.viewLabel.SetText("Search Results")
 			}
 		}
 
@@ -460,29 +462,29 @@ func UpdateView() error {
 	if err != nil {
 		return err
 	}
-	err = showCurrentLayout()
+	err = mw.showCurrentLayout()
 
 	return err
 }
 
-func showCurrentLayout() error {
+func (mw *MainWindow) showCurrentLayout() error {
 	var err error = nil
 	switch main_app.AppStatus.CurrentLayout {
 	case main_app.LAYOUT_GRID:
 		if len(main_app.AppStatus.Notes) <= main_app.Conf.Settings.GridMaxPages {
-			AppWidgets.Toolbar.Items[2].ToolbarObject().Hide() //page back
-			AppWidgets.Toolbar.Items[3].ToolbarObject().Hide() //page forward
-			AppWidgets.pageLabel.Hide()
+			mw.AppWidgets.Toolbar.Items[2].ToolbarObject().Hide() //page back
+			mw.AppWidgets.Toolbar.Items[3].ToolbarObject().Hide() //page forward
+			mw.AppWidgets.pageLabel.Hide()
 		} else {
-			AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // page back
-			AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
-			AppWidgets.pageLabel.Show()
+			mw.AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // page back
+			mw.AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
+			mw.AppWidgets.pageLabel.Show()
 		}
-		showNotesInGrid(main_app.AppStatus.Notes)
+		mw.showNotesInGrid(main_app.AppStatus.Notes)
 	case main_app.LAYOUT_PAGE:
-		AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // page back
-		AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
-		showNotesAsPages(main_app.AppStatus.Notes)
+		mw.AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // page back
+		mw.AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
+		mw.showNotesAsPages(main_app.AppStatus.Notes)
 	default:
 		err = errors.New("undefined layout")
 	}
@@ -490,16 +492,16 @@ func showCurrentLayout() error {
 	return err
 }
 
-func CreateNotebooksList() {
+func (mw *MainWindow) CreateNotebooksList() {
 	var err error
 	main_app.AppStatus.Notebooks, err = minotedb.GetNotebooks()
 	if err != nil {
 		log.Print("Error getting Notebooks: ")
-		dialog.ShowError(err, mainWindow)
+		dialog.ShowError(err, mw.window)
 		log.Panic(err)
 	}
 
-	AppWidgets.notebooksList = widget.NewList(
+	mw.AppWidgets.notebooksList = widget.NewList(
 		func() int {
 			return len(main_app.AppStatus.Notebooks)
 		},
@@ -519,125 +521,125 @@ func CreateNotebooksList() {
 				main_app.AppStatus.CurrentView = main_app.VIEW_NOTEBOOK
 				main_app.AppStatus.CurrentNotebook = main_app.AppStatus.Notebooks[id]
 				PageView.Reset()
-				setSortOptions(main_app.VIEW_NOTEBOOK)
-				AppWidgets.sortSelect.SetSelectedIndex(0) //this will also trigger UpdateView()
+				mw.setSortOptions(main_app.VIEW_NOTEBOOK)
+				mw.AppWidgets.sortSelect.SetSelectedIndex(0) //this will also trigger UpdateView()
 			}
 		},
 	)
 
 }
 
-func UpdateNotebooksList() {
+func (mw *MainWindow) UpdateNotebooksList() {
 	var err error
 	main_app.AppStatus.Notebooks, err = minotedb.GetNotebooks()
 	if err != nil {
 		log.Print("Error getting Notebooks: ")
-		dialog.ShowError(err, mainWindow)
+		dialog.ShowError(err, mw.window)
 		log.Panic(err)
 	}
-	AppWidgets.notebooksList.Refresh()
+	mw.AppWidgets.notebooksList.Refresh()
 }
 
-func showNotebooksPanel() {
-	UpdateNotebooksList()
+func (mw *MainWindow) showNotebooksPanel() {
+	mw.UpdateNotebooksList()
 	if main_app.AppStatus.CurrentView != main_app.VIEW_NOTEBOOK {
-		AppWidgets.viewLabel.SetText("Notebooks")
+		mw.AppWidgets.viewLabel.SetText("Notebooks")
 	}
 
-	if AppContainers.listPanel != nil {
-		if AppContainers.listPanel.Visible() {
-			AppContainers.listPanel.Hide()
+	if mw.AppContainers.listPanel != nil {
+		if mw.AppContainers.listPanel.Visible() {
+			mw.AppContainers.listPanel.Hide()
 		} else {
-			AppContainers.listPanel.Show()
+			mw.AppContainers.listPanel.Show()
 		}
 	}
 }
 
-func addMainKeyboardShortcuts() {
+func (mw *MainWindow) addMainKeyboardShortcuts() {
 	//Keyboard shortcut to show Pinned Notes
-	mainWindow.Canvas().AddShortcut(main_app.ScViewPinned, func(shortcut fyne.Shortcut) {
+	mw.window.Canvas().AddShortcut(main_app.ScViewPinned, func(shortcut fyne.Shortcut) {
 		var err error
 		main_app.AppStatus.CurrentView = main_app.VIEW_PINNED
 		PageView.Reset()
-		err = UpdateView()
+		err = mw.UpdateView()
 		if err != nil {
 			log.Print("Error getting pinned notes: ")
-			dialog.ShowError(err, mainWindow)
+			dialog.ShowError(err, mw.window)
 			log.Panic(err)
 		}
 	})
 
 	//Keyboard shortcut to show Recent notes
-	mainWindow.Canvas().AddShortcut(main_app.ScViewRecent, func(shortcut fyne.Shortcut) {
+	mw.window.Canvas().AddShortcut(main_app.ScViewRecent, func(shortcut fyne.Shortcut) {
 		var err error
 		main_app.AppStatus.CurrentView = main_app.VIEW_RECENT
 		PageView.Reset()
-		err = UpdateView()
+		err = mw.UpdateView()
 		if err != nil {
 			log.Print("Error getting recent notes: ")
-			dialog.ShowError(err, mainWindow)
+			dialog.ShowError(err, mw.window)
 			log.Panic(err)
 		}
 	})
 
-	mainWindow.Canvas().AddShortcut(main_app.ScPageForward, func(shortcut fyne.Shortcut) {
+	mw.window.Canvas().AddShortcut(main_app.ScPageForward, func(shortcut fyne.Shortcut) {
 		if PageView.PageForward() > 0 {
-			UpdateView()
+			mw.UpdateView()
 		}
 	})
 
-	mainWindow.Canvas().AddShortcut(main_app.ScPageBack, func(shortcut fyne.Shortcut) {
+	mw.window.Canvas().AddShortcut(main_app.ScPageBack, func(shortcut fyne.Shortcut) {
 		if PageView.PageBack() > 0 {
-			UpdateView()
+			mw.UpdateView()
 		}
 	})
 
-	mainWindow.Canvas().AddShortcut(main_app.ScFind, func(shortcut fyne.Shortcut) {
-		ShowSearchPanel()
+	mw.window.Canvas().AddShortcut(main_app.ScFind, func(shortcut fyne.Shortcut) {
+		mw.ShowSearchPanel()
 	})
 
 	//Keyboard shortcut to create a new note
-	mainWindow.Canvas().AddShortcut(main_app.ScOpenNote, func(shortcut fyne.Shortcut) {
+	mw.window.Canvas().AddShortcut(main_app.ScOpenNote, func(shortcut fyne.Shortcut) {
 		//CreateNewNote()
 	})
 
 	//Keyboard shortcut to show notebooks list
-	mainWindow.Canvas().AddShortcut(main_app.ScShowNotebooks, func(shortcut fyne.Shortcut) {
-		showNotebooksPanel()
+	mw.window.Canvas().AddShortcut(main_app.ScShowNotebooks, func(shortcut fyne.Shortcut) {
+		mw.showNotebooksPanel()
 	})
 
 	//Keyboard shortcut to show notebooks list
-	mainWindow.Canvas().AddShortcut(main_app.ScShowTags, func(shortcut fyne.Shortcut) {
-		ToggleMainTagsPanel()
+	mw.window.Canvas().AddShortcut(main_app.ScShowTags, func(shortcut fyne.Shortcut) {
+		mw.ToggleMainTagsPanel()
 		main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
 		PageView.Reset()
-		err := UpdateView()
+		err := mw.UpdateView()
 		if err != nil {
 			log.Print("Error getting tagged notes: ")
-			dialog.ShowError(err, mainWindow)
+			dialog.ShowError(err, mw.window)
 			log.Panic(err)
 		}
 
 	})
 }
 
-func setSortOptions(view string) {
+func (mw *MainWindow) setSortOptions(view string) {
 
 	switch view {
 	// note - these options must match values in the sortViews map
 	case main_app.VIEW_PINNED:
-		AppWidgets.sortSelect.Options = []string{"Newly Pinned First", "Newly Pinned Last", "Modified First", "Modified Last"}
+		mw.AppWidgets.sortSelect.Options = []string{"Newly Pinned First", "Newly Pinned Last", "Modified First", "Modified Last"}
 	case main_app.VIEW_RECENT:
-		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
+		mw.AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
 	case main_app.VIEW_NOTEBOOK:
-		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
+		mw.AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
 	case main_app.VIEW_TAGS:
-		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
+		mw.AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
 	case main_app.VIEW_SEARCH:
-		AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
+		mw.AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
 
 	}
 
-	AppWidgets.sortSelect.ClearSelected()
-	AppWidgets.sortSelect.Refresh()
+	mw.AppWidgets.sortSelect.ClearSelected()
+	mw.AppWidgets.sortSelect.Refresh()
 }

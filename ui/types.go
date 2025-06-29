@@ -38,9 +38,17 @@ type ApplicationWidgets struct {
 	searchResultsLabel *widget.Label
 	sortSelect         *widget.Select
 }
+
+type MainWindow struct {
+	window        fyne.Window
+	AppWidgets    ApplicationWidgets
+	AppContainers ApplicationContainers
+}
+
 type NotePage struct {
 	Id                 uint
 	ParentWindow       fyne.Window
+	MainAppWindow      *MainWindow
 	NoteInfo           note.NoteInfo
 	RetrievedNote      note.NoteData
 	AllowEdit          bool
