@@ -46,7 +46,7 @@ func main() {
 		newConfig := CreateAppConfig(homeDir)
 
 		if err = config.WriteConfig(confFile, newConfig); err != nil {
-			log.Panicln(fmt.Sprintf("Error writing config file: %s", err))
+			log.Panicf("Error writing config file: %s", err)
 		}
 	}
 
@@ -63,7 +63,7 @@ func main() {
 
 		//create a new database
 		if err = minotedb.CreateNew(dbName, dbPath); err != nil {
-			log.Panicln(fmt.Sprintf("Something went wrong creating new db: %s", err))
+			log.Panicf("Something went wrong creating new db: %s", err)
 		}
 		minotedb.Close()
 	}
