@@ -13,6 +13,7 @@ type AppSettings struct {
 	InitialView      string  `toml:"initial_view"`
 	InitialLayout    string  `toml:"initial_layout"`
 	GridMaxPages     int     `toml:"grid_max_pages"`
+	FontSize         float32 `toml:"font_size"`
 	ThemeVariant     string  `toml:"theme_variant"`
 	DarkColourNote   string  `toml:"dark_colour_note"`
 	LightColourNote  string  `toml:"light_colour_note"`

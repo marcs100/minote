@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"os"
@@ -87,8 +86,9 @@ func CreateAppConfig(homeDir string) config.Config {
 		NoteWidth:        500,
 		RecentNotesLimit: 50,
 		GridMaxPages:     500,
+		FontSize:         12,
 		ThemeVariant:     "system",
-		DarkColourNote:   "#2f2f2f",
+		DarkColourNote:   "#242424",
 		LightColourNote:  "#e2e2e2",
 		DarkColourBg:     "#1e1e1e",
 		LightColourBg:    "#efefef",

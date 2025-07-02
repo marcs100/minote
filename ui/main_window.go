@@ -53,6 +53,13 @@ func createMainWindow(version string) {
 
 	main_app.AppTheme = main_app.GetThemeColours(themeVar)
 
+	custTheme := &minoteTheme{
+		FontSize:    main_app.Conf.Settings.FontSize,
+		BgColour:    main_app.AppTheme.MainBgColour,
+		EntryColour: main_app.AppTheme.NoteBgColour,
+	}
+	main_app.MainApp.Settings().SetTheme(custTheme)
+
 	//Main Grid container for displaying notes
 	grid := container.NewGridWrap(main_app.AppStatus.NoteSize)
 	mw.AppContainers.grid = grid //store to allow interaction in other functions
@@ -95,7 +102,7 @@ func createMainWindow(version string) {
 
 	mw.window.SetCloseIntercept(func() {
 		if tracker.TrackerLen() > 0 {
-			fmt.Println(fmt.Sprintf("len of open notes array is %d", tracker.TrackerLen()))
+			fmt.Printf("len of open notes array is %d", tracker.TrackerLen())
 			//do not close if there are notes open
 			dlg := dialog.NewInformation("Error", "There are notes open, please close them before closing the application!", mw.window)
 			dlg.Show()
@@ -114,9 +121,9 @@ func (mw *MainWindow) createMainPanel() *fyne.Container {
 	mw.AppContainers.mainGridContainer = mainGridContainer
 	mainPageContainer := container.NewScroll(mw.AppContainers.singleNoteStack)
 	mw.AppContainers.mainPageContainer = mainPageContainer
-	bgRect := canvas.NewRectangle(main_app.AppTheme.MainBgColour)
+	//bgRect := canvas.NewRectangle(main_app.AppTheme.MainBgColour)
 
-	mainStackedContainer := container.NewStack(bgRect, mainPageContainer, mainGridContainer)
+	mainStackedContainer := container.NewStack(mainPageContainer, mainGridContainer)
 
 	return mainStackedContainer
 }
@@ -230,12 +237,6 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 		mw.setSortOptions(main_app.AppStatus.CurrentView)
 		PageView.Reset()
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
-		// err := UpdateView()
-		// if err != nil {
-		// 	log.Print("Error getting pinned notes: ")
-		// 	dialog.ShowError(err, mainWindow)
-		// 	log.Panic(err)
-		// }
 	})
 
 	RecentBtn := widget.NewButtonWithIcon("", theme.HistoryIcon(), func() {
@@ -244,12 +245,6 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 		PageView.Reset()
 		mw.setSortOptions(main_app.AppStatus.CurrentView)
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
-		// err := UpdateView()
-		// if err != nil {
-		// 	log.Print("Error getting recent notes: ")
-		// 	dialog.ShowError(err, mainWindow)
-		// 	log.Panic(err)
-		// }
 	})
 
 	tagsBtn := widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
@@ -258,12 +253,6 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 		PageView.Reset()
 		mw.setSortOptions(main_app.VIEW_TAGS)
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
-		// err := UpdateView()
-		// if err != nil {
-		// 	log.Print("Error getting tagged notes: ")
-		// 	dialog.ShowError(err, mainWindow)
-		// 	log.Panic(err)
-		// }
 
 	})
 
@@ -326,7 +315,7 @@ func (mw *MainWindow) showNotesInGrid(notes []note.NoteData) {
 		})
 		richText.Wrapping = fyne.TextWrapWord
 		themeBackground := canvas.NewRectangle(main_app.AppTheme.NoteBgColour)
-		noteColour, _ := conversions.RGBStringToFyneColor(notes[i].BackgroundColour)
+		noteColour := conversions.RGBStringToFyneColor(notes[i].BackgroundColour)
 		noteBackground := canvas.NewRectangle(noteColour)
 		if notes[i].BackgroundColour == "#e7edef" || notes[i].BackgroundColour == "#FFFFFF" || notes[i].BackgroundColour == "#ffffff" || notes[i].BackgroundColour == "#000000" {
 			noteBackground = canvas.NewRectangle(main_app.AppTheme.NoteBgColour) // colour not set or using the old scribe default note colour

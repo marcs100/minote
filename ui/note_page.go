@@ -99,7 +99,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 
 	themeBackground := canvas.NewRectangle(main_app.AppTheme.NoteBgColour)
 	topBarBackground := canvas.NewRectangle(main_app.AppTheme.MainCtrlsBgColour)
-	noteColour, _ := conversions.RGBStringToFyneColor(np.NoteInfo.Colour)
+	noteColour := conversions.RGBStringToFyneColor(np.NoteInfo.Colour)
 
 	np.NotePageCanvas.NoteBackground = canvas.NewRectangle(noteColour)
 	if np.NoteInfo.Colour == "#e7edef" || np.NoteInfo.Colour == "#FFFFFF" || np.NoteInfo.Colour == "#ffffff" || np.NoteInfo.Colour == "#000000" {
