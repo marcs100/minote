@@ -15,3 +15,11 @@ var SortViews = map[string]int{
 	"Created First":      4,
 	"Created Last":       5,
 }
+
+const (
+	LIGHT_THEME ThemeVariant = iota
+	DARK_THEME
+	SYSTEM_THEME
+)
+
+var UI_Colours AppColours

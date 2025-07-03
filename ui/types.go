@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/marcs100/minote/note"
+	"image/color"
 )
 
 type PageViewStatus struct {
@@ -80,4 +81,12 @@ type NotePageContainers struct {
 
 type NotePageCanvas struct {
 	NoteBackground *canvas.Rectangle
+}
+
+type ThemeVariant int
+
+type AppColours struct {
+	NoteBgColour      color.Color
+	MainBgColour      color.Color
+	MainCtrlsBgColour color.Color
 }

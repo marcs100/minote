@@ -4,12 +4,11 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"github.com/marcs100/minote/main_app"
 	"github.com/marcs100/minote/note"
 )
 
 func CreateProperetiesPanel(np *NotePage) error {
-	themeBackground := canvas.NewRectangle(main_app.AppTheme.NoteBgColour)
+	themeBackground := canvas.NewRectangle(UI_Colours.NoteBgColour)
 	propertiesTitle := widget.NewRichTextFromMarkdown("**Properties**")
 	np.NotePageWidgets.PropertiesText = widget.NewLabel("")
 	vbox := container.NewVBox(propertiesTitle, np.NotePageWidgets.PropertiesText)

@@ -97,13 +97,13 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 	np.NotePageWidgets.Entry.Text = np.NoteInfo.Content
 	np.NotePageWidgets.Entry.Wrapping = fyne.TextWrapWord
 
-	themeBackground := canvas.NewRectangle(main_app.AppTheme.NoteBgColour)
-	topBarBackground := canvas.NewRectangle(main_app.AppTheme.MainCtrlsBgColour)
+	themeBackground := canvas.NewRectangle(UI_Colours.NoteBgColour)
+	topBarBackground := canvas.NewRectangle(UI_Colours.MainCtrlsBgColour)
 	noteColour := conversions.RGBStringToFyneColor(np.NoteInfo.Colour)
 
 	np.NotePageCanvas.NoteBackground = canvas.NewRectangle(noteColour)
 	if np.NoteInfo.Colour == "#e7edef" || np.NoteInfo.Colour == "#FFFFFF" || np.NoteInfo.Colour == "#ffffff" || np.NoteInfo.Colour == "#000000" {
-		np.NotePageCanvas.NoteBackground = canvas.NewRectangle(main_app.AppTheme.NoteBgColour) // colour not set or using the old scribe default note colour
+		np.NotePageCanvas.NoteBackground = canvas.NewRectangle(UI_Colours.NoteBgColour) // colour not set or using the old scribe default note colour
 	}
 
 	colourStack := container.NewStack(np.NotePageCanvas.NoteBackground)
@@ -116,7 +116,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 	spacerLabel := widget.NewLabel("      ")
 
 	scrolledMarkdown := container.NewScroll(np.NotePageContainers.Markdown)
-	background := canvas.NewRectangle(main_app.AppTheme.NoteBgColour)
+	background := canvas.NewRectangle(UI_Colours.NoteBgColour)
 	content := container.NewStack(background, scrolledMarkdown, np.NotePageWidgets.Entry)
 
 	btnIcon := theme.RadioButtonIcon()

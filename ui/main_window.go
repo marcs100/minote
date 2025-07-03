@@ -41,22 +41,22 @@ func createMainWindow(version string) {
 	main_app.AppStatus.NoteSize = fyne.NewSize(main_app.Conf.Settings.NoteWidth, main_app.Conf.Settings.NoteHeight)
 
 	mw.window = main_app.MainApp.NewWindow(fmt.Sprintf("Minote   v%s", version))
-	var themeVar main_app.ThemeVariant
+	var themeVar ThemeVariant
 	switch main_app.Conf.Settings.ThemeVariant {
 	case "light":
-		themeVar = main_app.LIGHT_THEME
+		themeVar = LIGHT_THEME
 	case "dark":
-		themeVar = main_app.DARK_THEME
+		themeVar = DARK_THEME
 	case "system":
-		themeVar = main_app.SYSTEM_THEME
+		themeVar = SYSTEM_THEME
 	}
 
-	main_app.AppTheme = main_app.GetThemeColours(themeVar)
+	UI_Colours = GetAppColours(themeVar)
 
 	custTheme := &minoteTheme{
 		FontSize:    main_app.Conf.Settings.FontSize,
-		BgColour:    main_app.AppTheme.MainBgColour,
-		EntryColour: main_app.AppTheme.NoteBgColour,
+		BgColour:    UI_Colours.MainBgColour,
+		EntryColour: UI_Colours.NoteBgColour,
 	}
 	main_app.MainApp.Settings().SetTheme(custTheme)
 
@@ -121,7 +121,7 @@ func (mw *MainWindow) createMainPanel() *fyne.Container {
 	mw.AppContainers.mainGridContainer = mainGridContainer
 	mainPageContainer := container.NewScroll(mw.AppContainers.singleNoteStack)
 	mw.AppContainers.mainPageContainer = mainPageContainer
-	//bgRect := canvas.NewRectangle(main_app.AppTheme.MainBgColour)
+	//bgRect := canvas.NewRectangle(UI_Colours.MainBgColour)
 
 	mainStackedContainer := container.NewStack(mainPageContainer, mainGridContainer)
 
@@ -196,7 +196,7 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 	mw.AppWidgets.sortSelect.SetSelectedIndex(0)
 
 	mw.AppWidgets.Toolbar = toolbar
-	//rect := canvas.NewRectangle(main_app.AppTheme.)
+	//rect := canvas.NewRectangle(UI_Colours.)
 	topBar := container.New(layout.NewHBoxLayout(),
 		spacerLabel,
 		mw.AppWidgets.viewLabel,
@@ -210,7 +210,7 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 		settingsBar,
 	)
 
-	rect := canvas.NewRectangle(main_app.AppTheme.MainCtrlsBgColour)
+	rect := canvas.NewRectangle(UI_Colours.MainCtrlsBgColour)
 	topPanel := container.NewStack(rect, topBar)
 	return topPanel
 }
@@ -274,7 +274,7 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 
 	sidePanel := container.NewHBox(btnPanel, mw.AppContainers.listPanel, mw.AppContainers.searchPanel, mw.AppContainers.tagsPanel)
 
-	rect := canvas.NewRectangle(main_app.AppTheme.MainCtrlsBgColour)
+	rect := canvas.NewRectangle(UI_Colours.MainCtrlsBgColour)
 	sideContainer := container.NewStack(rect, sidePanel)
 
 	return sideContainer
@@ -314,11 +314,11 @@ func (mw *MainWindow) showNotesInGrid(notes []note.NoteData) {
 			}
 		})
 		richText.Wrapping = fyne.TextWrapWord
-		themeBackground := canvas.NewRectangle(main_app.AppTheme.NoteBgColour)
+		themeBackground := canvas.NewRectangle(UI_Colours.NoteBgColour)
 		noteColour := conversions.RGBStringToFyneColor(notes[i].BackgroundColour)
 		noteBackground := canvas.NewRectangle(noteColour)
 		if notes[i].BackgroundColour == "#e7edef" || notes[i].BackgroundColour == "#FFFFFF" || notes[i].BackgroundColour == "#ffffff" || notes[i].BackgroundColour == "#000000" {
-			noteBackground = canvas.NewRectangle(main_app.AppTheme.NoteBgColour) // colour not set or using the old scribe default note colour
+			noteBackground = canvas.NewRectangle(UI_Colours.NoteBgColour) // colour not set or using the old scribe default note colour
 		}
 
 		colourStack := container.NewStack(noteBackground)
