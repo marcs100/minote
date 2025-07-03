@@ -24,23 +24,17 @@ type minoteTheme struct {
 //var _ fyne.Theme = (*minoteTheme)(nil)
 
 func (t *minoteTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant) color.Color {
-	if variant == theme.VariantDark {
-		switch name {
-		/*case theme.ColorNameButton:
-		col := conversions.RGBStringToFyneColor("#332212")
-		return col*/
-		case theme.ColorNameBackground:
-			return t.BgColour
-		case theme.ColorNameInputBackground:
-			return t.EntryColour
+	switch name {
+	/*case theme.ColorNameButton:
+	col := conversions.RGBStringToFyneColor("#332212")
+	return col*/
+	case theme.ColorNameBackground:
+		return t.BgColour
+	case theme.ColorNameInputBackground:
+		return t.EntryColour
 
-		default:
-			return theme.DefaultTheme().Color(name, variant)
-		}
-
-	} else {
+	default:
 		return theme.DefaultTheme().Color(name, variant)
-
 	}
 }
 

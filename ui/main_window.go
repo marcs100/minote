@@ -48,17 +48,18 @@ func createMainWindow(version string) {
 	case "dark":
 		themeVar = DARK_THEME
 	case "system":
+		fmt.Println("system theme from settings")
 		themeVar = SYSTEM_THEME
 	}
 
 	UI_Colours = GetAppColours(themeVar)
 
-	custTheme := &minoteTheme{
-		FontSize:    main_app.Conf.Settings.FontSize,
-		BgColour:    UI_Colours.MainBgColour,
-		EntryColour: UI_Colours.NoteBgColour,
-	}
-	main_app.MainApp.Settings().SetTheme(custTheme)
+	// custTheme := &minoteTheme{
+	// 	FontSize:    main_app.Conf.Settings.FontSize,
+	// 	BgColour:    UI_Colours.MainBgColour,
+	// 	EntryColour: UI_Colours.NoteBgColour,
+	// }
+	// main_app.MainApp.Settings().SetTheme(custTheme)
 
 	//Main Grid container for displaying notes
 	grid := container.NewGridWrap(main_app.AppStatus.NoteSize)

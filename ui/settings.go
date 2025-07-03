@@ -17,17 +17,6 @@ func ShowSettings(parentWindow fyne.Window) {
 
 	newConf := CopySettings()
 
-	var themeVar ThemeVariant
-	switch main_app.Conf.Settings.ThemeVariant {
-	case "light":
-		themeVar = LIGHT_THEME
-	case "dark":
-		themeVar = DARK_THEME
-	case "system":
-		themeVar = SYSTEM_THEME
-	}
-	UI_Colours = GetAppColours(themeVar)
-
 	bg := canvas.NewRectangle(UI_Colours.MainBgColour)
 
 	viewHeading := widget.NewRichTextFromMarkdown("### View")
