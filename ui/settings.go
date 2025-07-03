@@ -37,7 +37,9 @@ func ShowSettings(parentWindow fyne.Window) {
 			return
 		}
 		if i < 1 {
-			dialog.ShowInformation("Setting Error", "Recent notes limit must be > 1", parentWindow)
+			dialog.ShowInformation("Settings Error", "Recent notes limit must be greater than 0", parentWindow)
+			recentNotesLimitEntry.SetText("")
+			return
 		} else {
 			newConf.Settings.RecentNotesLimit = i
 		}
@@ -63,7 +65,9 @@ func ShowSettings(parentWindow fyne.Window) {
 		}
 
 		if i < 1 {
-			dialog.ShowInformation("Setting Error", "Grid pages limit must be > 1", parentWindow)
+			dialog.ShowInformation("Settings Error", "Grid pages limit must be > 1", parentWindow)
+			gridLimitEntry.SetText("")
+			return
 		}
 		newConf.Settings.GridMaxPages = i
 	}
@@ -79,6 +83,25 @@ func ShowSettings(parentWindow fyne.Window) {
 	appearanceSelect.Selected = main_app.Conf.Settings.ThemeVariant
 	appearanceGrid := container.NewGridWithRows(1, appearanceLabel, appearanceSelect)
 
+	fontSizeLabel := widget.NewLabel("  FontSize:")
+	fontSizeEntry := widget.NewEntry()
+	fontSizeEntry.SetText(fmt.Sprintf("%.1f", main_app.Conf.Settings.FontSize))
+	fontSizeEntry.OnChanged = func(input string) {
+		f64, err := strconv.ParseFloat(input, 32)
+		if err != nil {
+			fontSizeEntry.SetText("")
+			return
+		}
+		i := float32(f64)
+		if i < 5 || i > 80 {
+			dialog.ShowInformation("Settings Error", "Font size must be between 5 and 80", parentWindow)
+			fontSizeEntry.SetText("")
+			return
+		}
+		fontSizeEntry.SetText(fmt.Sprintf("%.1f", i))
+	}
+	fontGrid := container.NewGridWithRows(1, fontSizeLabel, fontSizeEntry)
+
 	vbox := container.NewVBox(
 		viewHeading,
 		viewGrid,
@@ -88,6 +111,7 @@ func ShowSettings(parentWindow fyne.Window) {
 		gridLimitGrid,
 		appearanceHeading,
 		appearanceGrid,
+		fontGrid,
 		widget.NewLabel(" "),
 	)
 
@@ -96,6 +120,11 @@ func ShowSettings(parentWindow fyne.Window) {
 	formItem := widget.NewFormItem("", stack)
 	d := dialog.NewForm("      Settings      ", "Save", "Cancel", []*widget.FormItem{formItem}, func(confirmed bool) {
 		if confirmed {
+			if recentNotesLimitEntry.Text == "" || gridLimitEntry.Text == "" || fontSizeEntry.Text == "" {
+				dialog.ShowInformation("Settings Error", "blank entries found, settings will not be saved", parentWindow)
+				return
+			}
+
 			if newConf != *main_app.Conf {
 				if err := config.WriteConfig(main_app.AppStatus.ConfigFile, newConf); err != nil {
 					dialog.ShowError(err, parentWindow)
@@ -120,6 +149,7 @@ func CopySettings() config.Config {
 			InitialLayout:    main_app.Conf.Settings.InitialLayout,
 			GridMaxPages:     main_app.Conf.Settings.GridMaxPages,
 			ThemeVariant:     main_app.Conf.Settings.ThemeVariant,
+			FontSize:         main_app.Conf.Settings.FontSize,
 			DarkColourNote:   main_app.Conf.Settings.DarkColourNote,
 			LightColourNote:  main_app.Conf.Settings.LightColourNote,
 			DarkColourBg:     main_app.Conf.Settings.DarkColourBg,
