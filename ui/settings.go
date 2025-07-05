@@ -87,18 +87,21 @@ func ShowSettings(parentWindow fyne.Window) {
 	fontSizeEntry := widget.NewEntry()
 	fontSizeEntry.SetText(fmt.Sprintf("%.1f", main_app.Conf.Settings.FontSize))
 	fontSizeEntry.OnChanged = func(input string) {
-		f64, err := strconv.ParseFloat(input, 32)
-		if err != nil {
-			fontSizeEntry.SetText("")
-			return
+		if len(input) > 0 {
+			f64, err := strconv.ParseFloat(input, 32)
+			if err != nil {
+				fontSizeEntry.SetText("")
+				return
+			}
+			i := float32(f64)
+			if i < 5 || i > 80 {
+				dialog.ShowInformation("Settings Error", "Font size must be between 5 and 80", parentWindow)
+				fontSizeEntry.SetText("")
+				return
+			}
+			fontSizeEntry.SetText(fmt.Sprintf("%.1f", i))
+			newConf.Settings.FontSize = i
 		}
-		i := float32(f64)
-		if i < 5 || i > 80 {
-			dialog.ShowInformation("Settings Error", "Font size must be between 5 and 80", parentWindow)
-			fontSizeEntry.SetText("")
-			return
-		}
-		fontSizeEntry.SetText(fmt.Sprintf("%.1f", i))
 	}
 	fontGrid := container.NewGridWithRows(1, fontSizeLabel, fontSizeEntry)
 
@@ -121,14 +124,22 @@ func ShowSettings(parentWindow fyne.Window) {
 	d := dialog.NewForm("      Settings      ", "Save", "Cancel", []*widget.FormItem{formItem}, func(confirmed bool) {
 		if confirmed {
 			if recentNotesLimitEntry.Text == "" || gridLimitEntry.Text == "" || fontSizeEntry.Text == "" {
-				dialog.ShowInformation("Settings Error", "blank entries found, settings will not be saved", parentWindow)
+				dialog.ShowInformation("Settings Error", "blank entries found, settings will NOT be saved!", parentWindow)
 				return
 			}
 
 			if newConf != *main_app.Conf {
-				if err := config.WriteConfig(main_app.AppStatus.ConfigFile, newConf); err != nil {
+				var err error = nil
+				if err = main_app.ValidateConfig(&newConf); err != nil {
+					dialog.ShowInformation("Settings error", fmt.Sprint(err, " settings will NOT be saved!"), parentWindow)
+					return
+				}
+
+				if err = config.WriteConfig(main_app.AppStatus.ConfigFile, newConf); err != nil {
 					dialog.ShowError(err, parentWindow)
 				}
+
+				main_app.Conf = &newConf
 			}
 		}
 	}, parentWindow)

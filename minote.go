@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	"github.com/marcs100/minote/config"
+	"github.com/marcs100/minote/main_app"
 	"github.com/marcs100/minote/minotedb"
 	"github.com/marcs100/minote/ui"
 )
@@ -49,8 +50,13 @@ func main() {
 		}
 	}
 
-	appConfig, err = config.GetConfig(confFile)
-	if err != nil {
+	if appConfig, err = config.GetConfig(confFile); err != nil {
+		log.Panicln(err)
+		return
+	}
+
+	//validate config
+	if err = main_app.ValidateConfig(appConfig); err != nil {
 		log.Panicln(err)
 		return
 	}
