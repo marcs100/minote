@@ -9,6 +9,8 @@ import (
 	"image/color"
 )
 
+type ThemeVariant int
+
 type PageViewStatus struct {
 	NumberOfPages int
 	CurrentPage   int
@@ -44,6 +46,8 @@ type MainWindow struct {
 	window        fyne.Window
 	AppWidgets    ApplicationWidgets
 	AppContainers ApplicationContainers
+	ThemeVariant  ThemeVariant
+	UI_Colours    AppColours
 }
 
 type NotePage struct {
@@ -57,6 +61,8 @@ type NotePage struct {
 	NotePageWidgets    NotePageWidgets
 	NotePageContainers NotePageContainers
 	NotePageCanvas     NotePageCanvas
+	ThemeVariant       ThemeVariant
+	UI_Colours         AppColours
 }
 
 type NotePageWidgets struct {
@@ -82,8 +88,6 @@ type NotePageContainers struct {
 type NotePageCanvas struct {
 	NoteBackground *canvas.Rectangle
 }
-
-type ThemeVariant int
 
 type AppColours struct {
 	NoteBgColour      color.Color

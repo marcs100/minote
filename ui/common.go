@@ -22,4 +22,4 @@ const (
 	SYSTEM_THEME
 )
 
-var UI_Colours AppColours
+//var UI_Colours AppColours

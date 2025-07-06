@@ -8,7 +8,7 @@ import (
 )
 
 func CreateProperetiesPanel(np *NotePage) error {
-	themeBackground := canvas.NewRectangle(UI_Colours.NoteBgColour)
+	themeBackground := canvas.NewRectangle(np.UI_Colours.NoteBgColour)
 	propertiesTitle := widget.NewRichTextFromMarkdown("**Properties**")
 	np.NotePageWidgets.PropertiesText = widget.NewLabel("")
 	vbox := container.NewVBox(propertiesTitle, np.NotePageWidgets.PropertiesText)

@@ -13,7 +13,7 @@ import (
 	"github.com/marcs100/minote/main_app"
 )
 
-func ShowSettings(parentWindow fyne.Window) {
+func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 
 	newConf := CopySettings()
 

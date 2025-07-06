@@ -51,14 +51,17 @@ func createMainWindow(version string) {
 		themeVar = SYSTEM_THEME
 	}
 
-	UI_Colours = GetAppColours(themeVar)
-
-	custTheme := &minoteTheme{
-		FontSize:    main_app.Conf.Settings.FontSize,
-		BgColour:    UI_Colours.MainBgColour,
-		EntryColour: UI_Colours.NoteBgColour,
+	mw.ThemeVariant = themeVar
+	mw.UI_Colours = GetAppColours(themeVar)
+	if themeVar != SYSTEM_THEME {
+		fmt.Println("Will set a custom theme!")
+		custTheme := &minoteTheme{
+			FontSize:    main_app.Conf.Settings.FontSize,
+			BgColour:    mw.UI_Colours.MainBgColour,
+			EntryColour: mw.UI_Colours.NoteBgColour,
+		}
+		main_app.MainApp.Settings().SetTheme(custTheme)
 	}
-	main_app.MainApp.Settings().SetTheme(custTheme)
 
 	//Main Grid container for displaying notes
 	grid := container.NewGridWrap(main_app.AppStatus.NoteSize)
@@ -121,10 +124,9 @@ func (mw *MainWindow) createMainPanel() *fyne.Container {
 	mw.AppContainers.mainGridContainer = mainGridContainer
 	mainPageContainer := container.NewScroll(mw.AppContainers.singleNoteStack)
 	mw.AppContainers.mainPageContainer = mainPageContainer
-	//bgRect := canvas.NewRectangle(UI_Colours.MainBgColour)
 
-	mainStackedContainer := container.NewStack(mainPageContainer, mainGridContainer)
-
+	bgRect := canvas.NewRectangle(mw.UI_Colours.MainBgColour)
+	mainStackedContainer := container.NewStack(bgRect, mainPageContainer, mainGridContainer)
 	return mainStackedContainer
 }
 
@@ -179,7 +181,7 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
 			// if !main_app.AppStatus.SettingsOpen {
 			//NewSettingsWindow()
-			ShowSettings(mw.window)
+			ShowSettings(mw.window, mw.UI_Colours)
 			// main_app.AppStatus.SettingsOpen = true //we only allow one settings window
 			fmt.Println("Showing Settings window!")
 			// }
@@ -210,9 +212,10 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 		settingsBar,
 	)
 
-	rect := canvas.NewRectangle(UI_Colours.MainCtrlsBgColour)
+	rect := canvas.NewRectangle(mw.UI_Colours.MainCtrlsBgColour)
 	topPanel := container.NewStack(rect, topBar)
 	return topPanel
+
 }
 
 func (mw *MainWindow) createSidePanel() *fyne.Container {
@@ -274,10 +277,14 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 
 	sidePanel := container.NewHBox(btnPanel, mw.AppContainers.listPanel, mw.AppContainers.searchPanel, mw.AppContainers.tagsPanel)
 
-	rect := canvas.NewRectangle(UI_Colours.MainCtrlsBgColour)
-	sideContainer := container.NewStack(rect, sidePanel)
-
-	return sideContainer
+	if mw.ThemeVariant != SYSTEM_THEME {
+		rect := canvas.NewRectangle(mw.UI_Colours.MainCtrlsBgColour)
+		sideContainer := container.NewStack(rect, sidePanel)
+		return sideContainer
+	} else {
+		sideContainer := container.NewStack(sidePanel)
+		return sideContainer
+	}
 }
 
 func (mw *MainWindow) showNotesInGrid(notes []note.NoteData) {
@@ -314,11 +321,11 @@ func (mw *MainWindow) showNotesInGrid(notes []note.NoteData) {
 			}
 		})
 		richText.Wrapping = fyne.TextWrapWord
-		themeBackground := canvas.NewRectangle(UI_Colours.NoteBgColour)
+		themeBackground := canvas.NewRectangle(mw.UI_Colours.NoteBgColour)
 		noteColour := conversions.RGBStringToFyneColor(notes[i].BackgroundColour)
 		noteBackground := canvas.NewRectangle(noteColour)
 		if notes[i].BackgroundColour == "#e7edef" || notes[i].BackgroundColour == "#FFFFFF" || notes[i].BackgroundColour == "#ffffff" || notes[i].BackgroundColour == "#000000" {
-			noteBackground = canvas.NewRectangle(UI_Colours.NoteBgColour) // colour not set or using the old scribe default note colour
+			noteBackground = canvas.NewRectangle(mw.UI_Colours.NoteBgColour) // colour not set or using the old scribe default note colour
 		}
 
 		colourStack := container.NewStack(noteBackground)
@@ -374,6 +381,8 @@ func (mw *MainWindow) showNotesAsPages(notesIn []note.NoteData) {
 
 	var np NotePage
 	noteContainer := np.NewNotePage(&retrievedNote, allowEdit, false, mw.window, mw)
+	np.ThemeVariant = mw.ThemeVariant
+	np.UI_Colours = mw.UI_Colours
 	np.NotePageWidgets.ModeSelect.SetSelected("View")
 	np.AddNoteKeyboardShortcuts()
 	mw.AppContainers.singleNoteStack.Add(noteContainer)
