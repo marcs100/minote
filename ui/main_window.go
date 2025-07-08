@@ -86,7 +86,7 @@ func createMainWindow(version string) {
 	appContainer := container.NewBorder(top, nil, side, nil, main)
 
 	mw.window.SetContent(appContainer)
-	mw.window.Resize(fyne.NewSize(2000, 1200))
+	mw.window.Resize(fyne.NewSize(1800, 1100))
 
 	//set default view and layout`
 	main_app.AppStatus.CurrentView = main_app.Conf.Settings.InitialView
