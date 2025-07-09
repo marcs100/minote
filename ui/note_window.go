@@ -45,7 +45,7 @@ func NewNoteWindow(noteId uint, parentWindow fyne.Window, mainAppWindow *MainWin
 	noteWindow.SetContent(noteContainer)
 	noteWindow.Canvas().Focus(np.NotePageWidgets.Entry)
 	noteWindow.SetOnClosed(func() {
-		fmt.Println(fmt.Sprintf("Closing note %d", np.NoteInfo.Id))
+		fmt.Printf("Closing note %d", np.NoteInfo.Id)
 		np.SaveNote()
 		tracker.DelFromTracker(np.NoteInfo.Id)
 	})

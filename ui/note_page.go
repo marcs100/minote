@@ -218,7 +218,7 @@ func (np *NotePage) newChangeNotebookButton() *widget.Button {
 						}
 					} else {
 						dialog.ShowError(err, np.ParentWindow)
-						log.Panicln(fmt.Sprintf("Error check notebook exists: %s", err))
+						log.Panicf("Error check notebook exists: %s", err)
 					}
 				}
 			}, np.ParentWindow)
@@ -305,7 +305,7 @@ func (np *NotePage) PinNote() {
 			res, err = notes.PinNote(np.NoteInfo.Id)
 			pinnedDate, err := notes.GetPinnedDate(np.NoteInfo.Id)
 			if err != nil {
-				log.Println(fmt.Sprintf("Error getting pinned date: %s", err))
+				log.Printf("Error getting pinned date: %s", err)
 			}
 			np.NoteInfo.PinnedDate = pinnedDate
 		}
