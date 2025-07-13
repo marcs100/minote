@@ -28,6 +28,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 	np.NewWindowMode = newWindowMode
 	np.RetrievedNote = *retrievedNote
 	np.NoteInfo.NewNote = false
+	np.UI_Colours = GetAppColours(mainWindow.ThemeVariant)
 	if retrievedNote.Id == 0 {
 		//New note
 		np.NoteInfo = note.NoteInfo{
@@ -166,7 +167,13 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 
 	np.NotePageWidgets.ModeSelect.SetSelected("View")
 	np.NotePageWidgets.ModeSelect.Horizontal = true
-	toolbar := container.NewHBox(np.NotePageWidgets.ModeSelect, spacerLabel, np.NotePageWidgets.PinButton, colourButton, changeNotebookBtn, np.NotePageWidgets.TagsButton, propertiesButton, np.NotePageWidgets.DeleteButton)
+	toolbar := container.NewHBox(np.NotePageWidgets.ModeSelect,
+		spacerLabel, np.NotePageWidgets.PinButton,
+		colourButton, changeNotebookBtn,
+		np.NotePageWidgets.TagsButton,
+		propertiesButton,
+		np.NotePageWidgets.DeleteButton,
+	)
 
 	if err := CreateNotesTagPanel(np); err != nil {
 		dialog.ShowError(err, np.ParentWindow)

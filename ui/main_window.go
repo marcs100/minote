@@ -381,8 +381,6 @@ func (mw *MainWindow) showNotesAsPages(notesIn []note.NoteData) {
 
 	var np NotePage
 	noteContainer := np.NewNotePage(&retrievedNote, allowEdit, false, mw.window, mw)
-	np.ThemeVariant = mw.ThemeVariant
-	np.UI_Colours = mw.UI_Colours
 	np.NotePageWidgets.ModeSelect.SetSelected("View")
 	np.AddNoteKeyboardShortcuts()
 	mw.AppContainers.singleNoteStack.Add(noteContainer)
