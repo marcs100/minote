@@ -47,21 +47,27 @@ func createMainWindow(version string) {
 		themeVar = LIGHT_THEME
 	case "dark":
 		themeVar = DARK_THEME
-	case "system":
-		themeVar = SYSTEM_THEME
+	case "auto":
+		switch main_app.MainApp.Settings().ThemeVariant() {
+		case theme.VariantDark:
+			themeVar = DARK_THEME
+		case theme.VariantLight:
+			themeVar = LIGHT_THEME
+		default:
+			log.Println("Warning.. Could not auto detect theme variant, will default to dark theme!")
+			themeVar = DARK_THEME
+		}
 	}
 
 	mw.ThemeVariant = themeVar
 	mw.UI_Colours = GetAppColours(themeVar)
-	if themeVar != SYSTEM_THEME {
-		fmt.Println("Will set a custom theme!")
-		custTheme := &minoteTheme{
-			FontSize:    main_app.Conf.Settings.FontSize,
-			BgColour:    mw.UI_Colours.MainBgColour,
-			EntryColour: mw.UI_Colours.NoteBgColour,
-		}
-		main_app.MainApp.Settings().SetTheme(custTheme)
+	fmt.Println("Will set a custom theme!")
+	custTheme := &minoteTheme{
+		FontSize:    main_app.Conf.Settings.FontSize,
+		BgColour:    mw.UI_Colours.MainBgColour,
+		EntryColour: mw.UI_Colours.NoteBgColour,
 	}
+	main_app.MainApp.Settings().SetTheme(custTheme)
 
 	//Main Grid container for displaying notes
 	grid := container.NewGridWrap(main_app.AppStatus.NoteSize)
@@ -277,14 +283,9 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 
 	sidePanel := container.NewHBox(btnPanel, mw.AppContainers.listPanel, mw.AppContainers.searchPanel, mw.AppContainers.tagsPanel)
 
-	if mw.ThemeVariant != SYSTEM_THEME {
-		rect := canvas.NewRectangle(mw.UI_Colours.MainCtrlsBgColour)
-		sideContainer := container.NewStack(rect, sidePanel)
-		return sideContainer
-	} else {
-		sideContainer := container.NewStack(sidePanel)
-		return sideContainer
-	}
+	rect := canvas.NewRectangle(mw.UI_Colours.MainCtrlsBgColour)
+	sideContainer := container.NewStack(rect, sidePanel)
+	return sideContainer
 }
 
 func (mw *MainWindow) showNotesInGrid(notes []note.NoteData) {

@@ -19,7 +19,7 @@ var SortViews = map[string]int{
 const (
 	LIGHT_THEME ThemeVariant = iota
 	DARK_THEME
-	SYSTEM_THEME
+	AUTO_THEME
 )
 
 //var UI_Colours AppColours

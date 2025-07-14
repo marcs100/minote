@@ -77,7 +77,7 @@ func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 
 	appearanceHeading := widget.NewRichTextFromMarkdown("### Appearance")
 	appearanceLabel := widget.NewLabel("  Theme:")
-	appearanceSelect := widget.NewSelect([]string{"light", "dark", "system"}, func(sel string) {
+	appearanceSelect := widget.NewSelect([]string{"light", "dark", "auto"}, func(sel string) {
 		newConf.Settings.ThemeVariant = sel
 	})
 	appearanceSelect.Selected = main_app.Conf.Settings.ThemeVariant

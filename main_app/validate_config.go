@@ -48,7 +48,7 @@ func ValidateConfig(appConfig *config.Config) error {
 	}
 
 	switch appConfig.Settings.ThemeVariant {
-	case "system", "dark", "light":
+	case "auto", "dark", "light":
 		break
 	default:
 		return errors.New("config error: unrecognised theme")
