@@ -13,7 +13,7 @@ import (
 	"github.com/marcs100/minote/ui"
 )
 
-const VERSION = "0.007"
+const VERSION = "0.008"
 
 func main() {
 	var err error
