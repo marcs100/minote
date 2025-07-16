@@ -451,8 +451,15 @@ func (np *NotePage) SaveNote() {
 func (np *NotePage) AddNoteKeyboardShortcuts() {
 	//Keyboard shortcut to set edit mode
 	if np.AllowEdit {
-		np.ParentWindow.Canvas().AddShortcut(main_app.ScEditMode, func(shortcut fyne.Shortcut) {
-			np.SetEditMode()
+		// np.ParentWindow.Canvas().AddShortcut(main_app.ScEditMode, func(shortcut fyne.Shortcut) {
+		// 	np.SetEditMode()
+		// })
+		//
+		np.ParentWindow.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
+			fmt.Println(ke.Name)
+			if ke.Name == "I" {
+				np.SetEditMode()
+			}
 		})
 	}
 
