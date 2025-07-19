@@ -31,6 +31,17 @@ type EntryCustom struct {
 	widget.Entry
 	onCustomShortCut func(cs *desktop.CustomShortcut)
 	onFocusLost      func()
+	OnTypedKey       func(k *fyne.KeyEvent)
+}
+
+func (e *EntryCustom) TypedKey(k *fyne.KeyEvent) {
+	if e.OnTypedKey != nil {
+		if k.Name == fyne.KeyEscape {
+			e.OnTypedKey(k)
+		} else {
+			e.Entry.TypedKey(k)
+		}
+	}
 }
 
 func (e *EntryCustom) TypedShortcut(s fyne.Shortcut) {
@@ -51,12 +62,13 @@ func (e *EntryCustom) FocusLost() {
 	e.onFocusLost()
 }
 
-func NewEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut), onFocusLost func()) *EntryCustom {
+func NewEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut), onTypedKey func(k *fyne.KeyEvent), onFocusLost func()) *EntryCustom {
 	e := &EntryCustom{}
 	e.MultiLine = true
 	e.Wrapping = fyne.TextWrapWord
 	e.onCustomShortCut = onCustomShortcut
 	e.onFocusLost = onFocusLost
+	e.OnTypedKey = onTypedKey
 	e.ExtendBaseWidget(e)
 	return e
 }

@@ -86,13 +86,17 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 		case main_app.ScNoteTags.ShortcutName():
 			np.ToggleTagsNotePanel()
 		}
-	}, func() {
-		if !np.NoteInfo.Deleted {
-			np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
-			fmt.Println("Focus lost will try and save note")
-			np.SaveNote()
-		}
 	},
+		func(k *fyne.KeyEvent) {
+			fmt.Println("Entry - key pressed!!!!!!!")
+		},
+		func() {
+			if !np.NoteInfo.Deleted {
+				np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
+				fmt.Println("Focus lost will try and save note")
+				np.SaveNote()
+			}
+		},
 	)
 
 	np.NotePageWidgets.Entry.Text = np.NoteInfo.Content
