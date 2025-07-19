@@ -75,8 +75,8 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 	//setup keyboard shortcuts
 	np.NotePageWidgets.Entry = NewEntryCustom(func(cs *desktop.CustomShortcut) {
 		switch cs.ShortcutName() {
-		case main_app.ScViewMode.ShortcutName():
-			np.SetViewMode()
+		// case main_app.ScViewMode.ShortcutName():
+		// 	np.SetViewMode()
 		case main_app.ScPinNote.ShortcutName():
 			np.PinNote()
 		case main_app.ScNoteColour.ShortcutName():
@@ -87,10 +87,12 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 			np.ToggleTagsNotePanel()
 		}
 	},
-		func(k *fyne.KeyEvent) {
-			fmt.Println("Entry - key pressed!!!!!!!")
+
+		func(k *fyne.KeyEvent) { // Escape key detected
+			np.SetViewMode()
 		},
-		func() {
+
+		func() { // On focus lost
 			if !np.NoteInfo.Deleted {
 				np.NoteInfo.Content = np.NotePageWidgets.Entry.Text
 				fmt.Println("Focus lost will try and save note")

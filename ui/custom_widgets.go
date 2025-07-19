@@ -62,13 +62,13 @@ func (e *EntryCustom) FocusLost() {
 	e.onFocusLost()
 }
 
-func NewEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut), onTypedKey func(k *fyne.KeyEvent), onFocusLost func()) *EntryCustom {
+func NewEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut), onEscapeKey func(k *fyne.KeyEvent), onFocusLost func()) *EntryCustom {
 	e := &EntryCustom{}
 	e.MultiLine = true
 	e.Wrapping = fyne.TextWrapWord
 	e.onCustomShortCut = onCustomShortcut
 	e.onFocusLost = onFocusLost
-	e.OnTypedKey = onTypedKey
+	e.OnTypedKey = onEscapeKey
 	e.ExtendBaseWidget(e)
 	return e
 }

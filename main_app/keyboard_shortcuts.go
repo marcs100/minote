@@ -58,10 +58,10 @@ var ScPageBack = &desktop.CustomShortcut{
 // }
 
 // Set view mode
-var ScViewMode = &desktop.CustomShortcut{
-	KeyName:  fyne.KeyQ,
-	Modifier: fyne.KeyModifierControl | fyne.KeyModifierShift,
-}
+// var ScViewMode = &desktop.CustomShortcut{
+// 	KeyName:  fyne.KeyQ,
+// 	Modifier: fyne.KeyModifierControl | fyne.KeyModifierShift,
+// }
 
 // Pin note
 var ScPinNote = &desktop.CustomShortcut{
