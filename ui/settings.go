@@ -90,15 +90,10 @@ func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 		if len(input) > 0 {
 			f64, err := strconv.ParseFloat(input, 32)
 			if err != nil {
-				fontSizeEntry.SetText("")
+				fontSizeEntry.SetText("0")
 				return
 			}
 			i := float32(f64)
-			if i < 5 || i > 80 {
-				dialog.ShowInformation("Settings Error", "Font size must be between 5 and 80", parentWindow)
-				fontSizeEntry.SetText("")
-				return
-			}
 			fontSizeEntry.SetText(fmt.Sprintf("%.1f", i))
 			newConf.Settings.FontSize = i
 		}
