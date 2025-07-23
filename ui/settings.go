@@ -87,7 +87,7 @@ func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 	fontSizeEntry := widget.NewEntry()
 	fontSizeEntry.SetText(fmt.Sprintf("%.1f", main_app.Conf.Settings.FontSize))
 	fontSizeEntry.OnChanged = func(input string) {
-		if len(input) > 0 {
+		if len(input) > 1 {
 			f64, err := strconv.ParseFloat(input, 32)
 			if err != nil {
 				fontSizeEntry.SetText("0")
