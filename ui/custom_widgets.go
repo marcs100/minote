@@ -8,20 +8,20 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-type scribeNoteText struct {
+type MarkdownCustom struct {
 	widget.RichText
 	OnTapped func()
 }
 
 // Implement onTapped for this widget
-func (sn *scribeNoteText) Tapped(*fyne.PointEvent) {
+func (sn *MarkdownCustom) Tapped(*fyne.PointEvent) {
 	if sn.OnTapped != nil {
 		sn.OnTapped()
 	}
 }
 
-func NewScribeNoteText(content string, tapped func()) *scribeNoteText {
-	rt := &scribeNoteText{}
+func NewMarkdownCustom(content string, tapped func()) *MarkdownCustom {
+	rt := &MarkdownCustom{}
 	rt.AppendMarkdown(content)
 	rt.OnTapped = tapped
 	return rt

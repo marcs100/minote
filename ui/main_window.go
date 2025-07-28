@@ -314,7 +314,7 @@ func (mw *MainWindow) showNotesInGrid(notes []note.NoteData) {
 	}
 
 	for i := PageView.CurrentPage - 1; i < numPages; i++ {
-		richText := NewScribeNoteText(notes[i].Content, func() {
+		richText := NewMarkdownCustom(notes[i].Content, func() {
 			if tracker.AddToTracker(notes[i].Id) {
 				NewNoteWindow(notes[i].Id, mw.window, mw)
 			} else {
