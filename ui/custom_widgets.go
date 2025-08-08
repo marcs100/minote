@@ -72,3 +72,49 @@ func NewEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut), onEscapeK
 	e.ExtendBaseWidget(e)
 	return e
 }
+
+type ButtonCustom struct {
+	widget.Button
+	onTapped    func()
+	icon        *fyne.Resource
+	tooltipText string
+	// 	tooltip       *widget.PopUp
+	mw *MainWindow
+}
+
+func (b *ButtonCustom) MouseIn(m *desktop.MouseEvent) {
+	fmt.Println("MouseIn event!")
+	if b.mw.ToolTip.Hidden {
+		fmt.Println("showing tooltip!")
+		b.mw.ToolTip.Show()
+		b.mw.window.Canvas().Refresh(b.mw.ToolTip)
+	}
+}
+
+func (b *ButtonCustom) MouseOut() {
+	fmt.Println("MouseOut event!")
+	if !b.mw.ToolTip.Hidden {
+		fmt.Println("hiding tooltip!")
+		b.mw.ToolTip.Hide()
+		b.mw.window.Canvas().Refresh(b.mw.ToolTip)
+	}
+}
+
+func (b *ButtonCustom) Tapped(pe *fyne.PointEvent) {
+	if b.OnTapped != nil {
+		b.OnTapped()
+	}
+}
+
+func NewButtonCustom(label string, icon fyne.Resource, tooltipText string, mw *MainWindow, tapped func()) *ButtonCustom {
+	b := &ButtonCustom{}
+	b.SetIcon(icon)
+	b.SetText(label)
+	b.OnTapped = tapped
+	b.mw = mw
+	b.mw.ToolTip.Text = tooltipText
+	b.ExtendBaseWidget(b)
+	// text := canvas.NewText(b.tooltipText, color.White)
+	// b.tooltip = widget.NewPopUp(text, b.parent) //This popup seems to be the cause of the MouseOut event always firing!
+	return b
+}

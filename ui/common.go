@@ -8,12 +8,12 @@ package ui
 // var AppWidgets ApplicationWidgets       //structure containing pointers to fyne widgets for main window
 var PageView PageViewStatus //structure to track page numbers
 var SortViews = map[string]int{
-	"Modified First":     0,
-	"Modified Last":      1,
-	"Newly Pinned First": 2,
-	"Newly Pinned last":  3,
-	"Created First":      4,
-	"Created Last":       5,
+	"Modified: new to old":   0,
+	"Modified: old to new":   1,
+	"Pinned: most recently":  2,
+	"Pinned: least recently": 3,
+	"Created: new to old":    4,
+	"Created: old to new":    5,
 }
 
 const (

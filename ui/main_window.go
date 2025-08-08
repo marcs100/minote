@@ -3,6 +3,7 @@ package ui
 import (
 	"errors"
 	"fmt"
+	"image/color"
 	"log"
 
 	"strings"
@@ -80,6 +81,9 @@ func createMainWindow(version string) {
 
 	PageView.CurrentPage = 0
 	PageView.NumberOfPages = 0
+
+	mw.ToolTip = canvas.NewText("test tooltip", color.White)
+	mw.ToolTip.Hide()
 
 	//Create The main panel
 	main := mw.createMainPanel()
@@ -177,21 +181,32 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 		}),
 	)
 
-	settingsBar := widget.NewToolbar(
+	rightToolbar := widget.NewToolbar(
 		//backup database
-		widget.NewToolbarAction(theme.DownloadIcon(), func() {
-			BackupNotes(main_app.Conf.Settings.Database, mw.window)
-		}),
+		// widget.NewToolbarAction(theme.DownloadIcon(), func() {
+		// 	BackupNotes(main_app.Conf.Settings.Database, mw.window)
+		// }),
 
 		//display settings
-		widget.NewToolbarAction(theme.SettingsIcon(), func() {
-			// if !main_app.AppStatus.SettingsOpen {
-			//NewSettingsWindow()
-			ShowSettings(mw.window, mw.UI_Colours)
-			// main_app.AppStatus.SettingsOpen = true //we only allow one settings window
-			fmt.Println("Showing Settings window!")
-			// }
+		widget.NewToolbarAction(theme.MenuIcon(), func() {
+			options := fyne.NewMenu("Options")
+			settingsMenuItem := fyne.NewMenuItem("Settings", func() {
+				ShowSettings(mw.window, mw.UI_Colours)
+			})
 
+			backupMenuItem := fyne.NewMenuItem("Backup Notes", func() {
+				BackupNotes(main_app.Conf.Settings.Database, mw.window)
+			})
+
+			options.Items = append(options.Items, settingsMenuItem, backupMenuItem)
+
+			popUpMenu := widget.NewPopUpMenu(options, mw.window.Canvas())
+			pos := fyne.NewPos(225, 40)
+			// popUpMenu.ShowAtPosition(pos)
+			popUpMenu.ShowAtRelativePosition(pos, mw.AppWidgets.sortSelect)
+
+			//current option - will remove - replace with menu
+			//ShowSettings(mw.window, mw.UI_Colours)
 		}),
 	)
 
@@ -215,7 +230,7 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 		sortLabel,
 		mw.AppWidgets.sortSelect,
 		spacerLabel,
-		settingsBar,
+		rightToolbar,
 	)
 
 	rect := canvas.NewRectangle(mw.UI_Colours.MainCtrlsBgColour)
@@ -265,6 +280,11 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 
 	})
 
+	testBtn := NewButtonCustom("Test", theme.ComputerIcon(), "some action", mw, func() {
+		fmt.Println("Test button pressed!!!!!!!!")
+		mw.ToolTip.Show()
+	})
+
 	mw.CreateNotebooksList()
 
 	notebooksBtn := widget.NewButtonWithIcon("", theme.FolderOpenIcon(), func() {
@@ -276,7 +296,7 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 
 	spacerLabel := widget.NewLabel(" ")
 
-	btnPanel := container.NewVBox(searchBtn, newNoteBtn, spacerLabel, pinnedBtn, RecentBtn, notebooksBtn, tagsBtn)
+	btnPanel := container.NewVBox(searchBtn, newNoteBtn, spacerLabel, pinnedBtn, RecentBtn, notebooksBtn, tagsBtn, testBtn)
 	mw.AppContainers.listPanel = container.NewStack(mw.AppWidgets.notebooksList)
 	mw.AppContainers.listPanel.Hide()
 	mw.AppContainers.tagsPanel.Hide()
@@ -284,7 +304,7 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 	sidePanel := container.NewHBox(btnPanel, mw.AppContainers.listPanel, mw.AppContainers.searchPanel, mw.AppContainers.tagsPanel)
 
 	rect := canvas.NewRectangle(mw.UI_Colours.MainCtrlsBgColour)
-	sideContainer := container.NewStack(rect, sidePanel)
+	sideContainer := container.NewStack(rect, sidePanel, mw.ToolTip)
 	return sideContainer
 }
 
@@ -625,15 +645,15 @@ func (mw *MainWindow) setSortOptions(view string) {
 	switch view {
 	// note - these options must match values in the sortViews map
 	case main_app.VIEW_PINNED:
-		mw.AppWidgets.sortSelect.Options = []string{"Newly Pinned First", "Newly Pinned Last", "Modified First", "Modified Last"}
+		mw.AppWidgets.sortSelect.Options = []string{"Pinned: most recently", "Pinned: least recently", "Modified: new to old", "Modified: old to new"}
 	case main_app.VIEW_RECENT:
-		mw.AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
+		mw.AppWidgets.sortSelect.Options = []string{"Modified: new to old", "Modified: old to new", "Created: new to old", "Created: old to new"}
 	case main_app.VIEW_NOTEBOOK:
-		mw.AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
+		mw.AppWidgets.sortSelect.Options = []string{"Modified: new to old", "Modified: old to new", "Created: new to old", "Created: old to new"}
 	case main_app.VIEW_TAGS:
-		mw.AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
+		mw.AppWidgets.sortSelect.Options = []string{"Modified: new to old", "Modified: old to new", "Created: new to old", "Created: old to new"}
 	case main_app.VIEW_SEARCH:
-		mw.AppWidgets.sortSelect.Options = []string{"Modified First", "Modified Last", "Created First", "Created Last"}
+		mw.AppWidgets.sortSelect.Options = []string{"Modified: new to old", "Modified: old to new", "Created: new to old", "Created: old to new"}
 
 	}
 

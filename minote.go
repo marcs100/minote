@@ -55,12 +55,6 @@ func main() {
 		return
 	}
 
-	//validate config
-	if err = main_app.ValidateConfig(appConfig); err != nil {
-		log.Panicln(err)
-		return
-	}
-
 	//check if the database already exists
 	if _, dbf_err := os.Stat(appConfig.Settings.Database); dbf_err != nil {
 		dbName := filepath.Base(appConfig.Settings.Database)
@@ -79,13 +73,30 @@ func main() {
 		log.Panicln(err)
 	}
 
+	//validate config
+	if err = main_app.ValidateConfig(appConfig); err != nil {
+		log.Panicln(err)
+		return
+	}
 	ui.StartUI(appConfig, confFile, VERSION)
 }
 
 func CreateAppConfig(homeDir string) config.Config {
+	dbDir := ""
+	var err error
+	if runtime.GOOS != "windows" {
+		dbDir = filepath.Join(homeDir, ".minote", "minote.db")
+	} else {
+		dbDir = filepath.Join(homeDir, "MinoteData", "minote.db")
+	}
+	if _, f_err := os.Stat(dbDir); f_err != nil {
+		//create config path
+		if err = os.MkdirAll(dbDir, os.ModePerm); err != nil {
+			log.Panicf("Something went wrong creating config path: %s", err)
+		}
+	}
 	appSettings := config.AppSettings{
-		Database: filepath.Join(homeDir, "minoteData", "minote.db"), //this one for release
-		//Database: filepath.Join(homeDir,"sync","scribe","scribeNB.db"), //temp one for dev
+		Database:         dbDir,
 		InitialLayout:    "grid",
 		InitialView:      "pinned",
 		NoteHeight:       350,
@@ -93,7 +104,7 @@ func CreateAppConfig(homeDir string) config.Config {
 		RecentNotesLimit: 50,
 		GridMaxPages:     500,
 		FontSize:         12,
-		ThemeVariant:     "system",
+		ThemeVariant:     "auto",
 		DarkColourNote:   "#242424",
 		LightColourNote:  "#e2e2e2",
 		DarkColourBg:     "#1e1e1e",

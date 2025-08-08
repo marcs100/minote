@@ -32,6 +32,7 @@ func CreateNotesTagPanel(np *NotePage) error {
 			}
 		}, np.ParentWindow)
 		tagEntryDialog.Show()
+		np.ParentWindow.Canvas().Focus(tagEntry)
 	})
 
 	err := np.UpdateTags()
