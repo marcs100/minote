@@ -22,6 +22,7 @@ func (sn *MarkdownCustom) Tapped(*fyne.PointEvent) {
 
 func NewMarkdownCustom(content string, tapped func()) *MarkdownCustom {
 	rt := &MarkdownCustom{}
+	rt.ExtendBaseWidget(rt)
 	rt.AppendMarkdown(content)
 	rt.OnTapped = tapped
 	return rt
@@ -75,9 +76,8 @@ func NewEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut), onEscapeK
 
 type ButtonCustom struct {
 	widget.Button
-	onTapped    func()
-	icon        *fyne.Resource
-	tooltipText string
+	onTapped func()
+	icon     *fyne.Resource
 	// 	tooltip       *widget.PopUp
 	mw *MainWindow
 }
@@ -89,6 +89,7 @@ func (b *ButtonCustom) MouseIn(m *desktop.MouseEvent) {
 		b.mw.ToolTip.Show()
 		b.mw.window.Canvas().Refresh(b.mw.ToolTip)
 	}
+	b.Button.MouseIn(m)
 }
 
 func (b *ButtonCustom) MouseOut() {
@@ -98,22 +99,24 @@ func (b *ButtonCustom) MouseOut() {
 		b.mw.ToolTip.Hide()
 		b.mw.window.Canvas().Refresh(b.mw.ToolTip)
 	}
+	b.Button.MouseOut()
 }
 
 func (b *ButtonCustom) Tapped(pe *fyne.PointEvent) {
 	if b.OnTapped != nil {
 		b.OnTapped()
 	}
+	b.Button.Tapped(pe)
 }
 
 func NewButtonCustom(label string, icon fyne.Resource, tooltipText string, mw *MainWindow, tapped func()) *ButtonCustom {
 	b := &ButtonCustom{}
+	b.ExtendBaseWidget(b)
 	b.SetIcon(icon)
 	b.SetText(label)
 	b.OnTapped = tapped
 	b.mw = mw
 	b.mw.ToolTip.Text = tooltipText
-	b.ExtendBaseWidget(b)
 	// text := canvas.NewText(b.tooltipText, color.White)
 	// b.tooltip = widget.NewPopUp(text, b.parent) //This popup seems to be the cause of the MouseOut event always firing!
 	return b
