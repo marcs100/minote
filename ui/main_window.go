@@ -277,7 +277,6 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 		PageView.Reset()
 		mw.setSortOptions(main_app.VIEW_TAGS)
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
-
 	})
 
 	mw.CreateNotebooksList()

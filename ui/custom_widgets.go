@@ -108,7 +108,6 @@ func (b *ButtonWithTooltip) Tapped(pe *fyne.PointEvent) {
 	if b.OnTapped != nil {
 		b.OnTapped()
 	}
-	b.Button.Tapped(pe)
 }
 
 func NewButtonWithTooltip(label string, icon fyne.Resource, tooltipText string, tooltip *canvas.Text, window fyne.Window, tapped func()) *ButtonWithTooltip {
