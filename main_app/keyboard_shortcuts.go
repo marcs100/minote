@@ -52,10 +52,10 @@ var ScPageBack = &desktop.CustomShortcut{
 }
 
 // Set edit mode
-// var ScEditMode = &desktop.CustomShortcut{
-// 	KeyName:  fyne.KeyE,
-// 	Modifier: fyne.KeyModifierControl | fyne.KeyModifierShift,
-// }
+var ScEditMode = &desktop.CustomShortcut{
+	KeyName:  fyne.KeyI,
+	Modifier: fyne.KeyModifierControl,
+}
 
 // Set view mode
 // var ScViewMode = &desktop.CustomShortcut{

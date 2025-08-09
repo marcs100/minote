@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
 )
@@ -28,6 +29,8 @@ func NewMarkdownCustom(content string, tapped func()) *MarkdownCustom {
 	rt.OnTapped = tapped
 	return rt
 }
+
+//##################################################################
 
 type EntryCustom struct {
 	widget.Entry
@@ -66,28 +69,28 @@ func (e *EntryCustom) FocusLost() {
 
 func NewEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut), onEscapeKey func(k *fyne.KeyEvent), onFocusLost func()) *EntryCustom {
 	e := &EntryCustom{}
+	e.ExtendBaseWidget(e)
 	e.MultiLine = true
 	e.Wrapping = fyne.TextWrapWord
 	e.onCustomShortCut = onCustomShortcut
 	e.onFocusLost = onFocusLost
 	e.OnTypedKey = onEscapeKey
-	e.ExtendBaseWidget(e)
 	return e
 }
 
+//################################################################
+
 type ButtonWithTooltip struct {
 	widget.Button
-	onTapped func()
-	icon     *fyne.Resource
-	// 	tooltip       *widget.PopUp
+	icon        *fyne.Resource
 	window      fyne.Window
 	tooltipText string
-	tooltip     *widget.Label
+	tooltip     *canvas.Text
 }
 
 func (b *ButtonWithTooltip) MouseIn(m *desktop.MouseEvent) {
 	if len(strings.TrimSpace(b.tooltip.Text)) == 0 {
-		b.tooltip.SetText(b.tooltipText)
+		b.tooltip.Text = b.tooltipText
 		b.window.Canvas().Refresh(b.tooltip)
 	}
 	b.Button.MouseIn(m)
@@ -95,7 +98,7 @@ func (b *ButtonWithTooltip) MouseIn(m *desktop.MouseEvent) {
 
 func (b *ButtonWithTooltip) MouseOut() {
 	if len(strings.TrimSpace(b.tooltip.Text)) > 0 {
-		b.tooltip.SetText("                         ")
+		b.tooltip.Text = fmt.Sprintf("%-25s", "")
 		b.window.Canvas().Refresh(b.tooltip)
 	}
 	b.Button.MouseOut()
@@ -108,7 +111,7 @@ func (b *ButtonWithTooltip) Tapped(pe *fyne.PointEvent) {
 	b.Button.Tapped(pe)
 }
 
-func NewButtonWithTooltip(label string, icon fyne.Resource, tooltipText string, tooltip *widget.Label, window fyne.Window, tapped func()) *ButtonWithTooltip {
+func NewButtonWithTooltip(label string, icon fyne.Resource, tooltipText string, tooltip *canvas.Text, window fyne.Window, tapped func()) *ButtonWithTooltip {
 	b := &ButtonWithTooltip{}
 	b.ExtendBaseWidget(b)
 	b.SetIcon(icon)
@@ -120,3 +123,49 @@ func NewButtonWithTooltip(label string, icon fyne.Resource, tooltipText string, 
 	// b.tooltip = widget.NewPopUp(text, b.parent) //This popup seems to be the cause of the MouseOut event always firing!
 	return b
 }
+
+//##################################################################
+
+// type ToolbarActionWithTooltip struct {
+// 	widget.ToolbarAction
+// 	onTapped    func()
+// 	icon        *fyne.Resource
+// 	window      fyne.Window
+// 	tooltipText string
+// 	tooltip     *widget.Label
+// }
+
+// func (ta *ToolbarActionWithTooltip) MouseIn(m *desktop.MouseEvent) {
+// 	if len(strings.TrimSpace(ta.tooltip.Text)) == 0 {
+// 		ta.tooltip.SetText(ta.tooltipText)
+// 		ta.window.Canvas().Refresh(ta.tooltip)
+// 	}
+// 	ta.ToolbarAction.MouseIn(m)
+// }
+
+// func (ta *ToolbarActionWithTooltip) MouseOut() {
+// 	if len(strings.TrimSpace(ta.tooltip.Text)) > 0 {
+// 		ta.tooltip.SetText("                         ")
+// 		ta.window.Canvas().Refresh(ta.tooltip)
+// 	}
+// 	ta.ToolbarAction.MouseOut()
+// }
+
+// func (ta *ToolbarActionWithTooltip) Tapped(pe *fyne.PointEvent) {
+// 	if ta.OnTapped != nil {
+// 		ta.OnTapped()
+// 	}
+// 	ta.ToolbarAction.Tapped(pe)
+// }
+// func NewToolbarActionWithTooltip(label string, icon fyne.Resource, tooltipText string, tooltip *widget.Label, window fyne.Window, tapped func()) *ToolbarActionWithTooltip {
+// 	ta := &ToolbarActionWithTooltip{}
+// 	ta.ExtendBaseWidget(ta)
+// 	ta.SetIcon(icon)
+// 	ta.SetText(label)
+// 	ta.OnTapped = tapped
+// 	ta.tooltip = tooltip
+// 	ta.tooltipText = tooltipText
+// 	ta.window = window
+// 	// b.tooltip = widget.NewPopUp(text, b.parent) //This popup seems to be the cause of the MouseOut event always firing!
+// 	return ta
+// }

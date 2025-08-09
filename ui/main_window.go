@@ -81,8 +81,7 @@ func createMainWindow(version string) {
 	PageView.CurrentPage = 0
 	PageView.NumberOfPages = 0
 
-	mw.ToolTip = widget.NewLabel(fmt.Sprintf("%-25s", ""))
-	// mw.ToolTip.Hide()
+	mw.ToolTip = canvas.NewText(fmt.Sprintf("%-25s", ""), conversions.RGBStringToFyneColor("#0ed6ea"))
 	mw.ToolTip.TextStyle = fyne.TextStyle{Monospace: true}
 
 	//Create The main panel
