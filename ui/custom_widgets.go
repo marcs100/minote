@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/driver/desktop"
@@ -74,50 +75,48 @@ func NewEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut), onEscapeK
 	return e
 }
 
-type ButtonCustom struct {
+type ButtonWithTooltip struct {
 	widget.Button
 	onTapped func()
 	icon     *fyne.Resource
 	// 	tooltip       *widget.PopUp
-	mw *MainWindow
+	window      fyne.Window
+	tooltipText string
+	tooltip     *widget.Label
 }
 
-func (b *ButtonCustom) MouseIn(m *desktop.MouseEvent) {
-	fmt.Println("MouseIn event!")
-	if b.mw.ToolTip.Hidden {
-		fmt.Println("showing tooltip!")
-		b.mw.ToolTip.Show()
-		b.mw.window.Canvas().Refresh(b.mw.ToolTip)
+func (b *ButtonWithTooltip) MouseIn(m *desktop.MouseEvent) {
+	if len(strings.TrimSpace(b.tooltip.Text)) == 0 {
+		b.tooltip.SetText(b.tooltipText)
+		b.window.Canvas().Refresh(b.tooltip)
 	}
 	b.Button.MouseIn(m)
 }
 
-func (b *ButtonCustom) MouseOut() {
-	fmt.Println("MouseOut event!")
-	if !b.mw.ToolTip.Hidden {
-		fmt.Println("hiding tooltip!")
-		b.mw.ToolTip.Hide()
-		b.mw.window.Canvas().Refresh(b.mw.ToolTip)
+func (b *ButtonWithTooltip) MouseOut() {
+	if len(strings.TrimSpace(b.tooltip.Text)) > 0 {
+		b.tooltip.SetText("                         ")
+		b.window.Canvas().Refresh(b.tooltip)
 	}
 	b.Button.MouseOut()
 }
 
-func (b *ButtonCustom) Tapped(pe *fyne.PointEvent) {
+func (b *ButtonWithTooltip) Tapped(pe *fyne.PointEvent) {
 	if b.OnTapped != nil {
 		b.OnTapped()
 	}
 	b.Button.Tapped(pe)
 }
 
-func NewButtonCustom(label string, icon fyne.Resource, tooltipText string, mw *MainWindow, tapped func()) *ButtonCustom {
-	b := &ButtonCustom{}
+func NewButtonWithTooltip(label string, icon fyne.Resource, tooltipText string, tooltip *widget.Label, window fyne.Window, tapped func()) *ButtonWithTooltip {
+	b := &ButtonWithTooltip{}
 	b.ExtendBaseWidget(b)
 	b.SetIcon(icon)
 	b.SetText(label)
 	b.OnTapped = tapped
-	b.mw = mw
-	b.mw.ToolTip.Text = tooltipText
-	// text := canvas.NewText(b.tooltipText, color.White)
+	b.tooltip = tooltip
+	b.tooltipText = tooltipText
+	b.window = window
 	// b.tooltip = widget.NewPopUp(text, b.parent) //This popup seems to be the cause of the MouseOut event always firing!
 	return b
 }

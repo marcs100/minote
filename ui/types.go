@@ -48,7 +48,7 @@ type MainWindow struct {
 	AppContainers ApplicationContainers
 	ThemeVariant  ThemeVariant
 	UI_Colours    AppColours
-	ToolTip       *canvas.Text
+	ToolTip       *widget.Label
 }
 
 type NotePage struct {

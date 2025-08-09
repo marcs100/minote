@@ -3,7 +3,6 @@ package ui
 import (
 	"errors"
 	"fmt"
-	"image/color"
 	"log"
 
 	"strings"
@@ -82,8 +81,9 @@ func createMainWindow(version string) {
 	PageView.CurrentPage = 0
 	PageView.NumberOfPages = 0
 
-	mw.ToolTip = canvas.NewText("test tooltip", color.White)
-	mw.ToolTip.Hide()
+	mw.ToolTip = widget.NewLabel(fmt.Sprintf("%-25s", ""))
+	// mw.ToolTip.Hide()
+	mw.ToolTip.TextStyle = fyne.TextStyle{Monospace: true}
 
 	//Create The main panel
 	main := mw.createMainPanel()
@@ -142,7 +142,7 @@ func (mw *MainWindow) createMainPanel() *fyne.Container {
 
 func (mw *MainWindow) createTopPanel() *fyne.Container {
 	//AppWidgets.viewLabel = widget.NewLabelWithStyle("Pinned Notes", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
-	spacerLabel := widget.NewLabel("                                ")
+	spacerLabel := widget.NewLabel("  ")
 	mw.AppWidgets.viewLabel = widget.NewLabelWithStyle("Pinned Notes      >", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
 
 	mw.AppWidgets.pageLabel = widget.NewLabel("Page: ")
@@ -221,6 +221,7 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 	mw.AppWidgets.Toolbar = toolbar
 	//rect := canvas.NewRectangle(UI_Colours.)
 	topBar := container.New(layout.NewHBoxLayout(),
+		mw.ToolTip,
 		spacerLabel,
 		mw.AppWidgets.viewLabel,
 		layout.NewSpacer(),
@@ -243,11 +244,11 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 	mw.AppContainers.searchPanel = mw.CreateSearchPanel()
 	mw.AppContainers.tagsPanel = mw.CreateTagsPanel()
 
-	newNoteBtn := widget.NewButtonWithIcon("+", theme.DocumentCreateIcon(), func() {
+	newNoteBtn := NewButtonWithTooltip("+", theme.DocumentCreateIcon(), fmt.Sprintf("%-25s", "Action: New note"), mw.ToolTip, mw.window, func() {
 		NewNoteWindow(0, mw.window, mw)
 	})
 
-	searchBtn := widget.NewButtonWithIcon("", theme.SearchIcon(), func() {
+	searchBtn := NewButtonWithTooltip("", theme.SearchIcon(), fmt.Sprintf("%-25s", "Action: Search"), mw.ToolTip, mw.window, func() {
 		//Display the search panel here
 		main_app.AppStatus.CurrentView = main_app.VIEW_SEARCH
 		mw.setSortOptions(main_app.VIEW_SEARCH)
@@ -256,14 +257,14 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 	})
 
 	//pinnedBtn := widget.NewButton("P", func(){
-	pinnedBtn := widget.NewButtonWithIcon("", theme.RadioButtonCheckedIcon(), func() {
+	pinnedBtn := NewButtonWithTooltip("", theme.RadioButtonCheckedIcon(), fmt.Sprintf("%-25s", "Action: Show pinned notes"), mw.ToolTip, mw.window, func() {
 		main_app.AppStatus.CurrentView = main_app.VIEW_PINNED
 		mw.setSortOptions(main_app.AppStatus.CurrentView)
 		PageView.Reset()
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
 	})
 
-	RecentBtn := widget.NewButtonWithIcon("", theme.HistoryIcon(), func() {
+	RecentBtn := NewButtonWithTooltip("", theme.HistoryIcon(), fmt.Sprintf("%-25s", "Action: Show recent notes"), mw.ToolTip, mw.window, func() {
 		//AppStatus.Notes,err = minotedb.GetRecentNotes(Conf.Settings.RecentNotesLimit)
 		main_app.AppStatus.CurrentView = main_app.VIEW_RECENT
 		PageView.Reset()
@@ -271,7 +272,7 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
 	})
 
-	tagsBtn := widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
+	tagsBtn := NewButtonWithTooltip("", theme.CheckButtonIcon(), fmt.Sprintf("%-25s", "Action: Show tags"), mw.ToolTip, mw.window, func() {
 		mw.ToggleMainTagsPanel()
 		main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
 		PageView.Reset()
@@ -280,14 +281,9 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 
 	})
 
-	testBtn := NewButtonCustom("Test", theme.ComputerIcon(), "some action", mw, func() {
-		fmt.Println("Test button pressed!!!!!!!!")
-		mw.ToolTip.Show()
-	})
-
 	mw.CreateNotebooksList()
 
-	notebooksBtn := widget.NewButtonWithIcon("", theme.FolderOpenIcon(), func() {
+	notebooksBtn := NewButtonWithTooltip("", theme.FolderOpenIcon(), fmt.Sprintf("%-25s", "Action: Show notebooks"), mw.ToolTip, mw.window, func() {
 		main_app.AppStatus.CurrentView = main_app.VIEW_NOTEBOOK
 		mw.setSortOptions(main_app.AppStatus.CurrentView)
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
@@ -296,7 +292,7 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 
 	spacerLabel := widget.NewLabel(" ")
 
-	btnPanel := container.NewVBox(searchBtn, newNoteBtn, spacerLabel, pinnedBtn, RecentBtn, notebooksBtn, tagsBtn, testBtn)
+	btnPanel := container.NewVBox(searchBtn, newNoteBtn, spacerLabel, pinnedBtn, RecentBtn, notebooksBtn, tagsBtn)
 	mw.AppContainers.listPanel = container.NewStack(mw.AppWidgets.notebooksList)
 	mw.AppContainers.listPanel.Hide()
 	mw.AppContainers.tagsPanel.Hide()
@@ -304,7 +300,7 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 	sidePanel := container.NewHBox(btnPanel, mw.AppContainers.listPanel, mw.AppContainers.searchPanel, mw.AppContainers.tagsPanel)
 
 	rect := canvas.NewRectangle(mw.UI_Colours.MainCtrlsBgColour)
-	sideContainer := container.NewStack(rect, sidePanel, mw.ToolTip)
+	sideContainer := container.NewStack(rect, sidePanel)
 	return sideContainer
 }
 
