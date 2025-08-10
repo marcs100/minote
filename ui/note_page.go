@@ -21,7 +21,11 @@ import (
 	"github.com/marcs100/minote/tracker"
 )
 
-func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWindowMode bool, parentWindow fyne.Window, mainWindow *MainWindow) *fyne.Container {
+func (np *NotePage) NewNotePage(retrievedNote *note.NoteData,
+	allowEdit, newWindowMode bool,
+	parentWindow fyne.Window,
+	mainWindow *MainWindow) *fyne.Container {
+
 	np.ParentWindow = parentWindow
 	np.MainAppWindow = mainWindow
 	np.AllowEdit = allowEdit
@@ -101,6 +105,10 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 		},
 	)
 
+	tooltip := canvas.NewText(fmt.Sprintf("%-25s", ""), conversions.RGBStringToFyneColor("#0ed6ea"))
+	tooltip.TextStyle = fyne.TextStyle{Monospace: true}
+	np.Tooltip = tooltip
+
 	np.NotePageWidgets.Entry.Text = np.NoteInfo.Content
 	np.NotePageWidgets.Entry.Wrapping = fyne.TextWrapWord
 
@@ -132,25 +140,25 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 		//btnLabel = "Unpin"
 	}
 
-	np.NotePageWidgets.PinButton = widget.NewButtonWithIcon("", btnIcon, func() {
+	np.NotePageWidgets.PinButton = NewButtonWithTooltip("", btnIcon, "Action: Pin/unpin note", tooltip, np.ParentWindow, func() {
 		np.PinNote()
 	})
 
 	changeNotebookBtn := np.newChangeNotebookButton()
 
-	colourButton := widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), func() {
+	colourButton := NewButtonWithTooltip("", theme.ColorPaletteIcon(), "Action: Change colour", tooltip, np.ParentWindow, func() {
 		np.ChangeNoteColour()
 	})
 
-	np.NotePageWidgets.DeleteButton = widget.NewButtonWithIcon("", theme.DeleteIcon(), func() {
+	np.NotePageWidgets.DeleteButton = NewButtonWithTooltip("", theme.DeleteIcon(), "Action: Delete Note", tooltip, np.ParentWindow, func() {
 		np.DeleteNote()
 	})
 
-	np.NotePageWidgets.TagsButton = widget.NewButtonWithIcon("", theme.CheckButtonIcon(), func() {
+	np.NotePageWidgets.TagsButton = NewButtonWithTooltip("", theme.CheckButtonIcon(), "Action: Tags show/hide", tooltip, np.ParentWindow, func() {
 		np.ToggleTagsNotePanel()
 	})
 
-	propertiesButton := widget.NewButtonWithIcon("", theme.InfoIcon(), func() { np.ShowProperties() })
+	propertiesButton := NewButtonWithTooltip("", theme.InfoIcon(), "Action: Properties show/hide", tooltip, np.ParentWindow, func() { np.ShowProperties() })
 
 	np.NotePageWidgets.DeleteButton.Hide()
 
@@ -179,6 +187,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 		np.NotePageWidgets.TagsButton,
 		propertiesButton,
 		np.NotePageWidgets.DeleteButton,
+		tooltip,
 	)
 
 	if err := CreateNotesTagPanel(np); err != nil {
@@ -196,8 +205,8 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData, allowEdit, newWind
 	return container.NewBorder(topBar, nil, nil, np.NotePageContainers.PropertiesPanel, content)
 }
 
-func (np *NotePage) newChangeNotebookButton() *widget.Button {
-	changeNotebookBtn := widget.NewButtonWithIcon("", theme.FolderOpenIcon(), func() {
+func (np *NotePage) newChangeNotebookButton() *ButtonWithTooltip {
+	changeNotebookBtn := NewButtonWithTooltip("", theme.FolderOpenIcon(), "Action: Select notebook", np.Tooltip, np.ParentWindow, func() {
 		var notebooks []string
 		var err error
 		if notebooks, err = notes.GetNotebooks(); err != nil {

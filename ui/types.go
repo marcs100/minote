@@ -64,18 +64,19 @@ type NotePage struct {
 	NotePageCanvas     NotePageCanvas
 	ThemeVariant       ThemeVariant
 	UI_Colours         AppColours
+	Tooltip            *canvas.Text
 }
 
 type NotePageWidgets struct {
-	PinButton    *widget.Button
+	PinButton    *ButtonWithTooltip
 	MarkdownText *widget.RichText
-	DeleteButton *widget.Button
+	DeleteButton *ButtonWithTooltip
 	Entry        *EntryCustom
 	//entry      *widget.Entry
 	ModeSelect     *widget.RadioGroup
 	PropertiesText *widget.Label
 	AddTagButton   *widget.Button
-	TagsButton     *widget.Button
+	TagsButton     *ButtonWithTooltip
 }
 
 type NotePageContainers struct {
