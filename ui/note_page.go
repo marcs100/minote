@@ -105,7 +105,7 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData,
 		},
 	)
 
-	tooltip := canvas.NewText(fmt.Sprintf("%-25s", ""), conversions.RGBStringToFyneColor("#0ed6ea"))
+	tooltip := canvas.NewText(fmt.Sprintf("%-25s", ""), np.MainAppWindow.UI_Colours.AccentColour)
 	tooltip.TextStyle = fyne.TextStyle{Monospace: true}
 	np.Tooltip = tooltip
 

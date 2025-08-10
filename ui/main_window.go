@@ -63,9 +63,12 @@ func createMainWindow(version string) {
 	mw.UI_Colours = GetAppColours(themeVar)
 	fmt.Println("Will set a custom theme!")
 	custTheme := &minoteTheme{
-		FontSize:    main_app.Conf.Settings.FontSize,
-		BgColour:    mw.UI_Colours.MainBgColour,
-		EntryColour: mw.UI_Colours.NoteBgColour,
+		FontSize:     main_app.Conf.Settings.FontSize,
+		BgColour:     mw.UI_Colours.MainBgColour,
+		EntryColour:  mw.UI_Colours.NoteBgColour,
+		ButtonColour: mw.UI_Colours.ButtonColour,
+		AccentColour: mw.UI_Colours.AccentColour,
+		FgColour:     mw.UI_Colours.MainFgColour,
 	}
 	main_app.MainApp.Settings().SetTheme(custTheme)
 
@@ -81,8 +84,8 @@ func createMainWindow(version string) {
 	PageView.CurrentPage = 0
 	PageView.NumberOfPages = 0
 
-	mw.ToolTip = canvas.NewText(fmt.Sprintf("%-25s", ""), conversions.RGBStringToFyneColor("#0ed6ea"))
-	mw.ToolTip.TextStyle = fyne.TextStyle{Monospace: true}
+	mw.Tooltip = canvas.NewText(fmt.Sprintf("%-25s", ""), mw.UI_Colours.AccentColour)
+	mw.Tooltip.TextStyle = fyne.TextStyle{Monospace: true}
 
 	//Create The main panel
 	main := mw.createMainPanel()
@@ -220,7 +223,7 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 	mw.AppWidgets.Toolbar = toolbar
 	//rect := canvas.NewRectangle(UI_Colours.)
 	topBar := container.New(layout.NewHBoxLayout(),
-		mw.ToolTip,
+		mw.Tooltip,
 		spacerLabel,
 		mw.AppWidgets.viewLabel,
 		layout.NewSpacer(),
@@ -243,11 +246,11 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 	mw.AppContainers.searchPanel = mw.CreateSearchPanel()
 	mw.AppContainers.tagsPanel = mw.CreateTagsPanel()
 
-	newNoteBtn := NewButtonWithTooltip("+", theme.DocumentCreateIcon(), fmt.Sprintf("%-25s", "Action: New note"), mw.ToolTip, mw.window, func() {
+	newNoteBtn := NewButtonWithTooltip("+", theme.DocumentCreateIcon(), fmt.Sprintf("%-25s", "Action: New note"), mw.Tooltip, mw.window, func() {
 		NewNoteWindow(0, mw.window, mw)
 	})
 
-	searchBtn := NewButtonWithTooltip("", theme.SearchIcon(), fmt.Sprintf("%-25s", "Action: Search"), mw.ToolTip, mw.window, func() {
+	searchBtn := NewButtonWithTooltip("", theme.SearchIcon(), fmt.Sprintf("%-25s", "Action: Search"), mw.Tooltip, mw.window, func() {
 		//Display the search panel here
 		main_app.AppStatus.CurrentView = main_app.VIEW_SEARCH
 		mw.setSortOptions(main_app.VIEW_SEARCH)
@@ -256,14 +259,14 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 	})
 
 	//pinnedBtn := widget.NewButton("P", func(){
-	pinnedBtn := NewButtonWithTooltip("", theme.RadioButtonCheckedIcon(), fmt.Sprintf("%-25s", "Action: Show pinned notes"), mw.ToolTip, mw.window, func() {
+	pinnedBtn := NewButtonWithTooltip("", theme.RadioButtonCheckedIcon(), fmt.Sprintf("%-25s", "Action: Show pinned notes"), mw.Tooltip, mw.window, func() {
 		main_app.AppStatus.CurrentView = main_app.VIEW_PINNED
 		mw.setSortOptions(main_app.AppStatus.CurrentView)
 		PageView.Reset()
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
 	})
 
-	RecentBtn := NewButtonWithTooltip("", theme.HistoryIcon(), fmt.Sprintf("%-25s", "Action: Show recent notes"), mw.ToolTip, mw.window, func() {
+	RecentBtn := NewButtonWithTooltip("", theme.HistoryIcon(), fmt.Sprintf("%-25s", "Action: Show recent notes"), mw.Tooltip, mw.window, func() {
 		//AppStatus.Notes,err = minotedb.GetRecentNotes(Conf.Settings.RecentNotesLimit)
 		main_app.AppStatus.CurrentView = main_app.VIEW_RECENT
 		PageView.Reset()
@@ -271,7 +274,7 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
 	})
 
-	tagsBtn := NewButtonWithTooltip("", theme.CheckButtonIcon(), fmt.Sprintf("%-25s", "Action: Show tags"), mw.ToolTip, mw.window, func() {
+	tagsBtn := NewButtonWithTooltip("", theme.CheckButtonIcon(), fmt.Sprintf("%-25s", "Action: Show tags"), mw.Tooltip, mw.window, func() {
 		mw.ToggleMainTagsPanel()
 		main_app.AppStatus.CurrentView = main_app.VIEW_TAGS
 		PageView.Reset()
@@ -281,7 +284,7 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 
 	mw.CreateNotebooksList()
 
-	notebooksBtn := NewButtonWithTooltip("", theme.FolderOpenIcon(), fmt.Sprintf("%-25s", "Action: Show notebooks"), mw.ToolTip, mw.window, func() {
+	notebooksBtn := NewButtonWithTooltip("", theme.FolderOpenIcon(), fmt.Sprintf("%-25s", "Action: Show notebooks"), mw.Tooltip, mw.window, func() {
 		main_app.AppStatus.CurrentView = main_app.VIEW_NOTEBOOK
 		mw.setSortOptions(main_app.AppStatus.CurrentView)
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
@@ -336,7 +339,7 @@ func (mw *MainWindow) showNotesInGrid(notes []note.NoteData) {
 			}
 		})
 		richText.Wrapping = fyne.TextWrapWord
-		themeBackground := canvas.NewRectangle(mw.UI_Colours.NoteBgColour)
+		themeBackground := canvas.NewRectangle(mw.UI_Colours.NoteBgColour) //We need this to overlay the notecolour (border)
 		noteColour := conversions.RGBStringToFyneColor(notes[i].BackgroundColour)
 		noteBackground := canvas.NewRectangle(noteColour)
 		if notes[i].BackgroundColour == "#e7edef" || notes[i].BackgroundColour == "#FFFFFF" || notes[i].BackgroundColour == "#ffffff" || notes[i].BackgroundColour == "#000000" {

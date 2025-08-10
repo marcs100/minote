@@ -78,5 +78,29 @@ func ValidateConfig(appConfig *config.Config) error {
 		return errors.New("config error: LightColourCtBg invalid rgb string")
 	}
 
+	if err = config.CheckRGBString(appConfig.Settings.DarkColourFg); err != nil {
+		return errors.New("config error: DarkColourFg invalid rgb string")
+	}
+
+	if err = config.CheckRGBString(appConfig.Settings.LightColourFg); err != nil {
+		return errors.New("config error: LightColourFg invalid rgb string")
+	}
+
+	if err = config.CheckRGBString(appConfig.Settings.DarkColourButton); err != nil {
+		return errors.New("config error: DarkColourButton invalid rgb string")
+	}
+
+	if err = config.CheckRGBString(appConfig.Settings.LightColourButton); err != nil {
+		return errors.New("config error: LightColourButton invalid rgb string")
+	}
+
+	if err = config.CheckRGBString(appConfig.Settings.DarkColourAccent); err != nil {
+		return errors.New("config error: DarkColourAccent invalid rgb string")
+	}
+
+	if err = config.CheckRGBString(appConfig.Settings.LightColourAccent); err != nil {
+		return errors.New("config error: LightColourAccent invalid rgb string")
+	}
+
 	return err
 }

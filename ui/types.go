@@ -48,7 +48,7 @@ type MainWindow struct {
 	AppContainers ApplicationContainers
 	ThemeVariant  ThemeVariant
 	UI_Colours    AppColours
-	ToolTip       *canvas.Text
+	Tooltip       *canvas.Text
 }
 
 type NotePage struct {
@@ -94,5 +94,8 @@ type NotePageCanvas struct {
 type AppColours struct {
 	NoteBgColour      color.Color
 	MainBgColour      color.Color
+	MainFgColour      color.Color
 	MainCtrlsBgColour color.Color
+	ButtonColour      color.Color
+	AccentColour      color.Color
 }

@@ -16,9 +16,12 @@ Size(ThemeSizeName) float32
 }*/
 
 type minoteTheme struct {
-	FontSize    float32
-	BgColour    color.Color
-	EntryColour color.Color
+	FontSize     float32
+	BgColour     color.Color
+	FgColour     color.Color
+	EntryColour  color.Color
+	ButtonColour color.Color
+	AccentColour color.Color
 }
 
 //var _ fyne.Theme = (*minoteTheme)(nil)
@@ -32,7 +35,20 @@ func (t *minoteTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant)
 		return t.BgColour
 	case theme.ColorNameInputBackground:
 		return t.EntryColour
-
+	case theme.ColorNameHover:
+		return t.AccentColour
+	case theme.ColorNameButton:
+		return t.ButtonColour
+	case theme.ColorNameForeground:
+		return t.FgColour
+	case theme.ColorNameMenuBackground:
+		return t.BgColour
+	case theme.ColorNameFocus:
+		return t.AccentColour
+	case theme.ColorNameOverlayBackground:
+		return t.BgColour
+	case theme.ColorNamePrimary:
+		return t.AccentColour
 	default:
 		return theme.DefaultTheme().Color(name, variant)
 	}
