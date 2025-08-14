@@ -1,0 +1,24 @@
+[Desktop Entry]
+Categories=Utility
+Comment[en_GB]=Note taking application
+Comment=Note taking application
+Comment[en_US.UTF-8]=Note taking application
+Comment[en_US]=Note taking application
+Exec=/home/marc/.local/bin/minote
+GenericName[en_GB]=
+GenericName=
+Hidden=false
+Icon=/usr/share/pixmaps/minote.svg
+MimeType=
+Name[en_GB]=Minote
+Name=Scribe
+Name[en_US.UTF-8]=Minote
+Name[en_US]=Minote
+NoDisplay=false
+Path=
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+X-KDE-SubstituteUID=false
+X-KDE-Username=
