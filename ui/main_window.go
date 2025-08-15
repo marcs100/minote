@@ -61,7 +61,7 @@ func createMainWindow(version string) {
 
 	mw.ThemeVariant = themeVar
 	mw.UI_Colours = GetAppColours(themeVar)
-	fmt.Println("Will set a custom theme!")
+	// fmt.Println("Will set a custom theme!")
 	custTheme := &minoteTheme{
 		FontSize:     main_app.Conf.Settings.FontSize,
 		BgColour:     mw.UI_Colours.MainBgColour,
@@ -150,38 +150,37 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 	mw.AppWidgets.pageLabel = widget.NewLabel("Page: ")
 	mw.AppWidgets.pageLabel.Hide()
 
-	toolbar := widget.NewToolbar(
-		//show grid view
-		widget.NewToolbarAction(theme.GridIcon(), func() {
-			if main_app.AppStatus.CurrentLayout != main_app.LAYOUT_GRID {
-				main_app.AppStatus.CurrentLayout = main_app.LAYOUT_GRID
-				PageView.Reset()
-				mw.UpdateView()
-			}
-		}),
-		//show single page view
-		widget.NewToolbarAction(theme.FileIcon(), func() {
-			if main_app.AppStatus.CurrentLayout != main_app.LAYOUT_PAGE {
-				main_app.AppStatus.CurrentLayout = main_app.LAYOUT_PAGE
-				PageView.Reset()
-				mw.UpdateView()
-			}
-		}),
-		//page forward
-		widget.NewToolbarAction(theme.NavigateBackIcon(), func() {
-			if PageView.PageBack() > 0 {
-				mw.UpdateView()
-			}
+	gridViewBtn := NewButtonWithTooltip("", theme.GridIcon(), fmt.Sprintf("%-25s", "Grid View"), mw.Tooltip, mw.window, func() {
+		if main_app.AppStatus.CurrentLayout != main_app.LAYOUT_GRID {
+			main_app.AppStatus.CurrentLayout = main_app.LAYOUT_GRID
+			PageView.Reset()
+			mw.UpdateView()
+		}
+	})
 
-		}),
-		//page back
-		widget.NewToolbarAction(theme.NavigateNextIcon(), func() {
-			if PageView.PageForward() > 0 {
-				mw.UpdateView()
-			}
+	pageViewBtn := NewButtonWithTooltip("", theme.FileAudioIcon(), fmt.Sprintf("%-25s", "Single page View"), mw.Tooltip, mw.window, func() {
+		if main_app.AppStatus.CurrentLayout != main_app.LAYOUT_PAGE {
+			main_app.AppStatus.CurrentLayout = main_app.LAYOUT_PAGE
+			PageView.Reset()
+			mw.UpdateView()
+		}
+	})
 
-		}),
-	)
+	mw.AppWidgets.pageBackBtn = NewButtonWithTooltip("", theme.NavigateBackIcon(), fmt.Sprintf("%-25s", "Page back"), mw.Tooltip, mw.window, func() {
+		if PageView.PageBack() > 0 {
+			mw.UpdateView()
+		}
+	})
+	mw.AppWidgets.pageBackBtn.Hidden = true
+
+	mw.AppWidgets.pageForwardBtn = NewButtonWithTooltip("", theme.NavigateNextIcon(), fmt.Sprintf("%-25s", "Page forward"), mw.Tooltip, mw.window, func() {
+		if PageView.PageForward() > 0 {
+			mw.UpdateView()
+		}
+	})
+	mw.AppWidgets.pageForwardBtn.Hidden = true
+
+	viewsHbox := container.NewHBox(gridViewBtn, pageViewBtn, mw.AppWidgets.pageBackBtn, mw.AppWidgets.pageForwardBtn)
 
 	rightToolbar := widget.NewToolbar(
 		//backup database
@@ -220,14 +219,13 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 	mw.AppWidgets.sortSelect.PlaceHolder = "This is how the size "
 	mw.AppWidgets.sortSelect.SetSelectedIndex(0)
 
-	mw.AppWidgets.Toolbar = toolbar
 	//rect := canvas.NewRectangle(UI_Colours.)
 	topBar := container.New(layout.NewHBoxLayout(),
 		mw.Tooltip,
 		spacerLabel,
 		mw.AppWidgets.viewLabel,
 		layout.NewSpacer(),
-		toolbar,
+		viewsHbox,
 		mw.AppWidgets.pageLabel,
 		layout.NewSpacer(),
 		sortLabel,
@@ -486,18 +484,18 @@ func (mw *MainWindow) showCurrentLayout() error {
 	switch main_app.AppStatus.CurrentLayout {
 	case main_app.LAYOUT_GRID:
 		if len(main_app.AppStatus.Notes) <= main_app.Conf.Settings.GridMaxPages {
-			mw.AppWidgets.Toolbar.Items[2].ToolbarObject().Hide() //page back
-			mw.AppWidgets.Toolbar.Items[3].ToolbarObject().Hide() //page forward
+			mw.AppWidgets.pageBackBtn.Hidden = true
+			mw.AppWidgets.pageForwardBtn.Hidden = true
 			mw.AppWidgets.pageLabel.Hide()
 		} else {
-			mw.AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // page back
-			mw.AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
+			mw.AppWidgets.pageBackBtn.Hidden = false
+			mw.AppWidgets.pageForwardBtn.Hidden = false
 			mw.AppWidgets.pageLabel.Show()
 		}
 		mw.showNotesInGrid(main_app.AppStatus.Notes)
 	case main_app.LAYOUT_PAGE:
-		mw.AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // page back
-		mw.AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
+		mw.AppWidgets.pageBackBtn.Hidden = false
+		mw.AppWidgets.pageForwardBtn.Hidden = false
 		mw.showNotesAsPages(main_app.AppStatus.Notes)
 	default:
 		err = errors.New("undefined layout")

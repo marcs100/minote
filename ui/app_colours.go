@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"fmt"
-
 	"github.com/marcs100/minote/conversions"
 	"github.com/marcs100/minote/main_app"
 )
@@ -13,7 +11,7 @@ func GetAppColours(themeVarIn ThemeVariant) AppColours {
 
 	switch themeVarIn {
 	case DARK_THEME:
-		fmt.Println("Using Dark theme")
+		// fmt.Println("Using Dark theme")
 		appColours.MainBgColour = conversions.RGBStringToFyneColor(main_app.Conf.Settings.DarkColourBg)
 		appColours.NoteBgColour = conversions.RGBStringToFyneColor(main_app.Conf.Settings.DarkColourNote)
 		appColours.MainCtrlsBgColour = conversions.RGBStringToFyneColor(main_app.Conf.Settings.DarkColourCtBg)
@@ -22,7 +20,7 @@ func GetAppColours(themeVarIn ThemeVariant) AppColours {
 		appColours.AccentColour = conversions.RGBStringToFyneColor(main_app.Conf.Settings.DarkColourAccent)
 
 	case LIGHT_THEME:
-		fmt.Println("Using Light theme")
+		// fmt.Println("Using Light theme")
 		appColours.MainBgColour = conversions.RGBStringToFyneColor(main_app.Conf.Settings.LightColourBg)
 		appColours.NoteBgColour = conversions.RGBStringToFyneColor(main_app.Conf.Settings.LightColourNote)
 		appColours.MainCtrlsBgColour = conversions.RGBStringToFyneColor(main_app.Conf.Settings.LightColourCtBg)
