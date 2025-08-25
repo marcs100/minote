@@ -23,6 +23,13 @@ func main() {
 	var confFilePath string
 	var homeDir string
 
+	var about = main_app.About{
+		Version:    VERSION,
+		Licence:    "MIT",
+		Maintainer: "marcs100@gmail.com",
+		Website:    "https://github.com/marcs100/minote",
+	}
+
 	if homeDir, dir_err = os.UserHomeDir(); dir_err != nil {
 		log.Panicln(dir_err)
 	}
@@ -78,7 +85,7 @@ func main() {
 		log.Panicln(err)
 		return
 	}
-	ui.StartUI(appConfig, confFile, VERSION)
+	ui.StartUI(appConfig, confFile, about)
 }
 
 func CreateAppConfig(homeDir string) config.Config {
