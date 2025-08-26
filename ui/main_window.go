@@ -41,23 +41,7 @@ func createMainWindow(version string) {
 	main_app.AppStatus.NoteSize = fyne.NewSize(main_app.Conf.Settings.NoteWidth, main_app.Conf.Settings.NoteHeight)
 
 	mw.window = main_app.MainApp.NewWindow(fmt.Sprintf("Minote   v%s", version))
-	var themeVar ThemeVariant
-	switch main_app.Conf.Settings.ThemeVariant {
-	case "light":
-		themeVar = LIGHT_THEME
-	case "dark":
-		themeVar = DARK_THEME
-	case "auto":
-		switch main_app.MainApp.Settings().ThemeVariant() {
-		case theme.VariantDark:
-			themeVar = DARK_THEME
-		case theme.VariantLight:
-			themeVar = LIGHT_THEME
-		default:
-			log.Println("Warning.. Could not auto detect theme variant, will default to dark theme!")
-			themeVar = DARK_THEME
-		}
-	}
+	var themeVar = GetThemeVariant()
 
 	mw.ThemeVariant = themeVar
 	mw.UI_Colours = GetAppColours(themeVar)
