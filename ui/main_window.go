@@ -30,17 +30,17 @@ func StartUI(appConfigIn *config.Config, configFile string, about main_app.About
 	main_app.MainApp = app.NewWithID("minote")
 	main_app.AppStatus.ConfigFile = configFile
 	main_app.AppStatus.CurrentNotebook = "General" // default for new noteooks if note in notrbook view
-	createMainWindow(about.Version)
+	createMainWindow(about)
 	main_app.MainApp.Run()
 }
 
-func createMainWindow(version string) {
+func createMainWindow(about main_app.About) {
 
 	var mw MainWindow
 
 	main_app.AppStatus.NoteSize = fyne.NewSize(main_app.Conf.Settings.NoteWidth, main_app.Conf.Settings.NoteHeight)
 
-	mw.window = main_app.MainApp.NewWindow(fmt.Sprintf("Minote   v%s", version))
+	mw.window = main_app.MainApp.NewWindow(fmt.Sprintf("Minote   v%s", about.Version))
 	var themeVar = GetThemeVariant()
 
 	mw.ThemeVariant = themeVar
@@ -55,6 +55,8 @@ func createMainWindow(version string) {
 		FgColour:     mw.UI_Colours.MainFgColour,
 	}
 	main_app.MainApp.Settings().SetTheme(custTheme)
+
+	NewAbout(about, mw.window)
 
 	//Main Grid container for displaying notes
 	grid := container.NewGridWrap(main_app.AppStatus.NoteSize)
@@ -183,7 +185,10 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 				BackupNotes(main_app.Conf.Settings.Database, mw.window)
 			})
 
-			options.Items = append(options.Items, settingsMenuItem, backupMenuItem)
+			aboutMenuItem := fyne.NewMenuItem("About", func() {
+				ShowAbout()
+			})
+			options.Items = append(options.Items, settingsMenuItem, backupMenuItem, aboutMenuItem)
 
 			popUpMenu := widget.NewPopUpMenu(options, mw.window.Canvas())
 			pos := fyne.NewPos(225, 40)
