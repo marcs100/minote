@@ -26,8 +26,9 @@ type ApplicationStatus struct {
 }
 
 type About struct {
-	Version    string
-	Licence    string
-	Maintainer string
-	Website    string
+	Version     string
+	Licence     string
+	LicenceLink string
+	Maintainer  string
+	Website     string
 }

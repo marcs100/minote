@@ -11,24 +11,37 @@ import (
 	"github.com/marcs100/minote/main_app"
 )
 
-var aboutDlg *dialog.FormDialog
+// var aboutDlg *dialog.FormDialog
+var custAboutDlg *dialog.CustomDialog
 
 func NewAbout(about main_app.About, parentWindow fyne.Window) {
 
 	var UI_Colours = GetAppColours(GetThemeVariant())
 	bg := canvas.NewRectangle(UI_Colours.MainBgColour)
-	versionLabel := widget.NewLabel("Version")
-	versionText := widget.NewRichTextFromMarkdown(fmt.Sprintf("**%s**", about.Version))
-	versionGrid := container.NewGridWithRows(1, versionLabel, versionText)
-	aboutStack := container.NewStack(bg, versionGrid)
-	formItem := widget.NewFormItem("", aboutStack)
-	aboutDlg = dialog.NewForm("About", "Ok", "", []*widget.FormItem{formItem}, func(b bool) {
+	accent := canvas.NewRectangle(UI_Colours.AccentColour)
+	aboutGrid := container.NewGridWithColumns(1,
+		container.NewHBox(
+			widget.NewLabel("Minote: "),
+			widget.NewRichTextFromMarkdown(fmt.Sprintf("**v%s**", about.Version))),
+		container.NewHBox(
+			widget.NewLabel("Licence: "),
+			widget.NewRichTextFromMarkdown(fmt.Sprintf("[%s](%s)", about.Licence, about.LicenceLink))),
+		container.NewHBox(
+			widget.NewLabel("Website: "),
+			widget.NewRichTextFromMarkdown(fmt.Sprintf("[%s](%s)", about.Website, about.Website))),
+		container.NewHBox(
+			widget.NewLabel("Maintainer: "),
+			widget.NewRichTextFromMarkdown(fmt.Sprintf("**%s**", about.Maintainer))))
 
-	}, parentWindow)
+	gridPadded := container.NewPadded(bg, aboutGrid)
+
+	aboutStack := container.NewStack(accent, gridPadded)
+	custAboutDlg = dialog.NewCustom("About", "Ok", aboutStack, parentWindow)
 }
 
 func ShowAbout() {
-	if aboutDlg != nil {
-		aboutDlg.Show()
+	if custAboutDlg != nil {
+		// aboutDlg.Show()
+		custAboutDlg.Show()
 	}
 }

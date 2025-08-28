@@ -24,10 +24,11 @@ func main() {
 	var homeDir string
 
 	var about = main_app.About{
-		Version:    VERSION,
-		Licence:    "MIT",
-		Maintainer: "marcs100@gmail.com",
-		Website:    "https://github.com/marcs100/minote",
+		Version:     VERSION,
+		Licence:     "MIT",
+		LicenceLink: "https://mit-license.org/",
+		Maintainer:  "marcs100@gmail.com",
+		Website:     "https://github.com/marcs100/minote",
 	}
 
 	if homeDir, dir_err = os.UserHomeDir(); dir_err != nil {
