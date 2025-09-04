@@ -92,8 +92,24 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData,
 		}
 	},
 
-		func(k *fyne.KeyEvent) { // Escape key detected
-			np.SetViewMode()
+		func(k *fyne.KeyEvent) {
+			switch k.Name {
+			case fyne.KeyEscape:
+				np.SetViewMode()
+			case fyne.KeyF1:
+				col := np.NotePageWidgets.Entry.CursorColumn
+				row := np.NotePageWidgets.Entry.CursorRow
+				//cur := np.NotePageWidgets.Entry.Entry.Cursor()
+				fmt.Printf("%d,%d\n", row, col)
+			case fyne.KeyF2:
+				//place holder
+			case fyne.KeyF3:
+				//place holder
+			case fyne.KeyF4:
+				//place holder
+			case fyne.KeyF5:
+				//place holder
+			}
 		},
 
 		func() { // On focus lost
