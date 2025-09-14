@@ -99,8 +99,13 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData,
 			case fyne.KeyF1:
 				col := np.NotePageWidgets.Entry.CursorColumn
 				row := np.NotePageWidgets.Entry.CursorRow
-				//cur := np.NotePageWidgets.Entry.Entry.Cursor()
-				fmt.Printf("%d,%d\n", row, col)
+				text := np.NotePageWidgets.Entry.Text
+				date := fmt.Sprint(time.Now()) // THIS NEEDS FROMATTING!!!!!!!!!!!!!!!!
+				newText := note.InsertText(date, row, col, text)
+				np.NotePageWidgets.Entry.SetText(newText)
+				//can we now move the cusrsor to the new position???
+				np.NotePageWidgets.Entry.CursorColumn = col + len(date)
+				np.NotePageWidgets.Entry.Refresh()
 			case fyne.KeyF2:
 				//place holder
 			case fyne.KeyF3:
