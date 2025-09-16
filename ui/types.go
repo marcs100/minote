@@ -31,7 +31,6 @@ type ApplicationContainers struct {
 
 // widgets for main window
 type ApplicationWidgets struct {
-	Toolbar        *widget.Toolbar
 	singleNotePage *widget.RichText
 	viewLabel      *widget.Label
 	pageLabel      *widget.Label
@@ -40,6 +39,8 @@ type ApplicationWidgets struct {
 	searchEntry        *widget.Entry
 	searchResultsLabel *widget.Label
 	sortSelect         *widget.Select
+	pageForwardBtn     *ButtonWithTooltip
+	pageBackBtn        *ButtonWithTooltip
 }
 
 type MainWindow struct {

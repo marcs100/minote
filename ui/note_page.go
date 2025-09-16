@@ -92,8 +92,45 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData,
 		}
 	},
 
-		func(k *fyne.KeyEvent) { // Escape key detected
-			np.SetViewMode()
+		func(k *fyne.KeyEvent) {
+			switch k.Name {
+			case fyne.KeyEscape:
+				np.SetViewMode()
+			case fyne.KeyF1:
+				// print current date
+				col := np.NotePageWidgets.Entry.CursorColumn
+				row := np.NotePageWidgets.Entry.CursorRow
+				text := np.NotePageWidgets.Entry.Text
+				date := time.Now().Format(main_app.Conf.Settings.DateFormat)
+				newText := note.InsertText(date, row, col, text)
+				np.NotePageWidgets.Entry.SetText(newText)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(date)
+				np.NotePageWidgets.Entry.Refresh()
+			case fyne.KeyF2:
+				//print current time
+				col := np.NotePageWidgets.Entry.CursorColumn
+				row := np.NotePageWidgets.Entry.CursorRow
+				text := np.NotePageWidgets.Entry.Text
+				currTime := time.Now().Format(main_app.Conf.Settings.TimeFormat)
+				newText := note.InsertText(currTime, row, col, text)
+				np.NotePageWidgets.Entry.SetText(newText)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(currTime)
+				np.NotePageWidgets.Entry.Refresh()
+			case fyne.KeyF3:
+				//print date & time
+				col := np.NotePageWidgets.Entry.CursorColumn
+				row := np.NotePageWidgets.Entry.CursorRow
+				text := np.NotePageWidgets.Entry.Text
+				timestamp := time.Now().Format(main_app.Conf.Settings.DateTimeFormat)
+				newText := note.InsertText(timestamp, row, col, text)
+				np.NotePageWidgets.Entry.SetText(newText)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(timestamp)
+				np.NotePageWidgets.Entry.Refresh()
+			case fyne.KeyF4:
+				//place holder
+			case fyne.KeyF5:
+				//place holder
+			}
 		},
 
 		func() { // On focus lost

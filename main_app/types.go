@@ -24,3 +24,11 @@ type ApplicationStatus struct {
 	NoteSize     fyne.Size
 	SearchFilter notes.SearchFilter
 }
+
+type About struct {
+	Version     string
+	Licence     string
+	LicenceLink string
+	Maintainer  string
+	Website     string
+}

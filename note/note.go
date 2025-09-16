@@ -4,6 +4,7 @@ import (
 	"crypto/sha512"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/marcs100/minote/minotedb"
 )
@@ -159,4 +160,18 @@ func DeleteTag(tag string, noteId uint) error {
 		err = errors.New(fmt.Sprintf("Tag %s was not deleted, %d tags deleted", tag, numDeleted))
 	}
 	return err
+}
+
+func InsertText(textToInsert string, row int, col int, textIn string) string {
+	lines := strings.Split(textIn, "\n")
+	//insert out text
+	line := lines[row]
+	//replace old line with new line
+	lines[row] = fmt.Sprint(line[:col], textToInsert, line[col:])
+	//combine all the text
+	var newText = ""
+	for _, l := range lines {
+		newText = fmt.Sprint(newText, l, "\n")
+	}
+	return newText
 }

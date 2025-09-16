@@ -1,9 +1,9 @@
 [Desktop Entry]
 Categories=Utility
-Comment[en_GB]=Modern note taking application
-Comment=Modern note taking application
-Comment[en_US.UTF-8]=modern note taking application
-Comment[en_US]=Modern note taking application
+Comment[en_GB]=Note taking application
+Comment=Note taking application
+Comment[en_US.UTF-8]=Note taking application
+Comment[en_US]=Note taking application
 Exec=/usr/bin/minote
 GenericName[en_GB]=
 GenericName=

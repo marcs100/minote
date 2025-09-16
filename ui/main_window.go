@@ -25,43 +25,27 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func StartUI(appConfigIn *config.Config, configFile string, version string) {
+func StartUI(appConfigIn *config.Config, configFile string, about main_app.About) {
 	main_app.Conf = appConfigIn
 	main_app.MainApp = app.NewWithID("minote")
 	main_app.AppStatus.ConfigFile = configFile
 	main_app.AppStatus.CurrentNotebook = "General" // default for new noteooks if note in notrbook view
-	createMainWindow(version)
+	createMainWindow(about)
 	main_app.MainApp.Run()
 }
 
-func createMainWindow(version string) {
+func createMainWindow(about main_app.About) {
 
 	var mw MainWindow
 
 	main_app.AppStatus.NoteSize = fyne.NewSize(main_app.Conf.Settings.NoteWidth, main_app.Conf.Settings.NoteHeight)
 
-	mw.window = main_app.MainApp.NewWindow(fmt.Sprintf("Minote   v%s", version))
-	var themeVar ThemeVariant
-	switch main_app.Conf.Settings.ThemeVariant {
-	case "light":
-		themeVar = LIGHT_THEME
-	case "dark":
-		themeVar = DARK_THEME
-	case "auto":
-		switch main_app.MainApp.Settings().ThemeVariant() {
-		case theme.VariantDark:
-			themeVar = DARK_THEME
-		case theme.VariantLight:
-			themeVar = LIGHT_THEME
-		default:
-			log.Println("Warning.. Could not auto detect theme variant, will default to dark theme!")
-			themeVar = DARK_THEME
-		}
-	}
+	mw.window = main_app.MainApp.NewWindow(fmt.Sprintf("Minote   v%s", about.Version))
+	var themeVar = GetThemeVariant()
 
 	mw.ThemeVariant = themeVar
 	mw.UI_Colours = GetAppColours(themeVar)
-	fmt.Println("Will set a custom theme!")
+	// fmt.Println("Will set a custom theme!")
 	custTheme := &minoteTheme{
 		FontSize:     main_app.Conf.Settings.FontSize,
 		BgColour:     mw.UI_Colours.MainBgColour,
@@ -71,6 +55,8 @@ func createMainWindow(version string) {
 		FgColour:     mw.UI_Colours.MainFgColour,
 	}
 	main_app.MainApp.Settings().SetTheme(custTheme)
+
+	NewAbout(about, mw.window)
 
 	//Main Grid container for displaying notes
 	grid := container.NewGridWrap(main_app.AppStatus.NoteSize)
@@ -150,38 +136,37 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 	mw.AppWidgets.pageLabel = widget.NewLabel("Page: ")
 	mw.AppWidgets.pageLabel.Hide()
 
-	toolbar := widget.NewToolbar(
-		//show grid view
-		widget.NewToolbarAction(theme.GridIcon(), func() {
-			if main_app.AppStatus.CurrentLayout != main_app.LAYOUT_GRID {
-				main_app.AppStatus.CurrentLayout = main_app.LAYOUT_GRID
-				PageView.Reset()
-				mw.UpdateView()
-			}
-		}),
-		//show single page view
-		widget.NewToolbarAction(theme.FileIcon(), func() {
-			if main_app.AppStatus.CurrentLayout != main_app.LAYOUT_PAGE {
-				main_app.AppStatus.CurrentLayout = main_app.LAYOUT_PAGE
-				PageView.Reset()
-				mw.UpdateView()
-			}
-		}),
-		//page forward
-		widget.NewToolbarAction(theme.NavigateBackIcon(), func() {
-			if PageView.PageBack() > 0 {
-				mw.UpdateView()
-			}
+	gridViewBtn := NewButtonWithTooltip("", theme.GridIcon(), fmt.Sprintf("%-25s", "Grid View"), mw.Tooltip, mw.window, func() {
+		if main_app.AppStatus.CurrentLayout != main_app.LAYOUT_GRID {
+			main_app.AppStatus.CurrentLayout = main_app.LAYOUT_GRID
+			PageView.Reset()
+			mw.UpdateView()
+		}
+	})
 
-		}),
-		//page back
-		widget.NewToolbarAction(theme.NavigateNextIcon(), func() {
-			if PageView.PageForward() > 0 {
-				mw.UpdateView()
-			}
+	pageViewBtn := NewButtonWithTooltip("", theme.FileAudioIcon(), fmt.Sprintf("%-25s", "Single page View"), mw.Tooltip, mw.window, func() {
+		if main_app.AppStatus.CurrentLayout != main_app.LAYOUT_PAGE {
+			main_app.AppStatus.CurrentLayout = main_app.LAYOUT_PAGE
+			PageView.Reset()
+			mw.UpdateView()
+		}
+	})
 
-		}),
-	)
+	mw.AppWidgets.pageBackBtn = NewButtonWithTooltip("", theme.NavigateBackIcon(), fmt.Sprintf("%-25s", "Page back"), mw.Tooltip, mw.window, func() {
+		if PageView.PageBack() > 0 {
+			mw.UpdateView()
+		}
+	})
+	mw.AppWidgets.pageBackBtn.Hidden = true
+
+	mw.AppWidgets.pageForwardBtn = NewButtonWithTooltip("", theme.NavigateNextIcon(), fmt.Sprintf("%-25s", "Page forward"), mw.Tooltip, mw.window, func() {
+		if PageView.PageForward() > 0 {
+			mw.UpdateView()
+		}
+	})
+	mw.AppWidgets.pageForwardBtn.Hidden = true
+
+	viewsHbox := container.NewHBox(gridViewBtn, pageViewBtn, mw.AppWidgets.pageBackBtn, mw.AppWidgets.pageForwardBtn)
 
 	rightToolbar := widget.NewToolbar(
 		//backup database
@@ -200,7 +185,10 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 				BackupNotes(main_app.Conf.Settings.Database, mw.window)
 			})
 
-			options.Items = append(options.Items, settingsMenuItem, backupMenuItem)
+			aboutMenuItem := fyne.NewMenuItem("About", func() {
+				ShowAbout()
+			})
+			options.Items = append(options.Items, settingsMenuItem, backupMenuItem, aboutMenuItem)
 
 			popUpMenu := widget.NewPopUpMenu(options, mw.window.Canvas())
 			pos := fyne.NewPos(225, 40)
@@ -220,14 +208,13 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 	mw.AppWidgets.sortSelect.PlaceHolder = "This is how the size "
 	mw.AppWidgets.sortSelect.SetSelectedIndex(0)
 
-	mw.AppWidgets.Toolbar = toolbar
 	//rect := canvas.NewRectangle(UI_Colours.)
 	topBar := container.New(layout.NewHBoxLayout(),
 		mw.Tooltip,
 		spacerLabel,
 		mw.AppWidgets.viewLabel,
 		layout.NewSpacer(),
-		toolbar,
+		viewsHbox,
 		mw.AppWidgets.pageLabel,
 		layout.NewSpacer(),
 		sortLabel,
@@ -486,18 +473,18 @@ func (mw *MainWindow) showCurrentLayout() error {
 	switch main_app.AppStatus.CurrentLayout {
 	case main_app.LAYOUT_GRID:
 		if len(main_app.AppStatus.Notes) <= main_app.Conf.Settings.GridMaxPages {
-			mw.AppWidgets.Toolbar.Items[2].ToolbarObject().Hide() //page back
-			mw.AppWidgets.Toolbar.Items[3].ToolbarObject().Hide() //page forward
+			mw.AppWidgets.pageBackBtn.Hidden = true
+			mw.AppWidgets.pageForwardBtn.Hidden = true
 			mw.AppWidgets.pageLabel.Hide()
 		} else {
-			mw.AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // page back
-			mw.AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
+			mw.AppWidgets.pageBackBtn.Hidden = false
+			mw.AppWidgets.pageForwardBtn.Hidden = false
 			mw.AppWidgets.pageLabel.Show()
 		}
 		mw.showNotesInGrid(main_app.AppStatus.Notes)
 	case main_app.LAYOUT_PAGE:
-		mw.AppWidgets.Toolbar.Items[2].ToolbarObject().Show() // page back
-		mw.AppWidgets.Toolbar.Items[3].ToolbarObject().Show() // page forward
+		mw.AppWidgets.pageBackBtn.Hidden = false
+		mw.AppWidgets.pageForwardBtn.Hidden = false
 		mw.showNotesAsPages(main_app.AppStatus.Notes)
 	default:
 		err = errors.New("undefined layout")
