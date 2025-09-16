@@ -97,19 +97,35 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData,
 			case fyne.KeyEscape:
 				np.SetViewMode()
 			case fyne.KeyF1:
+				// print current date
 				col := np.NotePageWidgets.Entry.CursorColumn
 				row := np.NotePageWidgets.Entry.CursorRow
 				text := np.NotePageWidgets.Entry.Text
-				date := fmt.Sprint(time.Now()) // THIS NEEDS FROMATTING!!!!!!!!!!!!!!!!
+				date := time.Now().Format(main_app.Conf.Settings.DateFormat)
 				newText := note.InsertText(date, row, col, text)
 				np.NotePageWidgets.Entry.SetText(newText)
-				//can we now move the cusrsor to the new position???
 				np.NotePageWidgets.Entry.CursorColumn = col + len(date)
 				np.NotePageWidgets.Entry.Refresh()
 			case fyne.KeyF2:
-				//place holder
+				//print current time
+				col := np.NotePageWidgets.Entry.CursorColumn
+				row := np.NotePageWidgets.Entry.CursorRow
+				text := np.NotePageWidgets.Entry.Text
+				currTime := time.Now().Format(main_app.Conf.Settings.TimeFormat)
+				newText := note.InsertText(currTime, row, col, text)
+				np.NotePageWidgets.Entry.SetText(newText)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(currTime)
+				np.NotePageWidgets.Entry.Refresh()
 			case fyne.KeyF3:
-				//place holder
+				//print date & time
+				col := np.NotePageWidgets.Entry.CursorColumn
+				row := np.NotePageWidgets.Entry.CursorRow
+				text := np.NotePageWidgets.Entry.Text
+				timestamp := time.Now().Format(main_app.Conf.Settings.DateTimeFormat)
+				newText := note.InsertText(timestamp, row, col, text)
+				np.NotePageWidgets.Entry.SetText(newText)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(timestamp)
+				np.NotePageWidgets.Entry.Refresh()
 			case fyne.KeyF4:
 				//place holder
 			case fyne.KeyF5:
