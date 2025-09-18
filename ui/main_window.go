@@ -242,7 +242,7 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 		main_app.AppStatus.CurrentView = main_app.VIEW_SEARCH
 		mw.setSortOptions(main_app.VIEW_SEARCH)
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
-		mw.ShowSearchPanel()
+		mw.ToggleSearchPanel()
 	})
 
 	//pinnedBtn := widget.NewButton("P", func(){
@@ -596,7 +596,7 @@ func (mw *MainWindow) addMainKeyboardShortcuts() {
 	})
 
 	mw.window.Canvas().AddShortcut(main_app.ScFind, func(shortcut fyne.Shortcut) {
-		mw.ShowSearchPanel()
+		mw.ToggleSearchPanel()
 	})
 
 	//Keyboard shortcut to create a new note

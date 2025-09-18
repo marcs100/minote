@@ -90,12 +90,15 @@ func main() {
 }
 
 func CreateAppConfig(homeDir string) config.Config {
+	dbFile := ""
 	dbDir := ""
 	var err error
 	if runtime.GOOS != "windows" {
-		dbDir = filepath.Join(homeDir, ".minote", "minote.db")
+		dbFile = filepath.Join(homeDir, ".minote", "minote.db")
+		dbDir = filepath.Join(homeDir, ".minote")
 	} else {
-		dbDir = filepath.Join(homeDir, "MinoteData", "minote.db")
+		dbFile = filepath.Join(homeDir, "MinoteData", "minote.db")
+		dbDir = filepath.Join(homeDir, "MinoteData")
 	}
 	if _, f_err := os.Stat(dbDir); f_err != nil {
 		//create config path
@@ -104,7 +107,7 @@ func CreateAppConfig(homeDir string) config.Config {
 		}
 	}
 	appSettings := config.AppSettings{
-		Database:          dbDir,
+		Database:          dbFile,
 		InitialLayout:     "grid",
 		InitialView:       "pinned",
 		NoteHeight:        350,

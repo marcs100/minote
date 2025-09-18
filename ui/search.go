@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
 	"github.com/marcs100/minote/main_app"
 )
@@ -37,7 +38,11 @@ func (mw *MainWindow) CreateSearchPanel() *fyne.Container {
 		}
 	})
 	searchLabel := widget.NewLabel("               Search:               ")
-	mw.AppWidgets.searchEntry = widget.NewEntry()
+	mw.AppWidgets.searchEntry = NewFindEntryCustom(func(cs *desktop.CustomShortcut) {
+		if cs.ShortcutName() == main_app.ScFind.ShortcutName() {
+			mw.ToggleSearchPanel()
+		}
+	})
 	mw.AppWidgets.searchEntry.OnSubmitted = func(text string) {
 		main_app.AppStatus.CurrentView = main_app.VIEW_SEARCH
 		var err error = mw.UpdateView()
@@ -54,12 +59,12 @@ func (mw *MainWindow) CreateSearchPanel() *fyne.Container {
 	return searchPanel
 }
 
-func (mw *MainWindow) ShowSearchPanel() {
+func (mw *MainWindow) ToggleSearchPanel() {
 	if mw.AppContainers.searchPanel.Hidden {
 		mw.AppContainers.searchPanel.Show()
 		mw.window.Canvas().Focus(mw.AppWidgets.searchEntry)
 	} else {
-		mw.window.Canvas().Unfocus() //unfocuses entry to allow keyboard shortcits ro work
+		mw.window.Canvas().Unfocus() //unfocuses entry to allow keyboard shortcuts ro work
 		mw.AppContainers.searchPanel.Hide()
 	}
 	mw.window.Canvas().Refresh(mw.AppContainers.searchPanel)

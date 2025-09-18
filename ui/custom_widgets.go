@@ -79,8 +79,35 @@ func NewEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut), onEscapeK
 	return e
 }
 
-//################################################################
+// ################################################################
+type FindEntryCustom struct {
+	widget.Entry
+	onCustomShortCut func(cs *desktop.CustomShortcut)
+}
 
+func (e *FindEntryCustom) TypedShortcut(s fyne.Shortcut) {
+	var ok bool
+	var cs *desktop.CustomShortcut
+	if cs, ok = s.(*desktop.CustomShortcut); !ok {
+		//fmt.Printf("shortcut name is %s", cs.ShortcutName())
+		e.Entry.TypedShortcut(s) //not a customshort cut - pass through to normal predifined shortcuts
+		fmt.Println("** Not a custom shortcut!!")
+		return
+	}
+
+	e.onCustomShortCut(cs)
+}
+
+func NewFindEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut)) *FindEntryCustom {
+	e := &FindEntryCustom{}
+	e.ExtendBaseWidget(e)
+	e.MultiLine = false
+	e.Wrapping = fyne.TextWrapWord
+	e.onCustomShortCut = onCustomShortcut
+	return e
+}
+
+// ###############################################################
 type ButtonWithTooltip struct {
 	widget.Button
 	icon        *fyne.Resource
