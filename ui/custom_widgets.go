@@ -134,7 +134,7 @@ func (b *ButtonWithTooltip) MouseOut() {
 
 func (b *ButtonWithTooltip) Tapped(pe *fyne.PointEvent) {
 	if b.OnTapped != nil {
-		animateButton(&b.Button)
+		//animateButton(&b.Button)
 		b.OnTapped()
 
 	}
