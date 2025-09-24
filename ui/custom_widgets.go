@@ -114,6 +114,7 @@ type ButtonWithTooltip struct {
 	window      fyne.Window
 	tooltipText string
 	tooltip     *canvas.Text
+	gotTapped   bool
 }
 
 func (b *ButtonWithTooltip) MouseIn(m *desktop.MouseEvent) {
@@ -133,11 +134,7 @@ func (b *ButtonWithTooltip) MouseOut() {
 }
 
 func (b *ButtonWithTooltip) Tapped(pe *fyne.PointEvent) {
-	if b.OnTapped != nil {
-		//animateButton(&b.Button)
-		b.OnTapped()
-
-	}
+	b.Button.Tapped(pe)
 }
 
 func NewButtonWithTooltip(label string, icon fyne.Resource, tooltipText string, tooltip *canvas.Text, window fyne.Window, tapped func()) *ButtonWithTooltip {
@@ -149,6 +146,7 @@ func NewButtonWithTooltip(label string, icon fyne.Resource, tooltipText string, 
 	b.tooltip = tooltip
 	b.tooltipText = tooltipText
 	b.window = window
+	b.gotTapped = true
 	// b.tooltip = widget.NewPopUp(text, b.parent) //This popup seems to be the cause of the MouseOut event always firing!
 	return b
 }

@@ -272,6 +272,7 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 	mw.CreateNotebooksList()
 
 	notebooksBtn := NewButtonWithTooltip("", theme.FolderOpenIcon(), fmt.Sprintf("%-25s", "Action: Show notebooks"), mw.Tooltip, mw.window, func() {
+		fmt.Println("helloooooooooooooooo")
 		main_app.AppStatus.CurrentView = main_app.VIEW_NOTEBOOK
 		mw.setSortOptions(main_app.AppStatus.CurrentView)
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
