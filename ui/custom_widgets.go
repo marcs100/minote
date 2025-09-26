@@ -12,21 +12,29 @@ import (
 
 type MarkdownCustom struct {
 	widget.RichText
-	OnTapped func()
+	OnLeftMouseClick  func()
+	OnRightMouseClick func()
 }
 
 // Implement onTapped for this widget
-func (sn *MarkdownCustom) Tapped(*fyne.PointEvent) {
-	if sn.OnTapped != nil {
-		sn.OnTapped()
+func (md *MarkdownCustom) Tapped(*fyne.PointEvent) {
+	if md.OnLeftMouseClick != nil {
+		md.OnLeftMouseClick()
 	}
 }
 
-func NewMarkdownCustom(content string, tapped func()) *MarkdownCustom {
+func (md *MarkdownCustom) TappedSecondary(*fyne.PointEvent) {
+	if md.OnRightMouseClick != nil {
+		md.OnRightMouseClick()
+	}
+}
+
+func NewMarkdownCustom(content string, leftTapped func(), rightTapped func()) *MarkdownCustom {
 	rt := &MarkdownCustom{}
 	rt.ExtendBaseWidget(rt)
 	rt.AppendMarkdown(content)
-	rt.OnTapped = tapped
+	rt.OnLeftMouseClick = leftTapped
+	rt.OnRightMouseClick = rightTapped
 	return rt
 }
 
