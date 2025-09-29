@@ -272,7 +272,6 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 	mw.CreateNotebooksList()
 
 	notebooksBtn := NewButtonWithTooltip("", theme.FolderOpenIcon(), fmt.Sprintf("%-25s", "Action: Show notebooks"), mw.Tooltip, mw.window, func() {
-		fmt.Println("helloooooooooooooooo")
 		main_app.AppStatus.CurrentView = main_app.VIEW_NOTEBOOK
 		mw.setSortOptions(main_app.AppStatus.CurrentView)
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
@@ -325,6 +324,12 @@ func (mw *MainWindow) showNotesInGrid(notes []note.NoteData) {
 			} else {
 				fmt.Println("note is already open")
 			}
+		}, func() {
+			fmt.Println("right click event")
+			main_app.AppStatus.CurrentLayout = main_app.LAYOUT_PAGE
+			PageView.CurrentPage = i + 1
+			mw.UpdateView()
+
 		})
 		richText.Wrapping = fyne.TextWrapWord
 		themeBackground := canvas.NewRectangle(mw.UI_Colours.NoteBgColour) //We need this to overlay the notecolour (border)
