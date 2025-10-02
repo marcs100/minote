@@ -57,6 +57,7 @@ func createMainWindow(about main_app.About) {
 	main_app.MainApp.Settings().SetTheme(custTheme)
 
 	NewAbout(about, mw.window)
+	NewHints(mw.window)
 
 	//Main Grid container for displaying notes
 	grid := container.NewGridWrap(main_app.AppStatus.NoteSize)
@@ -188,7 +189,10 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 			aboutMenuItem := fyne.NewMenuItem("About", func() {
 				ShowAbout()
 			})
-			options.Items = append(options.Items, settingsMenuItem, backupMenuItem, aboutMenuItem)
+			hintsMenuItem := fyne.NewMenuItem("Hints/keyboard shortcuts", func() {
+				ShowHints()
+			})
+			options.Items = append(options.Items, settingsMenuItem, backupMenuItem, hintsMenuItem, aboutMenuItem)
 
 			popUpMenu := widget.NewPopUpMenu(options, mw.window.Canvas())
 			pos := fyne.NewPos(225, 40)
