@@ -50,7 +50,7 @@ type EntryCustom struct {
 func (e *EntryCustom) TypedKey(k *fyne.KeyEvent) {
 	if e.OnTypedKey != nil {
 		switch k.Name {
-		case fyne.KeyEscape, fyne.KeyF1, fyne.KeyF2, fyne.KeyF3, fyne.KeyF4, fyne.KeyF5:
+		case fyne.KeyEscape, fyne.KeyF1, fyne.KeyF2, fyne.KeyF3, fyne.KeyF4, fyne.KeyF5, fyne.KeyF6:
 			e.OnTypedKey(k)
 		default:
 			e.Entry.TypedKey(k)

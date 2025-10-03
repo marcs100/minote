@@ -127,9 +127,29 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData,
 				np.NotePageWidgets.Entry.CursorColumn = col + len(timestamp)
 				np.NotePageWidgets.Entry.Refresh()
 			case fyne.KeyF4:
-				//place holder
+				col := np.NotePageWidgets.Entry.CursorColumn
+				row := np.NotePageWidgets.Entry.CursorRow
+				text := np.NotePageWidgets.Entry.Text
+				newText := note.InsertText(main_app.Conf.Settings.F4Snippet, row, col, text)
+				np.NotePageWidgets.Entry.SetText(newText)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(main_app.Conf.Settings.F4Snippet)
+				np.NotePageWidgets.Entry.Refresh()
 			case fyne.KeyF5:
-				//place holder
+				col := np.NotePageWidgets.Entry.CursorColumn
+				row := np.NotePageWidgets.Entry.CursorRow
+				text := np.NotePageWidgets.Entry.Text
+				newText := note.InsertText(main_app.Conf.Settings.F5Snippet, row, col, text)
+				np.NotePageWidgets.Entry.SetText(newText)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(main_app.Conf.Settings.F5Snippet)
+				np.NotePageWidgets.Entry.Refresh()
+			case fyne.KeyF6:
+				col := np.NotePageWidgets.Entry.CursorColumn
+				row := np.NotePageWidgets.Entry.CursorRow
+				text := np.NotePageWidgets.Entry.Text
+				newText := note.InsertText(main_app.Conf.Settings.F6Snippet, row, col, text)
+				np.NotePageWidgets.Entry.SetText(newText)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(main_app.Conf.Settings.F6Snippet)
+				np.NotePageWidgets.Entry.Refresh()
 			}
 		},
 

@@ -32,7 +32,7 @@ func NewHints(parentWindow fyne.Window) {
 		widget.NewLabel(fmt.Sprintf("%-50s", "Show/hide recent notes:")),
 		widget.NewLabel(GetScName(main_app.ScViewRecent.ShortcutName())),
 		widget.NewLabel(fmt.Sprintf("%-50s", "Show/hide tags panel:")),
-		widget.NewLabel(GetScName(main_app.ScNoteTags.ShortcutName())),
+		widget.NewLabel(GetScName(main_app.ScShowTags.ShortcutName())),
 		widget.NewLabel(fmt.Sprintf("%-50s", "Show/hide notebooks panel:")),
 		widget.NewLabel(GetScName(main_app.ScShowNotebooks.ShortcutName())),
 		widget.NewLabel(fmt.Sprintf("%-50s", "Page forward:")),
@@ -48,15 +48,29 @@ func NewHints(parentWindow fyne.Window) {
 		widget.NewLabel(fmt.Sprintf("%-50s", "Pin/unpin note:")),
 		widget.NewLabel(GetScName(main_app.ScPinNote.ShortcutName())),
 		widget.NewLabel(fmt.Sprintf("%-50s", "Show/hide tags:")),
-		widget.NewLabel(GetScName(main_app.ScShowTags.ShortcutName())),
+		widget.NewLabel(GetScName(main_app.ScNoteTags.ShortcutName())),
 		widget.NewLabel(fmt.Sprintf("%-50s", "Change colour:")),
 		widget.NewLabel(GetScName(main_app.ScNoteColour.ShortcutName())),
 		widget.NewLabel(fmt.Sprintf("%-50s", "Select Notebook:")),
 		widget.NewLabel(GetScName(main_app.ScChangeNoteNotebook.ShortcutName())),
 		widget.NewLabel(fmt.Sprintf("%-50s", "Show/hide proprties panel:")),
-		widget.NewLabel(GetScName(main_app.ScShowInfo.ShortcutName())))
+		widget.NewLabel(GetScName(main_app.ScShowInfo.ShortcutName())),
+		widget.NewLabel(fmt.Sprintf("%-50s", "Insert date:")),
+		widget.NewLabel("F1"),
+		widget.NewLabel(fmt.Sprintf("%-50s", "Insert time:")),
+		widget.NewLabel("F2"),
+		widget.NewLabel(fmt.Sprintf("%-50s", "Insert date and time:")),
+		widget.NewLabel("F3"),
+		widget.NewLabel(fmt.Sprintf("%-50s", "Insert custom (F4) snippet:")),
+		widget.NewLabel("F4"),
+		widget.NewLabel(fmt.Sprintf("%-50s", "Insert custom (F5) snippet:")),
+		widget.NewLabel("F5"),
+		widget.NewLabel(fmt.Sprintf("%-50s", "Insert custom (F6) snippet:")),
+		widget.NewLabel("F6float64"))
 
-	custHintsDlg = dialog.NewCustom("Hints/keyboard shortcuts", "Close", hintsGrid, parentWindow)
+	scrolledCont := container.NewVScroll(hintsGrid)
+	scrolledCont.SetMinSize(fyne.NewSize(400, 900))
+	custHintsDlg = dialog.NewCustom("Hints/keyboard shortcuts", "Close", scrolledCont, parentWindow)
 }
 
 func GetScName(longName string) string {

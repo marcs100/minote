@@ -17,6 +17,9 @@ type AppSettings struct {
 	DateFormat        string  `toml:"date_format"`
 	TimeFormat        string  `toml:"time_format"`
 	DateTimeFormat    string  `toml:"date_time_format"`
+	F4Snippet         string  `toml:"f4_snippet"`
+	F5Snippet         string  `toml:"f5_snippet"`
+	F6Snippet         string  `toml:"f6_snippet"`
 	ThemeVariant      string  `toml:"theme_variant"`
 	DarkColourNote    string  `toml:"dark_colour_note"`
 	LightColourNote   string  `toml:"light_colour_note"`
