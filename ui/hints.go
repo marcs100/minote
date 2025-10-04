@@ -66,7 +66,7 @@ func NewHints(parentWindow fyne.Window) {
 		widget.NewLabel(fmt.Sprintf("%-50s", "Insert custom (F5) snippet:")),
 		widget.NewLabel("F5"),
 		widget.NewLabel(fmt.Sprintf("%-50s", "Insert custom (F6) snippet:")),
-		widget.NewLabel("F6float64"))
+		widget.NewLabel("F6"))
 
 	scrolledCont := container.NewVScroll(hintsGrid)
 	scrolledCont.SetMinSize(fyne.NewSize(400, 900))

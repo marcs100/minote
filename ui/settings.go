@@ -105,6 +105,32 @@ func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 	}
 	fontGrid := container.NewGridWithRows(1, fontSizeLabel, fontSizeEntry)
 
+	snippetsHeading := widget.NewRichTextFromMarkdown("### Text Snippets")
+	F4TextSnipLabel := widget.NewLabel("  Snippet (F4):")
+	f4TextSnipEntry := widget.NewEntry()
+	f4TextSnipEntry.SetText(newConf.Settings.F4Snippet)
+	f4TextSnipEntry.OnChanged = func(snippet string) {
+		newConf.Settings.F4Snippet = snippet
+	}
+	f4ScrollSnip := container.NewHScroll(f4TextSnipEntry)
+	f4SnipGrid := container.NewGridWithRows(1, F4TextSnipLabel, f4ScrollSnip)
+	F5TextSnipLabel := widget.NewLabel("  Snippet (F5):")
+	f5TextSnipEntry := widget.NewEntry()
+	f5TextSnipEntry.SetText(newConf.Settings.F5Snippet)
+	f5TextSnipEntry.OnChanged = func(snippet string) {
+		newConf.Settings.F5Snippet = snippet
+	}
+	f5ScrollSnip := container.NewHScroll(f5TextSnipEntry)
+	f5SnipGrid := container.NewGridWithRows(1, F5TextSnipLabel, f5ScrollSnip)
+	F6TextSnipLabel := widget.NewLabel("  Snippet (F6):")
+	f6TextSnipEntry := widget.NewEntry()
+	f6TextSnipEntry.SetText(newConf.Settings.F6Snippet)
+	f6ScrollSnip := container.NewHScroll(f6TextSnipEntry)
+	f6TextSnipEntry.OnChanged = func(snippet string) {
+		newConf.Settings.F6Snippet = snippet
+	}
+	f6SnipGrid := container.NewGridWithRows(1, F6TextSnipLabel, f6ScrollSnip)
+
 	vbox := container.NewVBox(
 		viewHeading,
 		viewGrid,
@@ -115,6 +141,10 @@ func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 		appearanceHeading,
 		appearanceGrid,
 		fontGrid,
+		snippetsHeading,
+		f4SnipGrid,
+		f5SnipGrid,
+		f6SnipGrid,
 		widget.NewLabel(" "),
 	)
 
@@ -162,6 +192,9 @@ func CopySettings() config.Config {
 			DateFormat:        main_app.Conf.Settings.DateFormat,
 			TimeFormat:        main_app.Conf.Settings.TimeFormat,
 			DateTimeFormat:    main_app.Conf.Settings.DateTimeFormat,
+			F4Snippet:         main_app.Conf.Settings.F4Snippet,
+			F5Snippet:         main_app.Conf.Settings.F5Snippet,
+			F6Snippet:         main_app.Conf.Settings.F6Snippet,
 			ThemeVariant:      main_app.Conf.Settings.ThemeVariant,
 			FontSize:          main_app.Conf.Settings.FontSize,
 			DarkColourNote:    main_app.Conf.Settings.DarkColourNote,
