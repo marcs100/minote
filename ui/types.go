@@ -36,7 +36,8 @@ type ApplicationWidgets struct {
 	pageLabel      *widget.Label
 	notebooksList  *widget.List
 	//tagsList           *widget.List
-	searchEntry        *widget.Entry
+	// searchEntry        *widget.Entry
+	searchEntry        *FindEntryCustom
 	searchResultsLabel *widget.Label
 	sortSelect         *widget.Select
 	pageForwardBtn     *ButtonWithTooltip

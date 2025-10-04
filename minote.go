@@ -13,7 +13,7 @@ import (
 	"github.com/marcs100/minote/ui"
 )
 
-const VERSION = "0.009"
+const VERSION = "1.0"
 
 func main() {
 	var err error
@@ -90,12 +90,15 @@ func main() {
 }
 
 func CreateAppConfig(homeDir string) config.Config {
+	dbFile := ""
 	dbDir := ""
 	var err error
 	if runtime.GOOS != "windows" {
-		dbDir = filepath.Join(homeDir, ".minote", "minote.db")
+		dbFile = filepath.Join(homeDir, ".minote", "minote.db")
+		dbDir = filepath.Join(homeDir, ".minote")
 	} else {
-		dbDir = filepath.Join(homeDir, "MinoteData", "minote.db")
+		dbFile = filepath.Join(homeDir, "MinoteData", "minote.db")
+		dbDir = filepath.Join(homeDir, "MinoteData")
 	}
 	if _, f_err := os.Stat(dbDir); f_err != nil {
 		//create config path
@@ -104,7 +107,7 @@ func CreateAppConfig(homeDir string) config.Config {
 		}
 	}
 	appSettings := config.AppSettings{
-		Database:          dbDir,
+		Database:          dbFile,
 		InitialLayout:     "grid",
 		InitialView:       "pinned",
 		NoteHeight:        350,
@@ -115,6 +118,9 @@ func CreateAppConfig(homeDir string) config.Config {
 		DateFormat:        "02-01-2006",
 		TimeFormat:        "15:04",
 		DateTimeFormat:    "[02-01-2006 at 15:04]",
+		F4Snippet:         "custom snippet F4",
+		F5Snippet:         "custom snippet F5",
+		F6Snippet:         "custom snippet F6",
 		ThemeVariant:      "auto",
 		DarkColourNote:    "#242424",
 		LightColourNote:   "#e2e2e2",

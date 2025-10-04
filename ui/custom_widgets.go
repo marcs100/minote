@@ -12,21 +12,29 @@ import (
 
 type MarkdownCustom struct {
 	widget.RichText
-	OnTapped func()
+	OnLeftMouseClick  func()
+	OnRightMouseClick func()
 }
 
 // Implement onTapped for this widget
-func (sn *MarkdownCustom) Tapped(*fyne.PointEvent) {
-	if sn.OnTapped != nil {
-		sn.OnTapped()
+func (md *MarkdownCustom) Tapped(*fyne.PointEvent) {
+	if md.OnLeftMouseClick != nil {
+		md.OnLeftMouseClick()
 	}
 }
 
-func NewMarkdownCustom(content string, tapped func()) *MarkdownCustom {
+func (md *MarkdownCustom) TappedSecondary(*fyne.PointEvent) {
+	if md.OnRightMouseClick != nil {
+		md.OnRightMouseClick()
+	}
+}
+
+func NewMarkdownCustom(content string, leftTapped func(), rightTapped func()) *MarkdownCustom {
 	rt := &MarkdownCustom{}
 	rt.ExtendBaseWidget(rt)
 	rt.AppendMarkdown(content)
-	rt.OnTapped = tapped
+	rt.OnLeftMouseClick = leftTapped
+	rt.OnRightMouseClick = rightTapped
 	return rt
 }
 
@@ -42,7 +50,7 @@ type EntryCustom struct {
 func (e *EntryCustom) TypedKey(k *fyne.KeyEvent) {
 	if e.OnTypedKey != nil {
 		switch k.Name {
-		case fyne.KeyEscape, fyne.KeyF1, fyne.KeyF2, fyne.KeyF3, fyne.KeyF4, fyne.KeyF5:
+		case fyne.KeyEscape, fyne.KeyF1, fyne.KeyF2, fyne.KeyF3, fyne.KeyF4, fyne.KeyF5, fyne.KeyF6:
 			e.OnTypedKey(k)
 		default:
 			e.Entry.TypedKey(k)
@@ -79,14 +87,42 @@ func NewEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut), onEscapeK
 	return e
 }
 
-//################################################################
+// ################################################################
+type FindEntryCustom struct {
+	widget.Entry
+	onCustomShortCut func(cs *desktop.CustomShortcut)
+}
 
+func (e *FindEntryCustom) TypedShortcut(s fyne.Shortcut) {
+	var ok bool
+	var cs *desktop.CustomShortcut
+	if cs, ok = s.(*desktop.CustomShortcut); !ok {
+		//fmt.Printf("shortcut name is %s", cs.ShortcutName())
+		e.Entry.TypedShortcut(s) //not a customshort cut - pass through to normal predifined shortcuts
+		fmt.Println("** Not a custom shortcut!!")
+		return
+	}
+
+	e.onCustomShortCut(cs)
+}
+
+func NewFindEntryCustom(onCustomShortcut func(cs *desktop.CustomShortcut)) *FindEntryCustom {
+	e := &FindEntryCustom{}
+	e.ExtendBaseWidget(e)
+	e.MultiLine = false
+	e.Wrapping = fyne.TextWrapWord
+	e.onCustomShortCut = onCustomShortcut
+	return e
+}
+
+// ###############################################################
 type ButtonWithTooltip struct {
 	widget.Button
 	icon        *fyne.Resource
 	window      fyne.Window
 	tooltipText string
 	tooltip     *canvas.Text
+	gotTapped   bool
 }
 
 func (b *ButtonWithTooltip) MouseIn(m *desktop.MouseEvent) {
@@ -106,11 +142,7 @@ func (b *ButtonWithTooltip) MouseOut() {
 }
 
 func (b *ButtonWithTooltip) Tapped(pe *fyne.PointEvent) {
-	if b.OnTapped != nil {
-		animateButton(&b.Button)
-		b.OnTapped()
-
-	}
+	b.Button.Tapped(pe)
 }
 
 func NewButtonWithTooltip(label string, icon fyne.Resource, tooltipText string, tooltip *canvas.Text, window fyne.Window, tapped func()) *ButtonWithTooltip {
@@ -122,6 +154,7 @@ func NewButtonWithTooltip(label string, icon fyne.Resource, tooltipText string, 
 	b.tooltip = tooltip
 	b.tooltipText = tooltipText
 	b.window = window
+	b.gotTapped = true
 	// b.tooltip = widget.NewPopUp(text, b.parent) //This popup seems to be the cause of the MouseOut event always firing!
 	return b
 }

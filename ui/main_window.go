@@ -57,6 +57,7 @@ func createMainWindow(about main_app.About) {
 	main_app.MainApp.Settings().SetTheme(custTheme)
 
 	NewAbout(about, mw.window)
+	NewHints(mw.window)
 
 	//Main Grid container for displaying notes
 	grid := container.NewGridWrap(main_app.AppStatus.NoteSize)
@@ -188,7 +189,10 @@ func (mw *MainWindow) createTopPanel() *fyne.Container {
 			aboutMenuItem := fyne.NewMenuItem("About", func() {
 				ShowAbout()
 			})
-			options.Items = append(options.Items, settingsMenuItem, backupMenuItem, aboutMenuItem)
+			hintsMenuItem := fyne.NewMenuItem("Hints/keyboard shortcuts", func() {
+				ShowHints()
+			})
+			options.Items = append(options.Items, settingsMenuItem, backupMenuItem, hintsMenuItem, aboutMenuItem)
 
 			popUpMenu := widget.NewPopUpMenu(options, mw.window.Canvas())
 			pos := fyne.NewPos(225, 40)
@@ -242,7 +246,7 @@ func (mw *MainWindow) createSidePanel() *fyne.Container {
 		main_app.AppStatus.CurrentView = main_app.VIEW_SEARCH
 		mw.setSortOptions(main_app.VIEW_SEARCH)
 		mw.AppWidgets.sortSelect.SetSelectedIndex(0)
-		mw.ShowSearchPanel()
+		mw.ToggleSearchPanel()
 	})
 
 	//pinnedBtn := widget.NewButton("P", func(){
@@ -324,6 +328,12 @@ func (mw *MainWindow) showNotesInGrid(notes []note.NoteData) {
 			} else {
 				fmt.Println("note is already open")
 			}
+		}, func() {
+			fmt.Println("right click event")
+			main_app.AppStatus.CurrentLayout = main_app.LAYOUT_PAGE
+			PageView.CurrentPage = i + 1
+			mw.UpdateView()
+
 		})
 		richText.Wrapping = fyne.TextWrapWord
 		themeBackground := canvas.NewRectangle(mw.UI_Colours.NoteBgColour) //We need this to overlay the notecolour (border)
@@ -596,7 +606,7 @@ func (mw *MainWindow) addMainKeyboardShortcuts() {
 	})
 
 	mw.window.Canvas().AddShortcut(main_app.ScFind, func(shortcut fyne.Shortcut) {
-		mw.ShowSearchPanel()
+		mw.ToggleSearchPanel()
 	})
 
 	//Keyboard shortcut to create a new note

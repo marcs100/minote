@@ -14,21 +14,17 @@ import (
 var custAboutDlg *dialog.CustomDialog
 
 func NewAbout(about main_app.About, parentWindow fyne.Window) {
-	aboutGrid := container.NewGridWithColumns(1,
-		container.NewHBox(
-			widget.NewLabel("Minote: "),
-			widget.NewRichTextFromMarkdown(fmt.Sprintf("**v%s**", about.Version))),
-		container.NewHBox(
-			widget.NewLabel("Licence: "),
-			widget.NewRichTextFromMarkdown(fmt.Sprintf("[%s](%s)", about.Licence, about.LicenceLink))),
-		container.NewHBox(
-			widget.NewLabel("Website: "),
-			widget.NewRichTextFromMarkdown(fmt.Sprintf("[%s](%s)", about.Website, about.Website))),
-		container.NewHBox(
-			widget.NewLabel("Maintainer: "),
-			widget.NewRichTextFromMarkdown(fmt.Sprintf("**%s**", about.Maintainer))))
+	aboutGrid := container.NewGridWithColumns(2,
+		widget.NewLabel("Minote:"),
+		widget.NewRichTextFromMarkdown(fmt.Sprintf("**v%s**", about.Version)),
+		widget.NewLabel("Licence:"),
+		widget.NewRichTextFromMarkdown(fmt.Sprintf("[%s](%s)", about.Licence, about.LicenceLink)),
+		widget.NewLabel("Website:"),
+		widget.NewRichTextFromMarkdown(fmt.Sprintf("[%s](%s)", about.Website, about.Website)),
+		widget.NewLabel("Maintainer:"),
+		widget.NewRichTextFromMarkdown(fmt.Sprintf("**%s**", about.Maintainer)))
 
-	custAboutDlg = dialog.NewCustom("About", "Ok", aboutGrid, parentWindow)
+	custAboutDlg = dialog.NewCustom("About", "Close", aboutGrid, parentWindow)
 }
 
 func ShowAbout() {
