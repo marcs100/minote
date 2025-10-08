@@ -16,7 +16,7 @@ type AppSettings struct {
 	FontSize          float32 `toml:"font_size"`
 	DateFormat        string  `toml:"date_format"`
 	TimeFormat        string  `toml:"time_format"`
-	DateTimeFormat    string  `toml:"date_time_format"`
+	F3Snippet         string  `toml:"f3_snippet"`
 	F4Snippet         string  `toml:"f4_snippet"`
 	F5Snippet         string  `toml:"f5_snippet"`
 	F6Snippet         string  `toml:"f6_snippet"`

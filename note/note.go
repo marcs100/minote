@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/marcs100/minote/minotedb"
 )
@@ -174,4 +175,13 @@ func InsertText(textToInsert string, row int, col int, textIn string) string {
 		newText = fmt.Sprint(newText, l, "\n")
 	}
 	return newText
+}
+
+// substitute {date and {time}}
+func ProcessSnippet(snippet string, dateFormat string, timeFormat string) string {
+	date := time.Now().Format(dateFormat)
+	time := time.Now().Format(timeFormat)
+	pass1 := strings.Replace(snippet, "{date}", date, -1)
+	newSnippet := strings.Replace(pass1, "{time}", time, -1)
+	return newSnippet
 }

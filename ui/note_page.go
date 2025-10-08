@@ -117,38 +117,48 @@ func (np *NotePage) NewNotePage(retrievedNote *note.NoteData,
 				np.NotePageWidgets.Entry.CursorColumn = col + len(currTime)
 				np.NotePageWidgets.Entry.Refresh()
 			case fyne.KeyF3:
-				//print date & time
 				col := np.NotePageWidgets.Entry.CursorColumn
 				row := np.NotePageWidgets.Entry.CursorRow
 				text := np.NotePageWidgets.Entry.Text
-				timestamp := time.Now().Format(main_app.Conf.Settings.DateTimeFormat)
-				newText := note.InsertText(timestamp, row, col, text)
+				snippet := note.ProcessSnippet(main_app.Conf.Settings.F3Snippet,
+					main_app.Conf.Settings.DateFormat,
+					main_app.Conf.Settings.TimeFormat)
+				newText := note.InsertText(snippet, row, col, text)
 				np.NotePageWidgets.Entry.SetText(newText)
-				np.NotePageWidgets.Entry.CursorColumn = col + len(timestamp)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(snippet)
 				np.NotePageWidgets.Entry.Refresh()
 			case fyne.KeyF4:
 				col := np.NotePageWidgets.Entry.CursorColumn
 				row := np.NotePageWidgets.Entry.CursorRow
 				text := np.NotePageWidgets.Entry.Text
-				newText := note.InsertText(main_app.Conf.Settings.F4Snippet, row, col, text)
+				snippet := note.ProcessSnippet(main_app.Conf.Settings.F4Snippet,
+					main_app.Conf.Settings.DateFormat,
+					main_app.Conf.Settings.TimeFormat)
+				newText := note.InsertText(snippet, row, col, text)
 				np.NotePageWidgets.Entry.SetText(newText)
-				np.NotePageWidgets.Entry.CursorColumn = col + len(main_app.Conf.Settings.F4Snippet)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(snippet)
 				np.NotePageWidgets.Entry.Refresh()
 			case fyne.KeyF5:
 				col := np.NotePageWidgets.Entry.CursorColumn
 				row := np.NotePageWidgets.Entry.CursorRow
 				text := np.NotePageWidgets.Entry.Text
-				newText := note.InsertText(main_app.Conf.Settings.F5Snippet, row, col, text)
+				snippet := note.ProcessSnippet(main_app.Conf.Settings.F5Snippet,
+					main_app.Conf.Settings.DateFormat,
+					main_app.Conf.Settings.TimeFormat)
+				newText := note.InsertText(snippet, row, col, text)
 				np.NotePageWidgets.Entry.SetText(newText)
-				np.NotePageWidgets.Entry.CursorColumn = col + len(main_app.Conf.Settings.F5Snippet)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(snippet)
 				np.NotePageWidgets.Entry.Refresh()
 			case fyne.KeyF6:
 				col := np.NotePageWidgets.Entry.CursorColumn
 				row := np.NotePageWidgets.Entry.CursorRow
 				text := np.NotePageWidgets.Entry.Text
-				newText := note.InsertText(main_app.Conf.Settings.F6Snippet, row, col, text)
+				snippet := note.ProcessSnippet(main_app.Conf.Settings.F6Snippet,
+					main_app.Conf.Settings.DateFormat,
+					main_app.Conf.Settings.TimeFormat)
+				newText := note.InsertText(snippet, row, col, text)
 				np.NotePageWidgets.Entry.SetText(newText)
-				np.NotePageWidgets.Entry.CursorColumn = col + len(main_app.Conf.Settings.F6Snippet)
+				np.NotePageWidgets.Entry.CursorColumn = col + len(snippet)
 				np.NotePageWidgets.Entry.Refresh()
 			}
 		},

@@ -106,14 +106,24 @@ func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 	fontGrid := container.NewGridWithRows(1, fontSizeLabel, fontSizeEntry)
 
 	snippetsHeading := widget.NewRichTextFromMarkdown("### Text Snippets")
-	F4TextSnipLabel := widget.NewLabel("  Snippet (F4):")
+
+	f3TextSnipLabel := widget.NewLabel("  Snippet (F3):")
+	f3TextSnipEntry := widget.NewEntry()
+	f3TextSnipEntry.SetText(newConf.Settings.F3Snippet)
+	f3TextSnipEntry.OnChanged = func(snippet string) {
+		newConf.Settings.F4Snippet = snippet
+	}
+	f3ScrollSnip := container.NewHScroll(f3TextSnipEntry)
+	f3SnipGrid := container.NewGridWithRows(1, f3TextSnipLabel, f3ScrollSnip)
+
+	f4TextSnipLabel := widget.NewLabel("  Snippet (F4):")
 	f4TextSnipEntry := widget.NewEntry()
 	f4TextSnipEntry.SetText(newConf.Settings.F4Snippet)
 	f4TextSnipEntry.OnChanged = func(snippet string) {
 		newConf.Settings.F4Snippet = snippet
 	}
 	f4ScrollSnip := container.NewHScroll(f4TextSnipEntry)
-	f4SnipGrid := container.NewGridWithRows(1, F4TextSnipLabel, f4ScrollSnip)
+	f4SnipGrid := container.NewGridWithRows(1, f4TextSnipLabel, f4ScrollSnip)
 	F5TextSnipLabel := widget.NewLabel("  Snippet (F5):")
 	f5TextSnipEntry := widget.NewEntry()
 	f5TextSnipEntry.SetText(newConf.Settings.F5Snippet)
@@ -122,14 +132,14 @@ func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 	}
 	f5ScrollSnip := container.NewHScroll(f5TextSnipEntry)
 	f5SnipGrid := container.NewGridWithRows(1, F5TextSnipLabel, f5ScrollSnip)
-	F6TextSnipLabel := widget.NewLabel("  Snippet (F6):")
+	f6TextSnipLabel := widget.NewLabel("  Snippet (F6):")
 	f6TextSnipEntry := widget.NewEntry()
 	f6TextSnipEntry.SetText(newConf.Settings.F6Snippet)
 	f6ScrollSnip := container.NewHScroll(f6TextSnipEntry)
 	f6TextSnipEntry.OnChanged = func(snippet string) {
 		newConf.Settings.F6Snippet = snippet
 	}
-	f6SnipGrid := container.NewGridWithRows(1, F6TextSnipLabel, f6ScrollSnip)
+	f6SnipGrid := container.NewGridWithRows(1, f6TextSnipLabel, f6ScrollSnip)
 
 	vbox := container.NewVBox(
 		viewHeading,
@@ -142,6 +152,7 @@ func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 		appearanceGrid,
 		fontGrid,
 		snippetsHeading,
+		f3SnipGrid,
 		f4SnipGrid,
 		f5SnipGrid,
 		f6SnipGrid,
@@ -191,7 +202,7 @@ func CopySettings() config.Config {
 			GridMaxPages:      main_app.Conf.Settings.GridMaxPages,
 			DateFormat:        main_app.Conf.Settings.DateFormat,
 			TimeFormat:        main_app.Conf.Settings.TimeFormat,
-			DateTimeFormat:    main_app.Conf.Settings.DateTimeFormat,
+			F3Snippet:         main_app.Conf.Settings.F3Snippet,
 			F4Snippet:         main_app.Conf.Settings.F4Snippet,
 			F5Snippet:         main_app.Conf.Settings.F5Snippet,
 			F6Snippet:         main_app.Conf.Settings.F6Snippet,

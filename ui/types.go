@@ -11,12 +11,6 @@ import (
 
 type ThemeVariant int
 
-type PageViewStatus struct {
-	NumberOfPages int
-	CurrentPage   int
-	Step          int
-}
-
 // containers for main window
 type ApplicationContainers struct {
 	grid              *fyne.Container

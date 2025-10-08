@@ -117,7 +117,7 @@ func CreateAppConfig(homeDir string) config.Config {
 		FontSize:          12,
 		DateFormat:        "02-01-2006",
 		TimeFormat:        "15:04",
-		DateTimeFormat:    "[02-01-2006 at 15:04]",
+		F3Snippet:         "completed on {date} at {time}",
 		F4Snippet:         "custom snippet F4",
 		F5Snippet:         "custom snippet F5",
 		F6Snippet:         "custom snippet F6",

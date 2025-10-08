@@ -1,12 +1,15 @@
 package ui
 
-//import "fyne.io/fyne/v2"
+import (
+	"github.com/marcs100/minote/notes"
+)
 
 //var mainWindow fyne.Window
 
 // var AppContainers ApplicationContainers //structure containing pointers to fyne containers for main window
 // var AppWidgets ApplicationWidgets       //structure containing pointers to fyne widgets for main window
-var PageView PageViewStatus //structure to track page numbers
+var PageView notes.PageViewStatus //structure to track page numbers
+
 var SortViews = map[string]int{
 	"Modified: new to old":   0,
 	"Modified: old to new":   1,
