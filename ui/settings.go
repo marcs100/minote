@@ -94,11 +94,6 @@ func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 				return
 			}
 			i := float32(f64)
-			if i < 5 || i > 80 {
-				dialog.ShowInformation("Settings Error", "Font size must be between 5 and 80", parentWindow)
-				fontSizeEntry.SetText("")
-				return
-			}
 			fontSizeEntry.SetText(fmt.Sprintf("%.1f", i))
 			newConf.Settings.FontSize = i
 		}
@@ -169,6 +164,19 @@ func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 				return
 			}
 
+			// f64, err := strconv.ParseFloat(fontSizeEntry.Text, 32)
+			// if err != nil {
+			// 	fontSizeEntry.SetText("")
+			// 	dialog.ShowInformation("Settings Error", "Could not parse font size, settings wil NOT be saved!", parentWindow)
+			// 	return
+			// }
+			// i := float32(f64)
+			// if i < 5 || i > 80 {
+			// 	dialog.ShowInformation("Settings Error", "Font size must be between 5 and 80, settings will NOT ne saved!", parentWindow)
+			// 	fontSizeEntry.SetText("")
+			// 	return
+			// }
+
 			if newConf != *main_app.Conf {
 				var err error = nil
 				if err = main_app.ValidateConfig(&newConf); err != nil {
@@ -186,7 +194,6 @@ func ShowSettings(parentWindow fyne.Window, UI_Colours AppColours) {
 	}, parentWindow)
 
 	d.Show()
-
 }
 
 func CopySettings() config.Config {
